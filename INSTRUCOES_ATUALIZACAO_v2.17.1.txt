@@ -1,0 +1,46 @@
+APONTA P3 v2.17.1 — CAMPOS PESQUISÁVEIS
+============================================
+
+TELA ATUALIZADA
+---------------
+Apontamentos.
+
+CAMPOS COM PESQUISA
+-------------------
+- Colaborador
+- Projeto
+- Área
+- Setor
+- Tipo de painel
+- Sala
+- Módulo
+- Parte do módulo
+- Atividade
+- Colaborador do filtro
+
+COMO USAR
+---------
+1. Toque ou clique no campo.
+2. Digite parte do código ou nome.
+3. Selecione a opção mostrada.
+4. Também é possível usar as setas do teclado e Enter.
+
+Exemplos:
+- Digitar TB14 para localizar o projeto.
+- Digitar estrutural para localizar a área.
+- Digitar HVAC 02 para localizar a sala.
+- Digitar MES-024 ou acoplamento para localizar a atividade.
+
+ATUALIZAÇÃO
+-----------
+Substitua:
+- index.html
+- app-v2.17.1.js
+- style-v2.17.1.css
+- sw.js
+- limpar-cache.html
+- netlify.toml
+- VERSAO.txt
+
+Mantenha o config.js atual.
+Não é necessário executar SQL.

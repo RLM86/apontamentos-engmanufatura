@@ -1,0 +1,12 @@
+APONTA P3 v2.17.0
+
+1. Faça backup manual.
+2. Execute ATUALIZAR_BANCO_v2.17_ATIVIDADES_CODIGOS_REVISADOS.sql no SQL Editor do Supabase.
+3. Publique os arquivos no Git/Netlify mantendo o config.js atual.
+4. Abra /limpar-cache.html.
+5. Confirme v2.17.0.
+
+EXCLUSÃO MÚLTIPLA
+Cadastros > Composição do projeto > Salas cadastradas.
+Marque as salas e use Inativar selecionadas ou Excluir selecionadas.
+Salas com apontamentos históricos não podem ser apagadas; use Inativar.
