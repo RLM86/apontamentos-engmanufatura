@@ -1,2 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.16.0
-Salas múltiplas por tipo e módulos com partes inferior/superior.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.16.2
+Revisão móvel aplicada a todas as abas e subabas.

@@ -1,0 +1,55 @@
+APONTA P3 v2.16.2 — REVISÃO MÓVEL DE TODAS AS TELAS
+=======================================================
+
+TELAS REVISADAS
+---------------
+- Painel
+- Apresentação
+- Apontamentos
+- Férias e Afastamentos
+- Fechamento
+- Relatórios
+- Meu perfil
+- Cadastros e todas as subabas
+- Importar Excel
+- Backup
+- Equipe
+- Janelas de edição
+
+COMPORTAMENTO NO CELULAR
+------------------------
+As tabelas deixam de ser uma faixa horizontal e aparecem como cartões.
+
+Exemplo:
+
+Projeto
+TB14
+
+Sala
+DH 01
+
+Módulos
+8
+
+Ações
+[Editar]
+[Inativar]
+[Excluir]
+
+COMO ATUALIZAR
+--------------
+Substitua:
+- index.html
+- app-v2.16.2.js
+- style-v2.16.2.css
+- sw.js
+- limpar-cache.html
+- netlify.toml
+- VERSAO.txt
+
+Mantenha o seu config.js.
+
+Não é necessário executar SQL.
+
+Depois da publicação, abra:
+https://ENDERECO-DO-APP/limpar-cache.html

@@ -1,0 +1,52 @@
+APONTA P3 v2.16.1 — CORREÇÃO DA ABA EQUIPE NO CELULAR
+=========================================================
+
+PROBLEMA CORRIGIDO
+------------------
+A tabela da equipe mantinha uma largura mínima de computador.
+No celular, isso cortava campos e botões à direita.
+
+NOVA EXIBIÇÃO
+-------------
+Cada colaborador aparece em um cartão de uma única coluna:
+
+Nome
+[campo completo]
+
+E-mail
+[e-mail completo]
+
+Perfil
+[seleção completa]
+
+Jornada
+[campo completo]
+
+Ativo
+[seleção completa]
+
+Inscrição
+[status]
+
+Revisão
+[data e responsável]
+
+Ações
+[botões completos]
+
+ATUALIZAÇÃO
+-----------
+Substitua:
+- index.html
+- app-v2.16.1.js
+- style-v2.16.1.css
+- sw.js
+- limpar-cache.html
+- netlify.toml
+- VERSAO.txt
+
+Mantenha o config.js atual.
+Não é necessário executar SQL.
+
+Após publicar, abra:
+https://ENDERECO-DO-APP/limpar-cache.html
