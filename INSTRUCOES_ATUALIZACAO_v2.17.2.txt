@@ -1,0 +1,35 @@
+APONTA P3 v2.17.2 — ATUALIZAÇÃO
+=================================
+
+ALTERAÇÕES
+----------
+1. A versão não aparece mais no cabeçalho.
+2. Observações de atividades são opcionais.
+3. Códigos de atividade não usam o prefixo EM-.
+   Exemplo: EM-SST-020 passa a ser SST-020.
+4. Ao abrir pelo celular, aparece a opção de instalação:
+   - Android: Instalar app;
+   - iPhone/iPad: Compartilhar > Adicionar à Tela de Início.
+5. Em Cadastros > Composição do projeto:
+   - inicia em Selecionar projeto;
+   - mantém a seleção enquanto o usuário permanece na tela;
+   - limpa a seleção quando o usuário muda de tela ou subaba.
+
+ORDEM
+-----
+1. Execute no Supabase:
+   ATUALIZAR_BANCO_v2.17.2_CODIGOS_OBSERVACOES.sql
+
+2. Publique:
+   - index.html
+   - app-v2.17.2.js
+   - style-v2.17.2.css
+   - sw.js
+   - limpar-cache.html
+   - netlify.toml
+   - VERSAO.txt
+
+3. Mantenha o seu config.js atual.
+
+4. Abra:
+   https://ENDERECO-DO-APP/limpar-cache.html

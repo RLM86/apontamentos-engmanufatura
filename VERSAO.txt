@@ -1,2 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.17.1
-Caixas de seleção pesquisáveis na tela de Apontamentos.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.17.3
+MONOBLOCO sem seleção de parte inferior ou superior.

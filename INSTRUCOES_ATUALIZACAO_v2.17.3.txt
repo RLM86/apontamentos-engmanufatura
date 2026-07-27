@@ -1,0 +1,45 @@
+APONTA P3 v2.17.3 — MONOBLOCO SEM INFERIOR/SUPERIOR
+======================================================
+
+REGRA
+-----
+MONOBLOCO não possui seleção de parte inferior ou superior.
+
+APONTAMENTO
+-----------
+Fluxo do MONOBLOCO:
+
+Projeto
+Área: Montagem Estrutural
+Sala: MONOBLOCO
+Módulo
+Atividade
+Data
+Horas
+Observação opcional
+
+O campo Parte do módulo não aparece e não é obrigatório.
+
+CADASTRO DE MÓDULOS
+-------------------
+Ao escolher uma sala MONOBLOCO:
+- os controles Inferior e Superior são ocultados;
+- novos módulos são salvos sem partes;
+- a tabela mostra “Não se aplica”.
+
+ATUALIZAÇÃO
+-----------
+Substitua:
+- index.html
+- app-v2.17.3.js
+- style-v2.17.3.css
+- sw.js
+- limpar-cache.html
+- netlify.toml
+- VERSAO.txt
+
+Mantenha o config.js atual.
+Não é necessário executar SQL.
+
+Após publicar, abra:
+https://ENDERECO-DO-APP/limpar-cache.html
