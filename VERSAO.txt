@@ -1,2 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.17.3
-MONOBLOCO sem seleção de parte inferior ou superior.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.17.4
+Salas cadastradas exibidas para todos os projetos, sem depender da seleção.

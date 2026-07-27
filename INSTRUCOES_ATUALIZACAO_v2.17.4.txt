@@ -1,0 +1,33 @@
+APONTA P3 v2.17.4 — TODAS AS SALAS VISÍVEIS
+==============================================
+
+ALTERAÇÃO
+---------
+Em Cadastros > Composição do projeto > Salas cadastradas:
+
+- todas as salas de todos os projetos ficam visíveis;
+- não é necessário selecionar um projeto para consultar as salas;
+- a tabela é ordenada pelo nome do projeto;
+- a seleção múltipla funciona com toda a lista visível.
+
+O campo Projeto da parte superior serve para:
+- cadastrar novas salas;
+- configurar a composição do projeto;
+- consultar os módulos avançados daquele projeto.
+
+ATUALIZAÇÃO
+-----------
+Substitua:
+- index.html
+- app-v2.17.4.js
+- style-v2.17.4.css
+- sw.js
+- limpar-cache.html
+- netlify.toml
+- VERSAO.txt
+
+Mantenha o config.js atual.
+Não é necessário executar SQL.
+
+Depois da publicação, abra:
+https://ENDERECO-DO-APP/limpar-cache.html

@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
   <meta name="description" content="Apontamento de horas compartilhado da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.17.3">
+  <link rel="manifest" href="manifest.webmanifest?v=2.17.4">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.17.3.css?build=2173">
+  <link rel="stylesheet" href="style-v2.17.4.css?build=2174">
   <title>Modular | Apontamento de Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -499,7 +499,7 @@
 
           <article class="card structure-summary-card">
             <div class="section-heading compact-heading">
-              <div><h3>Salas cadastradas</h3><p>Selecione uma ou várias salas para inativar ou excluir em conjunto.</p></div>
+              <div><h3>Salas cadastradas</h3><p>Todas as salas de todos os projetos são exibidas abaixo. Selecione uma ou várias para inativar ou excluir em conjunto.</p></div>
             </div>
             <div id="bulkProjectRoomActions" class="bulk-room-actions">
               <label class="bulk-select-all"><input id="selectAllProjectRooms" type="checkbox"> Selecionar todas visíveis</label>
@@ -884,7 +884,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.17.3.js?build=2173"></script>
+  <script src="app-v2.17.4.js?build=2174"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -933,7 +933,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.17.3", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.17.4", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });
