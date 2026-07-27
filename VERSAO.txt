@@ -1,3 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.13.0
-Fluxo estrutural: Projeto > Sala > Modulo.
-Cadastros divididos em tres subabas.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.14.0
+Revisão geral de abas, subabas e cadastros administrativos.

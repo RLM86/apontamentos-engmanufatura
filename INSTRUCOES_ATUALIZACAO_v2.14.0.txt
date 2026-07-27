@@ -1,0 +1,29 @@
+APONTA P3 v2.14.0 — REVISÃO GERAL
+===================================
+
+ANTES
+1. Confirme que o SQL v2.13 foi executado com sucesso.
+2. Faça um backup manual.
+
+PUBLICAÇÃO
+1. Extraia a versão completa ou use o pacote de atualização.
+2. Publique os arquivos na raiz do projeto Git/Netlify/Cloudflare.
+3. Preserve o seu config.js atual.
+4. Envie o commit para o GitHub.
+
+DEPOIS
+1. Abra /limpar-cache.html.
+2. Reabra o aplicativo.
+3. Confirme v2.14.0 no cabeçalho.
+
+CADASTROS
+- Cadastros gerais: Projetos, Atividades e Feriados.
+- Referências por área: Setores, Tipos de painel e Salas.
+- Estrutura por projeto: Salas por projeto e Módulos por sala.
+
+QUANTIDADE DE MÓDULOS
+Ao vincular ou editar uma sala do projeto, informe a quantidade de módulos.
+O sistema cria os módulos faltantes e inativa os excedentes sem apagar histórico.
+
+BANCO
+Não há SQL novo nesta versão. A estrutura necessária já foi criada pelo SQL v2.13.
