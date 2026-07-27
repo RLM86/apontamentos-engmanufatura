@@ -20,6 +20,8 @@ const TABLES = [
   "project_modules",
   "project_rooms",
   "project_room_modules",
+  "project_room_instances",
+  "project_room_instance_modules",
   "time_entries",
   "absences",
   "monthly_closings",
@@ -144,6 +146,8 @@ async function upsertRows(
       project_modules: "project_id,module_id",
       project_rooms: "project_id,room_id",
       project_room_modules: "project_id,room_id,module_id",
+      project_room_instances: "id",
+      project_room_instance_modules: "id",
     };
     const {error} = await admin
       .from(table)
@@ -286,6 +290,8 @@ Deno.serve(async (request: Request) => {
     restoredRecords += await upsertRows(admin, "project_modules", backupTables.project_modules || []);
     restoredRecords += await upsertRows(admin, "project_rooms", backupTables.project_rooms || []);
     restoredRecords += await upsertRows(admin, "project_room_modules", backupTables.project_room_modules || []);
+    restoredRecords += await upsertRows(admin, "project_room_instances", backupTables.project_room_instances || []);
+    restoredRecords += await upsertRows(admin, "project_room_instance_modules", backupTables.project_room_instance_modules || []);
 
     restoredRecords += await upsertRows(
       admin,

@@ -1,0 +1,67 @@
+APONTa P3 MODULAR v2.8 — ATUALIZAÇÃO COMPLETA
+================================================
+
+Este ZIP já contém o aplicativo completo v2.8, atualizado a partir do ZIP v2.7 enviado.
+O config.js original foi preservado.
+
+RECURSOS ADICIONADOS
+--------------------
+- Férias individuais por colaborador.
+- Afastados na mesma aba de Férias e Afastamentos.
+- Atestado médico, INSS, licenças, folga e outros afastamentos.
+- Edição e exclusão dos períodos.
+- Filtros por colaborador, tipo e situação.
+- Situação automática: Programado, Em andamento ou Encerrado.
+- Bloqueio de apontamentos durante o período cadastrado.
+- Exclusão segura de apontamentos.
+- Exclusão de projetos e atividades somente quando não possuem histórico.
+- Exclusão permanente de colaborador somente quando não possui histórico.
+- Atualização da visão de ausências para Power BI.
+
+ANTES DE PUBLICAR
+-----------------
+1. Entre na versão atual e gere um backup.
+2. Guarde uma cópia do ZIP v2.7.
+
+PASSO 1 — ATUALIZAR O BANCO SUPABASE
+-------------------------------------
+1. Abra o Supabase do Aponta P3.
+2. Vá em SQL Editor > New query.
+3. Abra o arquivo:
+   ATUALIZAR_BANCO_v2.8_FERIAS_AFASTAMENTOS_EXCLUSOES.sql
+4. Copie todo o conteúdo e clique em Run.
+5. O resultado deve mostrar: Aponta P3 v2.8 instalado.
+
+PASSO 2 — CRIAR A FUNÇÃO PARA EXCLUIR COLABORADOR
+--------------------------------------------------
+1. No Supabase, abra Edge Functions.
+2. Crie uma função chamada: excluir-cadastro
+3. Mantenha Verify JWT ativado.
+4. Cole o conteúdo de FUNCAO_EXCLUIR_CADASTRO.ts.
+   O mesmo código também está em supabase/functions/excluir-cadastro/index.ts.
+5. Publique a função.
+
+PASSO 3 — PUBLICAR O APLICATIVO COMPLETO
+----------------------------------------
+1. Extraia este ZIP.
+2. Não altere o config.js.
+3. Publique a pasta completa no mesmo site do Netlify.
+4. Não crie um site novo se deseja manter o mesmo endereço.
+5. Após publicar, abra o sistema e pressione Ctrl + F5.
+
+TESTES
+------
+1. Entre como Administrador.
+2. Abra Férias e Afastamentos.
+3. Selecione um colaborador e cadastre um período.
+4. Edite e exclua um registro de teste.
+5. Tente apontar horas em uma data dentro do afastamento: o banco deve bloquear.
+6. Teste excluir um projeto ou atividade sem uso.
+7. Na Equipe, teste excluir apenas um cadastro criado por engano e sem histórico.
+
+REGRAS DE SEGURANÇA
+-------------------
+- Períodos enviados ou aprovados precisam ser reabertos antes da exclusão de apontamentos.
+- Projetos e atividades com histórico devem ser inativados, não excluídos.
+- Colaborador com histórico deve ser desativado, não excluído.
+- O próprio Administrador não pode excluir a si mesmo.

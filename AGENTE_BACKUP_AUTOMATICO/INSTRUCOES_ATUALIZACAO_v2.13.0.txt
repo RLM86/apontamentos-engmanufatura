@@ -1,0 +1,87 @@
+APONTA P3 v2.13.0 — ATUALIZAÇÃO PROJETO > SALA > MÓDULO
+================================================================
+
+IMPORTANTE
+----------
+Esta versão altera o banco e o aplicativo.
+Siga exatamente a ordem abaixo.
+
+1. FAÇA UM BACKUP
+-----------------
+Gere um backup manual do Aponta P3 antes da atualização.
+
+2. ATUALIZE O SUPABASE
+----------------------
+Abra Supabase > SQL Editor > New query.
+
+Execute todo o arquivo:
+ATUALIZAR_BANCO_v2.13_ESTRUTURA_SALA_MODULO.sql
+
+O SQL:
+- cria as tabelas de salas por projeto;
+- cria os módulos por sala;
+- aplica os projetos, áreas, setores, salas, painéis e atividades da planilha;
+- preserva os apontamentos antigos;
+- adiciona validações para impedir combinações incorretas.
+
+3. PUBLIQUE O APP NO NETLIFY
+----------------------------
+Publique a pasta completa, ou substitua:
+- index.html
+- app-v2.13.0.js
+- style-v2.13.0.css
+- sw.js
+- manifest.webmanifest
+- netlify.toml
+
+Não substitua o config.js.
+
+4. ATUALIZE A EDGE FUNCTION DE BACKUP
+-------------------------------------
+No Supabase, atualize a função backup-aponta-p3 com:
+supabase/functions/backup-aponta-p3/index.ts
+
+A função passa a incluir:
+- project_rooms
+- project_room_modules
+
+5. LIMPE O CACHE
+----------------
+Abra:
+https://ENDERECO-DO-APP/limpar-cache.html
+
+Depois reabra o sistema e confirme:
+v2.13.0
+
+NOVO FLUXO
+----------
+Fabricação:
+Projeto > Área > Setor > Atividade
+
+Montagem Estrutural:
+Projeto > Área > Sala do projeto > Módulo da sala > Atividade
+
+Montagem de Painéis:
+Projeto > Área > Tipo de painel > Atividade
+
+Montagem Final:
+Projeto > Área > Sala do projeto > Atividade
+
+Administrativo:
+Projeto > Área > Atividade
+
+TRÊS SUBABAS EM CADASTROS
+-------------------------
+1. Cadastros gerais:
+   Projetos, Atividades e Feriados.
+
+2. Referências por área:
+   Setores, Tipos de painel e Catálogo de salas.
+
+3. Estrutura por projeto:
+   Salas vinculadas a cada projeto e módulos vinculados a cada sala.
+
+INTERPRETAÇÕES DA PLANILHA
+--------------------------
+Consulte:
+RESUMO_INTERPRETACAO_PLANILHA_v2.13.0.txt

@@ -1,0 +1,18 @@
+APONTA P3 v2.16.0 — SALAS MÚLTIPLAS E PARTES DO MÓDULO
+=========================================================
+
+ORDEM OBRIGATÓRIA
+1. Faça backup.
+2. Execute ATUALIZAR_BANCO_v2.16_SALAS_MULTIPLAS_PARTES_MODULO.sql no SQL Editor do Supabase.
+3. Publique os arquivos no Git/Netlify/Cloudflare.
+4. Mantenha o config.js atual.
+5. Abra /limpar-cache.html e reabra o app.
+
+EXEMPLO CRUSOE
+- Adicione DH: quantidade de salas 1; módulos por sala 8.
+- Adicione HVAC: quantidade de salas 2; módulos por sala 2.
+- Adicione SE: quantidade de salas 4; módulos por sala 2.
+- Adicione SM: quantidade de salas 2; módulos por sala 2.
+
+O sistema criará DH 01, HVAC 01, HVAC 02, SE 01 a SE 04 e SM 01 a SM 02.
+Todos os módulos são criados com Parte inferior e Parte superior habilitadas.

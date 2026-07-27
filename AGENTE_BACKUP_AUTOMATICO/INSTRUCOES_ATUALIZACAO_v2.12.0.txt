@@ -1,0 +1,38 @@
+APONTA P3 v2.12.0 — INSTALAÇÃO
+================================
+
+ORDEM OBRIGATÓRIA
+-----------------
+1. No Supabase, abra SQL Editor.
+2. Execute o arquivo ATUALIZAR_BANCO_v2.12_FLUXO_AREAS.sql completo.
+3. Aguarde o resultado final com a contagem dos cadastros.
+4. Só depois publique a pasta completa do app no Netlify.
+
+FLUXO DO APONTAMENTO
+--------------------
+Projeto > Área > Campo específico > Atividade > Data > Horas > Observação
+
+- Fabricação: Setor
+- Montagem Estrutural: Módulo do projeto
+- Montagem de Painéis: Tipo de painel
+- Montagem Final: Sala
+- Administrativo: sem campo intermediário
+
+PUBLICAÇÃO NO NETLIFY
+---------------------
+- Extraia o ZIP completo.
+- Faça o deploy da pasta extraída, mantendo index.html na raiz.
+- Preserve o config.js já configurado caso publique somente a atualização.
+- Confirme em /VERSAO.txt que a versão é 2.12.0.
+
+ATUALIZAÇÃO DO CELULAR
+----------------------
+- Feche o aplicativo instalado.
+- Abra /limpar-cache.html uma vez.
+- Reabra o site e confirme a etiqueta v2.12.0.
+- Se necessário, desinstale e instale novamente o PWA.
+
+IMPORTANTE
+----------
+O SQL preserva os apontamentos antigos. Registros antigos podem continuar sem Área;
+novos apontamentos feitos na v2.12.0 exigem o fluxo completo.

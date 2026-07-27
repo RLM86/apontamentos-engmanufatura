@@ -1,0 +1,61 @@
+APONTA P3 v2.11.1 — CORREÇÃO DO E-MAIL DE APROVAÇÃO
+=====================================================
+
+IMPORTANTE
+----------
+O fechamento mensal já foi enviado. Esta correção trata apenas o e-mail de aviso.
+
+1. ATUALIZAR A EDGE FUNCTION
+----------------------------
+No Supabase:
+1. Edge Functions > enviar-aprovacao > Code.
+2. Abra index.ts.
+3. Apague o conteúdo atual.
+4. Cole todo o conteúdo de FUNCAO_EMAIL_APROVACAO_v2.11.1.ts.
+5. Clique em Deploy/Save and deploy.
+6. Em Settings, mantenha Verify JWT ATIVADO.
+
+2. CONFERIR OS SECRETS
+----------------------
+Em Edge Functions > Secrets, confira:
+
+RESEND_API_KEY
+- Chave válida do Resend, normalmente iniciada por re_.
+
+EMAIL_FROM
+- Para produção, use um remetente de domínio verificado no Resend.
+- Exemplo: Aponta P3 <apontamento@modulardtc.com>
+
+APP_URL
+- URL do Aponta P3 no Netlify.
+
+APPROVAL_EMAILS (opcional)
+- E-mails separados por vírgula.
+- Se não existir, o sistema usa os e-mails dos Gestores e Administradores ativos.
+
+3. LIMITAÇÃO DO REMETENTE DE TESTE
+----------------------------------
+O remetente onboarding@resend.dev serve apenas para teste e normalmente só
+envia para o e-mail associado à conta Resend. Para enviar aos e-mails da
+empresa, verifique o domínio no Resend e altere EMAIL_FROM.
+
+4. ATUALIZAR O NETLIFY
+----------------------
+Substitua:
+- app.js
+- sw.js
+- index.html
+
+Não substitua config.js.
+
+Abra o aplicativo e pressione Ctrl + F5.
+
+5. NOVO DIAGNÓSTICO
+-------------------
+Na próxima tentativa, o aplicativo mostrará a causa exata, por exemplo:
+- RESEND_API_KEY não configurada;
+- chave inválida;
+- domínio/remetente não verificado;
+- nenhum aprovador com e-mail;
+- limite do Resend atingido;
+- função não publicada.

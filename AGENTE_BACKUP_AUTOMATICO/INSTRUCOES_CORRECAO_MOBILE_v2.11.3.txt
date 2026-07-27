@@ -1,0 +1,48 @@
+APONTA P3 v2.11.3 — CORREÇÃO DEFINITIVA NO CELULAR
+====================================================
+
+O QUE MUDOU
+-----------
+A aprovação não fica mais somente na coluna Ações da tabela.
+
+Agora existe, no topo da aba Equipe, um quadro:
+INSCRIÇÕES AGUARDANDO APROVAÇÃO
+
+Cada pessoa pendente terá:
+- Aprovar integrante
+- Rejeitar
+
+COMO ATUALIZAR
+--------------
+1. No Netlify, publique a pasta completa ou substitua:
+   - index.html
+   - app.js
+   - style.css
+   - sw.js
+
+2. Não substitua config.js.
+
+3. No celular:
+   - feche completamente o aplicativo;
+   - abra de novo;
+   - aguarde a atualização automática;
+   - entre em Equipe.
+
+4. Confirme no topo da aba Equipe:
+   Inscrições aguardando aprovação
+
+DIAGNÓSTICO
+-----------
+Se aparecer:
+“A aprovação de inscrições ainda não está instalada no banco”
+
+Execute no Supabase SQL Editor:
+ATUALIZAR_BANCO_v2.11_APROVACAO_USUARIOS.sql
+
+Se aparecer:
+“Nenhuma inscrição aguardando aprovação”
+
+Significa que não existe cadastro com situação Pendente.
+Crie uma nova conta para testar ou confira registration_status na tabela profiles.
+
+Não é necessário executar novo SQL se a versão 2.11 já foi instalada.

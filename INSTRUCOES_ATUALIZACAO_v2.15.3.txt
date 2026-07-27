@@ -1,0 +1,39 @@
+APONTA P3 v2.15.3 — CORREÇÃO DE FORMATAÇÃO
+================================================
+
+PROBLEMAS CORRIGIDOS
+--------------------
+- Status quebrando letra por letra.
+- Botões de ação cortados.
+- Três tabelas comprimidas lado a lado.
+- Projetos e atividades com pouco espaço.
+- Rolagem horizontal confusa.
+- Cards e formulários desalinhados.
+
+NOVA ORGANIZAÇÃO
+----------------
+Projetos e atividades:
+- Projeto em faixa ampla, com formulário e tabela.
+- Atividades em faixa de largura total.
+
+Referências:
+- Setores de fabricação em uma faixa própria.
+- Tipos de painel em uma faixa própria.
+- Catálogo de salas em uma faixa própria.
+
+ATUALIZAÇÃO
+-----------
+Substitua:
+- index.html
+- app-v2.15.3.js
+- style-v2.15.3.css
+- sw.js
+- limpar-cache.html
+- netlify.toml
+- VERSAO.txt
+
+Mantenha o config.js atual.
+Não é necessário executar SQL.
+
+Depois abra:
+https://ENDERECO-DO-APP/limpar-cache.html

@@ -1,0 +1,38 @@
+APONTA P3 v2.11 — COMO ATUALIZAR
+=================================
+
+1. Faça um backup do sistema atual.
+
+2. No Supabase, desative a confirmação por e-mail:
+   Authentication > Providers > Email > Confirm email
+   Deixe a opção DESATIVADA e salve.
+
+3. No Supabase, abra:
+   SQL Editor > New query
+
+4. Execute todo o arquivo:
+   ATUALIZAR_BANCO_v2.11_APROVACAO_USUARIOS.sql
+
+5. Confira se apareceu:
+   APONTA P3 v2.11 INSTALADO COM SUCESSO
+
+6. Publique no Netlify a pasta completa ou substitua:
+   - index.html
+   - app.js
+   - style.css
+   - sw.js
+
+7. Não substitua o config.js.
+
+8. Abra o aplicativo e pressione Ctrl + F5.
+
+TESTE
+-----
+1. Crie uma nova conta.
+2. Entre com a nova conta.
+3. Confirme que a aba Apontamentos não aparece.
+4. Entre como Gestor ou Administrador.
+5. Abra Equipe.
+6. Clique em Aprovar.
+7. Entre novamente com o novo usuário.
+8. Confirme que Apontamentos e Fechamento foram liberados.

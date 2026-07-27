@@ -1,0 +1,18 @@
+APONTa P3 v2.10 — COMO ATUALIZAR
+=================================
+
+1. Faça um backup do sistema.
+2. No Supabase, abra SQL Editor > New query.
+3. Execute todo o arquivo:
+   ATUALIZAR_BANCO_v2.10_APROVACAO_FERIAS_AFASTAMENTOS.sql
+4. Publique a pasta completa no Netlify ou substitua os arquivos do pacote de atualização.
+5. Não substitua o config.js.
+6. Abra o aplicativo e pressione Ctrl + F5.
+
+TESTE
+-----
+1. Entre como Colaborador e cadastre férias ou afastamento.
+2. Confirme que aparece como Pendente e ainda permite editar/excluir.
+3. Entre como Gestor ou Administrador e clique em Aprovar.
+4. Volte ao Colaborador. O registro deverá mostrar Aprovado e Bloqueado.
+5. Gestor e Administrador continuam podendo editar/excluir.

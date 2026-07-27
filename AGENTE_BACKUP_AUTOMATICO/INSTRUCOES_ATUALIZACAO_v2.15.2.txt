@@ -1,0 +1,35 @@
+APONTA P3 v2.15.2 — MONOBLOCO COM ATÉ 4 MÓDULOS
+=================================================
+
+REGRA
+-----
+O projeto MONOBLOCO pode possuir:
+- 1 módulo;
+- 2 módulos;
+- 3 módulos;
+- 4 módulos.
+
+O MONOBLOCO não pode ser combinado com DH, SE, SC, SM ou HVAC.
+
+COMO CONFIGURAR
+---------------
+1. Abra Cadastros.
+2. Entre em Composição do projeto.
+3. Selecione o projeto.
+4. Marque MONOBLOCO.
+5. Informe a quantidade entre 1 e 4.
+6. Salve a composição.
+
+ATUALIZAÇÃO
+-----------
+Substitua:
+- index.html
+- app-v2.15.2.js
+- style-v2.15.2.css
+- sw.js
+- limpar-cache.html
+- netlify.toml
+- VERSAO.txt
+
+Mantenha o config.js atual.
+Não é necessário executar SQL.

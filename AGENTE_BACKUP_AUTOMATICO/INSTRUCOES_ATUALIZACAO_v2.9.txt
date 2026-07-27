@@ -1,0 +1,26 @@
+APONTA P3 v2.9 — ATUALIZAÇÃO DOS RELATÓRIOS
+================================================
+
+Esta versão adiciona, dentro da aba Relatórios:
+- Projetos e horas;
+- Equipe: horas, férias e afastamentos.
+
+INSTALAÇÃO
+1. Faça backup do sistema atual.
+2. Publique a pasta completa no mesmo site do Netlify.
+3. Não troque o config.js: este pacote já preserva o arquivo enviado.
+4. Após publicar, abra o aplicativo e pressione Ctrl + F5.
+5. Abra Relatórios e selecione a nova visão de equipe.
+
+BANCO DE DADOS
+- Não é necessário executar novo SQL se a atualização v2.8 já foi instalada.
+- A tela consulta as tabelas time_entries, absences e profiles existentes.
+
+RELATÓRIO DE EQUIPE
+- Filtro por colaborador, início, fim e tipo.
+- Horas apontadas no período.
+- Dias de férias.
+- Dias de atestado.
+- Dias de afastamento ou licença.
+- Dias de folga e outros.
+- Tabela detalhada e exportações CSV.

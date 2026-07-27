@@ -1,0 +1,31 @@
+APONTA P3 v2.15.0 — ATUALIZAÇÃO
+=================================
+
+NOVA PREMISSA
+-------------
+- Um projeto pode ter: DH, SE, SC, SM e HVAC.
+- Ou pode ser apenas MONOBLOCO.
+- Cada sala possui de 1 a 8 módulos.
+- MONOBLOCO possui 1 unidade.
+
+CADASTROS
+---------
+1. Projetos e atividades
+2. Referências
+3. Composição do projeto
+4. Feriados
+
+EXCLUSÃO
+--------
+O Administrador pode excluir cadastros sem histórico.
+Quando houver apontamentos ou vínculos, o banco poderá bloquear a exclusão; nesse caso, use Inativar.
+
+COMO ATUALIZAR
+--------------
+1. Copie os arquivos desta versão para a pasta do projeto.
+2. Mantenha o config.js atual.
+3. Envie ao GitHub.
+4. Abra /limpar-cache.html.
+5. Confirme v2.15.0 no cabeçalho.
+
+Não é necessário executar SQL novo. O banco deve estar atualizado com a versão v2.13.
