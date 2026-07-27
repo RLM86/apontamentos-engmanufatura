@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest?v=2.12.0">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.14.0.css?build=2140">
+  <link rel="stylesheet" href="style-v2.15.2.css?build=2152">
   <title>Modular | Apontamento de Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -111,7 +111,7 @@
         <span id="currentUser"></span>
         <span id="currentRole" class="badge"></span>
         <span id="currentRegistration" class="badge registration-top-badge"></span>
-        <span class="badge app-version-badge">v2.14.0</span>
+        <span class="badge app-version-badge">v2.15.2</span>
         <button id="logoutBtn" class="btn ghost small">Sair</button>
       </div>
     </header>
@@ -383,39 +383,44 @@
       </section>
 
       <section id="catalogs" class="page">
-        <div class="page-title">
+        <div class="page-title catalog-page-title">
           <div>
             <h2>Cadastros</h2>
-            <p>Cadastros gerais, referências por área e estrutura específica de cada projeto. O Administrador pode incluir e editar todos os registros.</p>
+            <p>Cadastre projetos, atividades, referências, composição física e feriados.</p>
           </div>
         </div>
 
-        <div class="tabs report-tabs catalog-tabs catalog-tabs-three" role="tablist" aria-label="Tipos de cadastro">
-          <button class="tab active" type="button" data-catalog-view="general">1. Cadastros gerais</button>
-          <button class="tab" type="button" data-catalog-view="references">2. Referências por área</button>
-          <button class="tab" type="button" data-catalog-view="projects">3. Estrutura por projeto</button>
+        <div class="tabs catalog-tabs catalog-tabs-four" role="tablist" aria-label="Tipos de cadastro">
+          <button class="tab active" type="button" data-catalog-view="general">1. Projetos e atividades</button>
+          <button class="tab" type="button" data-catalog-view="references">2. Referências</button>
+          <button class="tab" type="button" data-catalog-view="projects">3. Composição do projeto</button>
+          <button class="tab" type="button" data-catalog-view="holidays">4. Feriados</button>
         </div>
 
         <section id="generalCatalogPanel" class="catalog-panel">
-          <div class="grid">
-            <article class="card span-4">
-              <h3>Projetos</h3>
-              <form id="projectForm" class="form-grid">
+          <div class="grid catalog-general-grid">
+            <article class="card span-4 catalog-compact-card">
+              <div class="section-heading compact-heading">
+                <div><h3>Projetos</h3><p>Inclua e administre todos os projetos.</p></div>
+              </div>
+              <form id="projectForm" class="form-grid compact-form-grid">
                 <label>Código<input id="projectCode" placeholder="TB14"></label>
                 <label>Cliente<input id="projectClient"></label>
                 <label class="full">Nome<input id="projectName" required></label>
                 <label class="full">Descrição<input id="projectDescription"></label>
                 <button class="btn primary full">Adicionar projeto</button>
               </form>
-              <div class="table-wrap compact"><table><thead><tr><th>Código</th><th>Projeto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="projectsTable"></tbody></table></div>
+              <div class="table-wrap compact catalog-table-wrap">
+                <table><thead><tr><th>Código</th><th>Projeto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="projectsTable"></tbody></table>
+              </div>
             </article>
 
-            <article class="card span-8">
-              <div class="section-heading">
-                <div><h3>Atividades</h3><p>Defina as áreas em que cada atividade pode ser utilizada.</p></div>
+            <article class="card span-8 catalog-compact-card">
+              <div class="section-heading compact-heading">
+                <div><h3>Atividades</h3><p>Defina em quais áreas cada atividade poderá ser utilizada.</p></div>
                 <span id="activityCatalogCount" class="badge">0</span>
               </div>
-              <form id="activityForm" class="form-grid">
+              <form id="activityForm" class="form-grid compact-form-grid">
                 <label>Código<input id="activityCode" placeholder="EM-MES-001"></label>
                 <label>Disciplina<input id="activityDiscipline" placeholder="Montagem Estrutural"></label>
                 <label class="full">Nome<input id="activityName" required></label>
@@ -425,98 +430,121 @@
                 <label class="full">Orientação de uso<textarea id="activityUsageDescription" maxlength="500"></textarea></label>
                 <button class="btn primary full">Adicionar atividade</button>
               </form>
-              <div class="table-wrap compact"><table><thead><tr><th>Código</th><th>Atividade</th><th>Áreas</th><th>Disciplina</th><th>Status</th><th>Ações</th></tr></thead><tbody id="activitiesTable"></tbody></table></div>
-            </article>
-
-            <article class="card span-12 holiday-catalog-card">
-              <div class="section-heading"><div><h3>Feriados</h3><p>Dias que não compõem a jornada normal.</p></div></div>
-              <form id="holidayForm" class="holiday-catalog-form">
-                <label>Data<input id="holidayDate" type="date" required></label>
-                <label>Descrição<input id="holidayName" required></label>
-                <button class="btn primary">Adicionar feriado</button>
-              </form>
-              <div class="table-wrap compact"><table><thead><tr><th>Data</th><th>Descrição</th><th>Ações</th></tr></thead><tbody id="holidaysTable"></tbody></table></div>
+              <div class="table-wrap compact catalog-table-wrap">
+                <table><thead><tr><th>Código</th><th>Atividade</th><th>Áreas</th><th>Disciplina</th><th>Status</th><th>Ações</th></tr></thead><tbody id="activitiesTable"></tbody></table>
+              </div>
             </article>
           </div>
         </section>
 
         <section id="referenceCatalogPanel" class="catalog-panel" hidden>
-          <div class="grid">
-            <article class="card span-4 reference-card">
-              <h3>Fabricação — Setores</h3>
-              <p class="catalog-section-help">Aparecem quando a área escolhida é Fabricação.</p>
-              <form id="sectorForm" class="mini-catalog-form">
+          <div class="grid catalog-reference-grid">
+            <article class="card span-4 reference-card catalog-compact-card">
+              <div class="section-heading compact-heading"><div><h3>Setores de fabricação</h3><p>Exibidos quando a área for Fabricação.</p></div></div>
+              <form id="sectorForm" class="mini-catalog-form compact-inline-form">
                 <input id="sectorCode" placeholder="Código" required>
                 <input id="sectorName" placeholder="Nome do setor" required>
                 <button class="btn primary small">Adicionar</button>
               </form>
-              <div class="table-wrap compact"><table><thead><tr><th>Código</th><th>Setor</th><th>Status</th><th>Ações</th></tr></thead><tbody id="sectorsTable"></tbody></table></div>
+              <div class="table-wrap compact catalog-table-wrap"><table><thead><tr><th>Código</th><th>Setor</th><th>Status</th><th>Ações</th></tr></thead><tbody id="sectorsTable"></tbody></table></div>
             </article>
 
-            <article class="card span-4 reference-card">
-              <h3>Painéis — Tipos</h3>
-              <p class="catalog-section-help">UPS, BMS, RPP, QGBT, PDU, ATS e outros.</p>
-              <form id="panelTypeForm" class="mini-catalog-form">
+            <article class="card span-4 reference-card catalog-compact-card">
+              <div class="section-heading compact-heading"><div><h3>Tipos de painel</h3><p>UPS, BMS, RPP, QGBT, PDU, ATS e outros.</p></div></div>
+              <form id="panelTypeForm" class="mini-catalog-form compact-inline-form">
                 <input id="panelTypeCode" placeholder="Código" required>
                 <input id="panelTypeName" placeholder="Tipo de painel" required>
                 <button class="btn primary small">Adicionar</button>
               </form>
-              <div class="table-wrap compact"><table><thead><tr><th>Código</th><th>Tipo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="panelTypesTable"></tbody></table></div>
+              <div class="table-wrap compact catalog-table-wrap"><table><thead><tr><th>Código</th><th>Tipo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="panelTypesTable"></tbody></table></div>
             </article>
 
-            <article class="card span-4 reference-card">
-              <h3>Catálogo de salas</h3>
-              <p class="catalog-section-help">Salas disponíveis para vínculo com os projetos.</p>
-              <form id="roomForm" class="mini-catalog-form">
-                <input id="roomCode" placeholder="Código" required>
-                <input id="roomName" placeholder="Nome da sala" required>
+            <article class="card span-4 reference-card catalog-compact-card">
+              <div class="section-heading compact-heading"><div><h3>Catálogo de salas</h3><p>Padrão: DH, SE, SC, SM, HVAC e MONOBLOCO.</p></div></div>
+              <form id="roomForm" class="mini-catalog-form compact-inline-form">
+                <input id="roomCode" placeholder="Código: DH" required>
+                <input id="roomName" placeholder="Nome: Data Hall" required>
                 <button class="btn primary small">Adicionar</button>
               </form>
-              <div class="table-wrap compact"><table><thead><tr><th>Código</th><th>Sala</th><th>Status</th><th>Ações</th></tr></thead><tbody id="roomsTable"></tbody></table></div>
+              <div class="table-wrap compact catalog-table-wrap"><table><thead><tr><th>Código</th><th>Sala</th><th>Status</th><th>Ações</th></tr></thead><tbody id="roomsTable"></tbody></table></div>
             </article>
           </div>
         </section>
 
         <section id="projectStructureCatalogPanel" class="catalog-panel" hidden>
-          <div class="structure-explanation">
-            <strong>Regra aplicada:</strong>
-            cada projeto possui suas próprias salas e cada sala possui uma quantidade específica de módulos.
-          </div>
-
-          <div class="grid">
-            <article class="card span-5">
-              <div class="section-heading">
-                <div><h3>Salas por projeto</h3><p>Vincule somente as salas que realmente existem no projeto.</p></div>
-                <span id="projectRoomsCount" class="badge">0</span>
+          <article class="card composition-card">
+            <div class="composition-heading">
+              <div>
+                <span class="eyebrow-small">COMPOSIÇÃO FÍSICA</span>
+                <h3>Salas e módulos do projeto</h3>
+                <p>Um projeto pode ter as salas DH, SE, SC, SM e HVAC, ou ser composto somente por um MONOBLOCO com até 4 módulos.</p>
               </div>
-              <form id="projectRoomForm" class="form-grid project-room-form">
-                <label class="full">Projeto<select id="projectRoomProject" required></select></label>
-                <label class="full">Sala do catálogo<select id="projectRoomRoom" required></select></label>
-                <label>Nome exibido<input id="projectRoomDisplayName" placeholder="Opcional"></label>
-                <label>Quantidade de módulos<input id="projectRoomModuleQuantity" type="number" min="0" max="200" value="1" required></label>
-                <label>Ordem<input id="projectRoomOrder" type="number" min="0" value="0"></label>
-                <button class="btn primary full">Salvar sala no projeto</button>
-              </form>
-              <p class="catalog-inline-help">Ao informar a quantidade, o sistema cria automaticamente os módulos da sala. A quantidade poderá ser alterada depois pelo Administrador.</p>
-              <div class="table-wrap compact"><table><thead><tr><th>Projeto</th><th>Sala</th><th>Módulos ativos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="projectRoomsTable"></tbody></table></div>
-            </article>
+              <span id="projectRoomsCount" class="badge">0 salas</span>
+            </div>
 
-            <article class="card span-7">
-              <div class="section-heading">
-                <div><h3>Módulos por sala</h3><p>Use esta área para módulos com código ou nome específico. Para módulos sequenciais, informe a quantidade no cadastro da sala.</p></div>
-                <span id="projectRoomModulesCount" class="badge">0</span>
-              </div>
-              <form id="projectRoomModuleForm" class="form-grid">
+            <div class="composition-toolbar">
+              <label>Projeto
+                <select id="projectCompositionProject" required></select>
+              </label>
+              <div id="projectCompositionStatus" class="composition-status">Selecione um projeto para configurar.</div>
+            </div>
+
+            <div class="composition-rule">
+              <strong>Regra:</strong> cada sala pode possuir uma <strong>quantidade própria de módulos</strong>, definida conforme cada projeto. O MONOBLOCO pode possuir de 1 a 4 módulos e não pode ser combinado com outras salas.
+            </div>
+
+            <div id="projectCompositionRooms" class="room-composition-grid"></div>
+
+            <div class="composition-footer">
+              <p>Marque apenas as salas existentes no projeto e informe a quantidade de módulos de cada uma.</p>
+              <button id="saveProjectCompositionBtn" class="btn primary" type="button">Salvar composição do projeto</button>
+            </div>
+          </article>
+
+          <article class="card structure-summary-card">
+            <div class="section-heading compact-heading">
+              <div><h3>Resumo da composição</h3><p>Salas vinculadas ao projeto selecionado.</p></div>
+            </div>
+            <div class="table-wrap compact catalog-table-wrap structure-summary-table">
+              <table><thead><tr><th>Projeto</th><th>Sala</th><th>Módulos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="projectRoomsTable"></tbody></table>
+            </div>
+          </article>
+
+          <details class="card advanced-module-card">
+            <summary>
+              <span><strong>Ajustes avançados de módulos</strong><small>Editar código, nome ou incluir um módulo específico.</small></span>
+              <span id="projectRoomModulesCount" class="badge">0 módulos</span>
+            </summary>
+            <div class="advanced-module-content">
+              <form id="projectRoomModuleForm" class="form-grid compact-form-grid advanced-module-form">
                 <label>Projeto<select id="projectRoomModuleProject" required></select></label>
                 <label>Sala<select id="projectRoomModuleRoom" required></select></label>
-                <label>Código do módulo<input id="projectRoomModuleCode" placeholder="MOD1" required></label>
+                <label>Código<input id="projectRoomModuleCode" placeholder="MOD1" required></label>
                 <label>Nome exibido<input id="projectRoomModuleName" placeholder="Módulo 01" required></label>
-                <label>Ordem<input id="projectRoomModuleOrder" type="number" min="0" value="0"></label>
-                <button class="btn primary">Adicionar módulo à sala</button>
+                <label>Ordem<input id="projectRoomModuleOrder" type="number" min="1" step="1" value="1"></label>
+                <button class="btn primary">Adicionar módulo</button>
               </form>
-              <div class="table-wrap compact"><table><thead><tr><th>Projeto</th><th>Sala</th><th>Código</th><th>Módulo</th><th>Ordem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="projectRoomModulesTable"></tbody></table></div>
-            </article>
-          </div>
+              <div class="table-wrap compact catalog-table-wrap">
+                <table><thead><tr><th>Projeto</th><th>Sala</th><th>Código</th><th>Módulo</th><th>Ordem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="projectRoomModulesTable"></tbody></table>
+              </div>
+            </div>
+          </details>
+        </section>
+
+        <section id="holidayCatalogPanel" class="catalog-panel" hidden>
+          <article class="card holiday-only-card">
+            <div class="section-heading compact-heading">
+              <div><h3>Feriados</h3><p>Cadastre, edite ou exclua os dias que não compõem a jornada normal.</p></div>
+            </div>
+            <form id="holidayForm" class="holiday-catalog-form compact-holiday-form">
+              <label>Data<input id="holidayDate" type="date" required></label>
+              <label>Descrição<input id="holidayName" required></label>
+              <button class="btn primary">Adicionar feriado</button>
+            </form>
+            <div class="table-wrap compact catalog-table-wrap holiday-table-wrap">
+              <table><thead><tr><th>Data</th><th>Descrição</th><th>Ações</th></tr></thead><tbody id="holidaysTable"></tbody></table>
+            </div>
+          </article>
         </section>
       </section>
 
@@ -806,7 +834,7 @@
       <label>Projeto<input id="editProjectRoomProjectName" readonly></label>
       <label>Sala do catálogo<input id="editProjectRoomCatalogName" readonly></label>
       <label>Nome exibido<input id="editProjectRoomDisplayName" required></label>
-      <label>Quantidade de módulos<input id="editProjectRoomModuleQuantity" type="number" min="0" max="200" required></label>
+      <label>Quantidade de módulos<input id="editProjectRoomModuleQuantity" type="number" min="1" step="1" required></label>
       <label>Ordem<input id="editProjectRoomOrder" type="number" min="0" required></label>
       <label>Situação<select id="editProjectRoomActive"><option value="true">Ativa</option><option value="false">Inativa</option></select></label>
       <div class="actions"><button class="btn secondary" value="cancel">Cancelar</button><button id="saveProjectRoomEditBtn" class="btn primary" value="default">Salvar</button></div>
@@ -851,7 +879,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.14.0.js?build=2140"></script>
+  <script src="app-v2.15.2.js?build=2152"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">

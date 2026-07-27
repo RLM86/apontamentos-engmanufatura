@@ -1,2 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.14.0
-Revisão geral de abas, subabas e cadastros administrativos.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.15.2
+MONOBLOCO permitido com 1 a 4 módulos.

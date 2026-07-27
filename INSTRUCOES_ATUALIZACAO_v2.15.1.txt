@@ -1,0 +1,47 @@
+APONTA P3 v2.15.1 — QUANTIDADE DE MÓDULOS POR PROJETO
+=========================================================
+
+NOVA REGRA
+----------
+Cada sala de cada projeto pode ter sua própria quantidade de módulos.
+
+Exemplo:
+Projeto AWS:
+- DH: 8 módulos
+- SE: 6 módulos
+- SC: 6 módulos
+- SM: 8 módulos
+- HVAC: 4 módulos
+
+Outro projeto poderá possuir quantidades diferentes.
+
+COMO EDITAR
+-----------
+1. Abra Cadastros.
+2. Entre em Composição do projeto.
+3. Selecione o projeto.
+4. Marque as salas existentes.
+5. Digite a quantidade de módulos de cada sala ou use os botões – e +.
+6. Clique em Salvar composição.
+
+REGRAS
+------
+- A quantidade deve ser um número inteiro maior que zero.
+- Não existe mais limite fixo de oito módulos.
+- MONOBLOCO permanece com uma unidade.
+- Ao aumentar, novos módulos são criados automaticamente.
+- Ao reduzir, os módulos excedentes são inativados, preservando o histórico.
+
+ATUALIZAÇÃO
+-----------
+Publique a versão completa no Netlify ou substitua:
+- index.html
+- app-v2.15.1.js
+- style-v2.15.1.css
+- sw.js
+- limpar-cache.html
+- netlify.toml
+- VERSAO.txt
+
+Mantenha o seu config.js atual.
+Não é necessário executar SQL.
