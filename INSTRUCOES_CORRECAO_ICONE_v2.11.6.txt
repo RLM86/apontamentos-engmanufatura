@@ -1,0 +1,39 @@
+APONTA P3 v2.11.6 — CORREÇÃO DO ÍCONE OFICIAL
+================================================
+
+CORREÇÃO
+--------
+O ícone provisório criado durante a implementação do PWA foi removido.
+
+Agora o aplicativo utiliza novamente o símbolo oficial da Modular Data Centers:
+- ícone do Android;
+- ícone do iPhone/iPad;
+- favicon do navegador;
+- imagem da tela “Instalar Aponta P3”.
+
+COMO ATUALIZAR
+--------------
+1. Publique a pasta completa no Netlify ou substitua:
+   - index.html
+   - manifest.webmanifest
+   - sw.js
+   - modular-app-icon-192-v2116.png
+   - modular-app-icon-512-v2116.png
+   - netlify.toml
+   - o arquivo app-v2.11.4.js, caso esteja usando o pacote de atualização.
+
+2. Não substitua o config.js.
+
+3. No celular:
+   - desinstale o ícone antigo do Aponta P3, caso já tenha instalado;
+   - feche completamente o navegador;
+   - abra novamente o endereço do sistema;
+   - instale o aplicativo outra vez.
+
+4. Confira no topo do sistema a versão:
+   v2.11.6
+
+IMPORTANTE
+----------
+O logo do cabeçalho do sistema não foi alterado.
+A correção é para o ícone de instalação do aplicativo.

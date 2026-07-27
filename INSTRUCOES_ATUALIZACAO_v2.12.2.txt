@@ -1,0 +1,40 @@
+APONTA P3 v2.12.2 — SUBABAS DA ÁREA CADASTROS
+================================================
+
+NOVA DIVISÃO
+------------
+1. CADASTROS GERAIS
+   - Projetos
+   - Atividades
+   - Feriados
+
+2. ESTRUTURA DO APONTAMENTO
+   - Fabricação: Setores
+   - Montagem Estrutural: Módulos do projeto
+   - Montagem de Painéis: Tipos de painel
+   - Montagem Final: Salas
+
+COMO ATUALIZAR
+--------------
+1. Publique a pasta completa no Netlify; ou
+2. Use o pacote menor e substitua:
+   - index.html
+   - app-v2.12.2.js
+   - style-v2.12.2.css
+   - sw.js
+   - limpar-cache.html
+   - netlify.toml
+
+Não substitua o config.js.
+
+DEPOIS DE PUBLICAR
+------------------
+1. Abra /limpar-cache.html.
+2. Limpe o cache.
+3. Reabra o sistema.
+4. Confira a versão v2.12.2 no cabeçalho.
+5. Entre em Cadastros e confira as duas subabas.
+
+BANCO DE DADOS
+--------------
+Não é necessário executar SQL.

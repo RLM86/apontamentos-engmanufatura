@@ -1,0 +1,43 @@
+APONTa P3 v2.8.1 — BACKUP AUTOMÁTICO E RESTAURAÇÃO
+
+1. CONFIRME A EDGE FUNCTION
+---------------------------
+No Supabase, publique a função backup-aponta-p3 usando:
+FUNCAO_BACKUP_APONTA_P3.ts
+
+Em Settings, deixe Verify JWT DESATIVADO somente nessa função.
+Ela é protegida pelo segredo BACKUP_TOKEN.
+
+2. CONFIRME O SEGREDO
+---------------------
+No Supabase: Edge Functions → Secrets
+
+Crie ou confira:
+BACKUP_TOKEN
+
+Use um valor com pelo menos 32 caracteres.
+
+3. INSTALE O AGENTE DO WINDOWS
+------------------------------
+Abra a pasta:
+AGENTE_BACKUP_AUTOMATICO
+
+Execute:
+Configurar_Backup_Diario.bat
+
+Confirme o horário 18:00 e faça o teste imediato.
+
+4. FUNCIONAMENTO
+----------------
+- Executa diariamente no horário escolhido.
+- Se o computador estiver desligado, recupera no próximo login.
+- Se a unidade Y: estiver indisponível, salva em Pendentes.
+- Faz três tentativas em falhas de internet.
+- Registra logs e o último status.
+
+5. RESTAURAR
+------------
+Entre como Administrador no aplicativo:
+Backup → Restaurar backup
+
+Selecione o JSON, digite RESTAURAR e confirme.

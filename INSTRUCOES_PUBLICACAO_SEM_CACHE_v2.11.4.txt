@@ -1,0 +1,60 @@
+APONTA P3 v2.11.4 — ATUALIZAÇÃO SEM CACHE
+============================================
+
+O print do celular mostrou uma versão antiga:
+- menu “Ausências”;
+- título antigo “Equipe”;
+- tabela sem Inscrição e Revisão;
+- nenhum quadro de aprovação.
+
+Isso confirma que a v2.11.3 não estava sendo carregada.
+
+PUBLICAÇÃO CORRETA NO NETLIFY
+-----------------------------
+1. Extraia este ZIP.
+2. No Netlify, abra o site correto.
+3. Vá em Deploys.
+4. Faça um novo deploy da PASTA extraída completa.
+5. Não envie somente o ZIP com uma pasta dentro sem conferir a raiz.
+6. O arquivo index.html deve ficar na raiz do deploy.
+
+CONFERIR A PUBLICAÇÃO
+---------------------
+Abra no navegador:
+
+https://SEU-SITE.netlify.app/VERSAO.txt
+
+O conteúdo precisa mostrar:
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.11.4
+
+Se mostrar erro 404 ou outra versão, o deploy não foi feito no site correto.
+
+LIMPAR O APLICATIVO ANTIGO
+--------------------------
+No celular, abra:
+
+https://SEU-SITE.netlify.app/limpar-cache.html
+
+Aguarde a mensagem:
+Cache antigo removido.
+
+Depois toque:
+Abrir Aponta P3 v2.11.4
+
+CONFERÊNCIA VISUAL
+------------------
+No topo do aplicativo deve aparecer:
+v2.11.4
+
+Na aba Equipe deve aparecer:
+Inscrições aguardando aprovação
+
+Se ainda aparecer apenas “Equipe” com a tabela antiga, o endereço aberto no
+celular não é o mesmo site que recebeu o novo deploy.
+
+USUÁRIO PENDENTE
+----------------
+Para conferir no Supabase, execute:
+CONFERIR_USUARIOS_PENDENTES.sql
+
+Não é necessário executar novo SQL de atualização se a versão 2.11 já foi instalada.

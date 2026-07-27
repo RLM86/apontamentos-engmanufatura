@@ -1,0 +1,44 @@
+APONTA P3 v2.11.5 — OPÇÃO DE INSTALAÇÃO NO CELULAR
+=====================================================
+
+O QUE FOI ADICIONADO
+--------------------
+- Ao abrir no celular, aparece uma tela convidando para instalar o aplicativo.
+- Android/Chrome: botão “Instalar app”.
+- iPhone/iPad: instrução “Compartilhar > Adicionar à Tela de Início”.
+- Outros navegadores: orientação para usar “Instalar aplicativo” no menu.
+- O aviso não aparece quando o aplicativo já está instalado.
+- Se o usuário fechar, o aviso volta somente depois de 7 dias.
+
+COMO PUBLICAR
+-------------
+1. Extraia o ZIP completo.
+2. Publique a pasta completa no Netlify.
+3. Confirme que estes arquivos estão na raiz:
+   - index.html
+   - manifest.webmanifest
+   - sw.js
+   - icon-192.png
+   - icon-512.png
+4. Não substitua o config.js por outro projeto.
+5. Abra o site no celular em HTTPS.
+
+TESTE NO ANDROID
+----------------
+1. Abra pelo Chrome.
+2. Aguarde cerca de 1 segundo.
+3. Toque em “Instalar app”.
+4. O ícone deverá aparecer na tela inicial.
+
+TESTE NO IPHONE
+---------------
+1. Abra pelo Safari.
+2. A tela mostrará as instruções.
+3. Toque em Compartilhar.
+4. Selecione “Adicionar à Tela de Início”.
+5. Toque em Adicionar.
+
+OBSERVAÇÃO
+----------
+Os navegadores não permitem forçar a instalação automática.
+O aplicativo mostra o convite imediatamente, mas a confirmação final depende do usuário.

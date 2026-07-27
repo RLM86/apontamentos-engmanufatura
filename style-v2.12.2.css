@@ -1,0 +1,719 @@
+:root{
+  --primary:#052630;--primary2:#78AD3E;--bg:#eef4f1;--card:#fff;--text:#052630;
+  --muted:#667085;--border:#d8e2dd;--success:#166534;--danger:#b42318;--warning:#92400e
+}
+*{box-sizing:border-box}html{font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+body{margin:0;min-height:100vh}button,input,select,textarea{font:inherit}
+[hidden]{display:none!important}.center-screen{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 12% 18%, rgba(120,173,62,.18), transparent 28%), linear-gradient(145deg,#eaf1ed,#f8fafc)}
+.auth-card{width:min(430px,100%);background:#fff;border:1px solid var(--border);border-radius:18px;padding:24px;box-shadow:0 18px 50px rgba(23,74,115,.14)}
+.auth-card.wide{width:min(680px,100%)}.brand{display:flex;align-items:center;gap:13px;margin-bottom:22px}.brand h1,.brand p{margin:0}.brand p{color:var(--muted)}
+.brand-mark{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;font-weight:800}
+.tabs{display:flex;gap:8px;margin-bottom:18px}.tab{flex:1;border:0;padding:10px;background:#e8f2df;color:var(--primary);border-radius:9px;font-weight:700;cursor:pointer}.tab.active{background:var(--primary);color:#fff}
+.auth-form{display:none}.auth-form.active{display:grid;gap:13px}.auth-form label,.dialog-card label{display:grid;gap:6px;font-weight:700;color:#475467}
+input,select,textarea{width:100%;border:1px solid var(--border);border-radius:9px;padding:10px 11px;background:#fff;color:var(--text)}textarea{min-height:86px;resize:vertical}
+.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer;text-decoration:none;text-align:center}.btn:disabled{opacity:.55;cursor:not-allowed}
+.primary{background:var(--primary);color:#fff}.secondary{background:#e8f2df;color:var(--primary)}.success{background:#dcfce7;color:var(--success)}.danger{background:#fee4e2;color:var(--danger)}
+.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4)}.small{padding:7px 10px;font-size:13px}.full{width:100%}.inline{display:inline-block}
+.link-button{border:0;background:transparent;color:var(--primary);cursor:pointer}.help{font-size:13px;color:var(--muted);margin:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;background:linear-gradient(135deg,var(--primary) 0%,#083746 70%,var(--primary2) 160%);color:#fff;padding:12px 18px;position:sticky;top:0;z-index:20}
+.brand.top{margin:0}.brand.top .brand-mark{background:#fff;color:var(--primary);width:40px;height:40px}.brand.top div{display:grid}.brand.top small{opacity:.82}
+.user-box{display:flex;align-items:center;gap:9px}.badge{display:inline-block;border-radius:999px;padding:4px 9px;background:#e7eef5;color:var(--primary);font-size:12px;font-weight:700}.topbar .badge{background:rgba(255,255,255,.18);color:#fff}
+.nav{display:flex;gap:6px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);padding:9px 14px;position:sticky;top:64px;z-index:15}
+.nav button{white-space:nowrap;border:0;border-radius:9px;padding:9px 13px;background:#edf3f8;color:var(--primary);font-weight:700;cursor:pointer}.nav button.active{background:var(--primary);color:#fff}
+main{max-width:1280px;margin:0 auto;padding:20px 14px 40px}.page{display:none}.page.active{display:block}.page-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}.page-title h2,.page-title p{margin:0}.page-title p{color:var(--muted);margin-top:4px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:14px}.metrics article{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px}.metrics span{display:block;color:var(--muted)}.metrics strong{display:block;color:var(--primary);font-size:29px;margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.span-4{grid-column:span 4}.span-6{grid-column:span 6}.span-8{grid-column:span 8}.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 4px 14px rgba(23,74,115,.05)}.card h3{margin-top:0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.form-grid label{display:grid;gap:5px;color:#475467;font-weight:700;font-size:13px}.form-grid .full{grid-column:1/-1}
+.filters{display:flex;flex-wrap:wrap;align-items:end;gap:10px;margin-bottom:13px}.filters label{display:grid;gap:5px;min-width:150px;color:#475467;font-size:13px;font-weight:700}
+.table-wrap{overflow:auto;max-height:560px;border:1px solid var(--border);border-radius:10px}.table-wrap.compact{max-height:400px;margin-top:14px}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:9px;border-bottom:1px solid var(--border);text-align:left;vertical-align:middle}th{position:sticky;top:0;background:#edf3f8;color:var(--primary);z-index:1}tr:last-child td{border-bottom:0}.empty{text-align:center;color:var(--muted);padding:22px}
+.section-heading{display:flex;justify-content:space-between;align-items:center}.day-total,.report-total{margin-top:12px;padding:11px;background:#edf3f8;border-radius:9px;color:var(--primary);font-weight:700}
+.status-draft{background:#e8eef4;color:#344054}.status-submitted{background:#fef0c7;color:#92400e}.status-approved{background:#dcfce7;color:#166534}.status-rejected{background:#fee4e2;color:#b42318}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.closing-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px 0}.closing-summary div{background:#edf3f8;border-radius:10px;padding:14px}.closing-summary span{display:block;color:var(--muted)}.closing-summary strong{font-size:24px;color:var(--primary)}
+.toast{position:fixed;right:16px;bottom:16px;z-index:100;background:#101828;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.25);max-width:420px}
+.loading{position:fixed;inset:0;z-index:200;background:rgba(255,255,255,.78);display:grid;place-items:center;align-content:center;gap:10px}.spinner{width:38px;height:38px;border:4px solid #dbe5ee;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+dialog{border:0;border-radius:15px;padding:0;box-shadow:0 20px 70px rgba(0,0,0,.25)}dialog::backdrop{background:rgba(15,23,42,.55)}.dialog-card{display:grid;gap:11px;width:min(470px,90vw);padding:20px}
+@media(max-width:900px){.metrics{grid-template-columns:repeat(2,1fr)}.span-4,.span-6,.span-8{grid-column:span 12}.topbar{align-items:flex-start}.user-box{flex-wrap:wrap;justify-content:flex-end}.nav{top:72px}}
+@media(max-width:560px){.metrics{grid-template-columns:1fr 1fr}.metrics strong{font-size:23px}.topbar{position:static}.nav{top:0}.user-box #currentUser{display:none}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.closing-summary{grid-template-columns:1fr}.page-title{align-items:flex-start}}
+
+.auth-message{margin-top:14px;padding:12px;border-radius:9px;border:1px solid #bfd7ea;background:#edf6fc;color:#174a73;white-space:pre-line}
+.auth-message.error{border-color:#f1b4ae;background:#fff0ef;color:#b42318}
+.profile-card{max-width:560px}
+.table-actions{display:flex;gap:5px;flex-wrap:wrap}
+
+.day-total-pending{
+  background:#edf3f8;
+  color:var(--primary);
+  border:1px solid #c6d7e5;
+}
+.day-total-complete{
+  background:#dcfce7;
+  color:#166534;
+  border:1px solid #86efac;
+}
+.day-total-exceeded{
+  background:#fee4e2;
+  color:#b42318;
+  border:2px solid #f97066;
+  box-shadow:0 0 0 3px rgba(249,112,102,.12);
+}
+
+/* Identidade Modular Data Centers */
+.brand-symbol{width:48px;height:48px;object-fit:contain;flex:0 0 auto}
+.brand-logo-full{width:168px;max-height:44px;object-fit:contain;flex:0 0 auto}
+.auth-card{border-top:5px solid var(--primary2)}
+.auth-card .brand h1{color:var(--primary);font-size:30px;line-height:1.05}
+.topbar .brand.top{gap:18px}.topbar .brand.top div{border-left:1px solid rgba(255,255,255,.22);padding-left:14px}
+.nav button.active{background:var(--primary);color:#fff}.nav button:hover{background:#dcebd1}.nav button.active:hover{background:var(--primary)}
+.metrics article{border-top:4px solid var(--primary2)}
+.card h3{color:var(--primary)}
+.presentation-hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);gap:22px;align-items:center;background:linear-gradient(135deg,var(--primary),#083746);border-radius:20px;padding:28px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden;box-shadow:0 18px 40px rgba(5,38,48,.18)}
+.presentation-hero:after{content:"";position:absolute;right:-90px;top:-120px;width:360px;height:360px;border-radius:50%;background:rgba(120,173,62,.16)}
+.presentation-hero-text{position:relative;z-index:1}.presentation-hero .eyebrow{display:inline-block;letter-spacing:.16em;font-size:12px;color:var(--primary2);font-weight:800;margin-bottom:12px}.presentation-hero h2{font-size:42px;margin:0 0 10px;line-height:1}.presentation-hero p{font-size:18px;line-height:1.5;max-width:760px;color:#eef6f2}.presentation-hero .secondary{background:#fff;color:var(--primary)}
+.presentation-hero-logo{position:relative;z-index:1;display:grid;place-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:18px;min-height:240px}.presentation-hero-logo img{width:min(260px,72%);filter:drop-shadow(0 14px 32px rgba(0,0,0,.28))}
+.presentation-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}.presentation-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 4px 14px rgba(5,38,48,.06)}.presentation-card span{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#e8f2df;color:var(--primary);font-weight:900;margin-bottom:10px}.presentation-card h3{margin:0 0 8px;color:var(--primary)}.presentation-card p{margin:0;color:#475467;line-height:1.45}
+.modular-flow-card{border-left:6px solid var(--primary2)}.modular-flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.modular-flow div{background:#f3f7f0;border:1px solid #d9e9ce;border-radius:12px;padding:14px;min-height:112px}.modular-flow strong{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--primary);color:#fff;margin-bottom:8px}.modular-flow span{font-weight:700;color:var(--primary)}
+@media(max-width:900px){.presentation-hero{grid-template-columns:1fr}.presentation-grid{grid-template-columns:repeat(2,1fr)}.modular-flow{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.brand-logo-full{width:120px}.topbar .brand.top div{display:none}.presentation-hero h2{font-size:32px}.presentation-grid,.modular-flow{grid-template-columns:1fr}}
+
+.file-field{display:grid;gap:7px;font-weight:700;color:#475467}
+.file-field input{padding:12px;background:#f8fafc}
+.import-options{display:grid;gap:9px;margin:16px 0}
+.import-options label{display:flex;align-items:center;gap:8px;font-weight:600}
+.import-options input{width:auto}
+.import-note{margin-top:14px;padding:12px;border-radius:10px;background:#eef5e7;border:1px solid #cfe1bd;color:#35551c;font-size:13px;line-height:1.45}
+.import-metrics{margin:14px 0}
+.import-metrics article{padding:12px}
+.import-metrics strong{font-size:24px}
+.import-warnings{padding:12px 14px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;margin-bottom:12px}
+.import-warnings p{margin:4px 0}
+.import-progress{margin-top:16px;padding:13px;background:#f8fafc;border:1px solid var(--border);border-radius:10px}
+.import-progress-bar{height:10px;background:#dce6ec;border-radius:999px;overflow:hidden}
+.import-progress-bar span{display:block;width:0;height:100%;background:var(--accent,#8dc63f);transition:width .25s ease}
+.import-progress p{margin:8px 0 0;color:var(--muted)}
+.import-result{margin-top:14px;padding:15px;border-radius:11px;background:#ecfdf3;border:1px solid #86efac;color:#166534}
+.import-result.error{background:#fff0ef;border-color:#f1b4ae;color:#b42318}
+.import-result h3{margin:0 0 10px}
+.import-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.import-result-grid span{padding:10px;background:rgba(255,255,255,.65);border-radius:8px}
+.import-result-grid strong{display:block;font-size:22px}
+@media(max-width:800px){.import-result-grid{grid-template-columns:1fr 1fr}}
+
+.backup-card-heading{display:flex;align-items:center;gap:13px;margin-bottom:16px}
+.backup-card-heading h3,.backup-card-heading p{margin:0}
+.backup-card-heading p{color:var(--muted);margin-top:4px}
+.backup-icon{display:grid;place-items:center;width:46px;height:46px;border-radius:13px;background:var(--primary);color:#fff;font-size:23px;font-weight:900}
+.backup-icon.restore{background:#8dc63f;color:#052630}
+.backup-info{padding:13px;border-radius:10px;background:#f5f8f9;border:1px solid var(--border);margin-bottom:14px}
+.backup-info span{font-weight:800;color:var(--primary)}
+.backup-info ul{margin:8px 0 0;padding-left:20px;display:grid;gap:5px}
+.restore-confirm-field{display:grid;gap:7px;margin:14px 0;color:#475467;font-weight:700}
+.backup-path-box{padding:14px;border-radius:11px;background:#052630;color:#fff;margin-bottom:12px;overflow-wrap:anywhere}
+.backup-path-box span{display:block;color:#8dc63f;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:800;margin-bottom:5px}
+.backup-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
+.backup-steps span{padding:11px;border-radius:9px;background:#eef5e7;border:1px solid #cfe1bd;color:#35551c;font-weight:700;font-size:13px}
+@media(max-width:850px){.backup-steps{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.backup-steps{grid-template-columns:1fr}}
+
+
+/* APONTA P3 v2.8 — Férias, afastamentos e exclusões seguras */
+.absence-help{margin-top:12px;padding:10px;border-radius:9px;background:#f5f9f1;border:1px solid #dce9cf}
+.absence-filters{margin-top:12px}
+.absence-programado{background:#dbeafe;color:#1d4ed8}
+.absence-em_andamento{background:#dcfce7;color:#166534}
+.absence-encerrado{background:#e5e7eb;color:#4b5563}
+.table-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+#teamTable input,#teamTable select{min-width:105px}
+@media(max-width:720px){
+  .absence-filters label{min-width:100%}
+  #absences .table-wrap{max-height:520px}
+}
+
+
+/* APONTA P3 v2.9 — Relatórios de equipe, férias e afastamentos */
+.report-tabs{max-width:760px;margin-bottom:14px}
+.report-panel{display:block}
+.report-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}
+.report-metrics article{background:#f7faf8;border:1px solid var(--border);border-top:4px solid var(--primary2);border-radius:12px;padding:14px}
+.report-metrics span{display:block;color:var(--muted);font-size:13px}
+.report-metrics strong{display:block;color:var(--primary);font-size:25px;margin-top:5px}
+.report-section-heading{margin:20px 0 10px;align-items:flex-end}
+.report-section-heading h3,.report-section-heading p{margin:0}
+.report-section-heading p{color:var(--muted);font-size:13px;margin-top:4px}
+.report-details-heading{padding-top:3px;border-top:1px solid var(--border)}
+.report-summary-table{max-height:460px}
+@media(max-width:900px){.report-metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.report-tabs{flex-direction:column}.report-metrics{grid-template-columns:1fr 1fr}.report-metrics strong{font-size:21px}}
+
+
+/* APONTA P3 v2.10 — Aprovação de férias e afastamentos */
+.approval-pendente{background:#fef0c7;color:#92400e}
+.approval-aprovado{background:#dcfce7;color:#166534}
+.approval-locked{background:#e5e7eb;color:#4b5563}
+
+
+/* APONTA P3 v2.11 — Aprovação de inscrições */
+.registration-pendente{background:#fef0c7!important;color:#92400e!important}
+.registration-aprovado{background:#dcfce7!important;color:#166534!important}
+.registration-rejeitado{background:#fee4e2!important;color:#b42318!important}
+.registration-top-badge{border:1px solid rgba(255,255,255,.24)}
+.registration-access-banner{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:15px 17px;margin-bottom:14px;border-radius:13px;
+  background:#fff7ed;border:1px solid #fed7aa;color:#9a3412
+}
+.registration-access-banner strong{display:block;font-size:16px}
+.registration-access-banner p{margin:4px 0 0;line-height:1.4}
+.team-legend{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  margin-bottom:13px;padding:11px;border-radius:10px;
+  background:#f8fafc;border:1px solid var(--border);color:#475467;font-size:13px
+}
+.team-review-note{margin-top:5px;color:#667085;font-size:12px;max-width:220px}
+#teamTable small{display:block;color:#667085;margin-top:3px}
+@media(max-width:650px){
+  .registration-access-banner{align-items:flex-start;flex-direction:column}
+}
+
+
+/* APONTA P3 v2.11.2 — Equipe responsiva no celular */
+.registration-row-pendente{
+  box-shadow:inset 4px 0 0 #f59e0b;
+}
+.registration-row-rejeitado{
+  box-shadow:inset 4px 0 0 #dc2626;
+}
+
+@media(max-width:720px){
+  #team .card{
+    padding:12px;
+    overflow:visible;
+  }
+
+  #team .team-legend{
+    align-items:flex-start;
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:7px 9px;
+  }
+
+  #team .table-wrap{
+    max-height:none;
+    overflow:visible;
+    border:0;
+    border-radius:0;
+    background:transparent;
+  }
+
+  #team table,
+  #team tbody,
+  #team tr,
+  #team td{
+    display:block;
+    width:100%;
+    box-sizing:border-box;
+  }
+
+  #team thead{
+    display:none;
+  }
+
+  #team .team-member-row{
+    margin:0 0 14px;
+    padding:10px 12px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    background:#fff;
+    box-shadow:0 5px 16px rgba(15,23,42,.07);
+  }
+
+  #team .team-member-row:last-child{
+    margin-bottom:0;
+  }
+
+  #team .team-member-row td{
+    display:grid;
+    grid-template-columns:minmax(92px,34%) minmax(0,1fr);
+    gap:10px;
+    align-items:start;
+    padding:10px 2px;
+    border-bottom:1px solid #e8edf2;
+    overflow-wrap:anywhere;
+  }
+
+  #team .team-member-row td::before{
+    content:attr(data-label);
+    color:var(--primary);
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.01em;
+  }
+
+  #team .team-member-row td:last-child{
+    border-bottom:0;
+  }
+
+  #team .team-actions-cell{
+    display:block!important;
+    padding-top:13px!important;
+  }
+
+  #team .team-actions-cell::before{
+    display:block;
+    margin-bottom:9px;
+  }
+
+  #team .table-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    width:100%;
+  }
+
+  #team .table-actions .btn{
+    width:100%;
+    min-height:44px;
+    padding:10px 8px;
+    justify-content:center;
+    font-size:14px;
+    touch-action:manipulation;
+  }
+
+  #teamTable input,
+  #teamTable select{
+    min-width:0;
+    width:100%;
+    max-width:100%;
+  }
+
+  #team .team-review-note{
+    max-width:none;
+  }
+
+  #team .registration-row-pendente .team-actions-cell{
+    background:#fffbeb;
+    margin-top:4px;
+    padding:12px 10px!important;
+    border-radius:10px;
+  }
+
+  #team .registration-row-pendente .team-actions-cell::before{
+    content:"Aprovação necessária";
+    color:#92400e;
+  }
+}
+
+@media(max-width:390px){
+  #team .team-member-row td{
+    grid-template-columns:82px minmax(0,1fr);
+    gap:8px;
+  }
+
+  #team .table-actions{
+    grid-template-columns:1fr;
+  }
+}
+
+
+/* APONTA P3 v2.11.3 — aprovação mobile definitiva */
+.pending-registrations-card{
+  margin-bottom:16px;
+  border:2px solid #f4c95d;
+  background:#fffcf2;
+}
+.pending-registrations-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:14px;
+}
+.pending-registrations-header h3{
+  margin:0;
+  color:var(--primary);
+}
+.pending-registrations-header p{
+  margin:4px 0 0;
+  color:#667085;
+}
+.pending-registrations-header-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.pending-registrations-list{
+  display:grid;
+  gap:10px;
+}
+.pending-registration-item{
+  display:grid;
+  grid-template-columns:minmax(220px,1fr) auto auto;
+  gap:14px;
+  align-items:center;
+  padding:13px;
+  border:1px solid #f1d990;
+  border-radius:12px;
+  background:#fff;
+}
+.pending-registration-person{
+  min-width:0;
+}
+.pending-registration-person strong,
+.pending-registration-person span,
+.pending-registration-person small{
+  display:block;
+  overflow-wrap:anywhere;
+}
+.pending-registration-person span{
+  margin-top:3px;
+  color:#475467;
+}
+.pending-registration-person small{
+  margin-top:3px;
+  color:#667085;
+}
+.pending-registration-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.pending-registrations-empty{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding:18px;
+  border:1px dashed #d0d5dd;
+  border-radius:10px;
+  background:#fff;
+  color:#667085;
+}
+.pending-registrations-empty strong{
+  color:#344054;
+}
+.registration-feature-warning{
+  padding:13px;
+  border:1px solid #fda29b;
+  border-radius:10px;
+  background:#fff1f0;
+  color:#b42318;
+  margin-bottom:12px;
+}
+
+@media(max-width:720px){
+  .pending-registrations-card{
+    position:relative;
+    padding:12px;
+    margin:0 0 15px;
+  }
+
+  .pending-registrations-header{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .pending-registrations-header-actions{
+    justify-content:space-between;
+  }
+
+  .pending-registration-item{
+    display:block;
+    padding:14px;
+  }
+
+  .pending-registration-status{
+    margin-top:10px;
+  }
+
+  .pending-registration-actions{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:9px;
+    margin-top:13px;
+  }
+
+  .pending-registration-actions .btn{
+    width:100%;
+    min-height:48px;
+    font-size:15px;
+    justify-content:center;
+    touch-action:manipulation;
+  }
+
+  .mobile-approval-button{
+    order:1;
+  }
+
+  .mobile-reject-button{
+    order:2;
+  }
+}
+
+
+/* APONTA P3 v2.11.4 — confirmação visual e modo sem cache */
+.app-version-badge{
+  background:#d1fae5!important;
+  color:#065f46!important;
+  border:1px solid #6ee7b7!important;
+  white-space:nowrap;
+}
+
+@media(max-width:720px){
+  .app-version-badge{
+    position:absolute;
+    right:12px;
+    top:8px;
+    z-index:5;
+    font-size:10px;
+  }
+
+  #pendingRegistrationsPanel{
+    display:block!important;
+  }
+
+  #pendingRegistrationsList{
+    display:block!important;
+  }
+}
+
+
+/* APONTA P3 v2.11.5 — instalação no celular */
+.install-app-overlay{
+  position:fixed;
+  inset:0;
+  z-index:20000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(2,24,31,.72);
+  backdrop-filter:blur(4px);
+}
+.install-app-overlay[hidden]{
+  display:none!important;
+}
+.install-app-card{
+  position:relative;
+  width:min(430px,100%);
+  max-height:calc(100vh - 36px);
+  overflow:auto;
+  padding:26px 22px 22px;
+  border-radius:20px;
+  background:#fff;
+  box-shadow:0 24px 70px rgba(0,0,0,.32);
+  text-align:center;
+}
+.install-app-close{
+  position:absolute;
+  top:10px;
+  right:12px;
+  width:38px;
+  height:38px;
+  border:0;
+  border-radius:50%;
+  background:#eef3f1;
+  color:#073642;
+  font-size:26px;
+  line-height:1;
+  cursor:pointer;
+}
+.install-app-icon{
+  width:82px;
+  height:82px;
+  margin:0 auto 14px;
+  border-radius:20px;
+  overflow:hidden;
+  background:#073642;
+  box-shadow:0 10px 24px rgba(7,54,66,.22);
+}
+.install-app-icon img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.install-app-card h2{
+  margin:0;
+  color:#073642;
+  font-size:25px;
+}
+.install-app-card > p{
+  margin:9px auto 18px;
+  max-width:340px;
+  color:#52646b;
+  line-height:1.45;
+}
+.install-app-actions{
+  display:grid;
+  gap:10px;
+}
+.install-main-btn{
+  min-height:50px;
+  font-size:16px;
+}
+.ios-install-instructions,
+.manual-install-instructions{
+  text-align:left;
+}
+.ios-install-instructions ol{
+  margin:0 0 18px;
+  padding-left:22px;
+  color:#344054;
+}
+.ios-install-instructions li{
+  margin-bottom:10px;
+  line-height:1.4;
+}
+.ios-install-instructions .btn,
+.manual-install-instructions .btn{
+  width:100%;
+}
+.manual-install-instructions p{
+  margin:0 0 18px;
+  color:#344054;
+  line-height:1.5;
+}
+
+@media(max-width:520px){
+  .install-app-overlay{
+    align-items:flex-end;
+    padding:0;
+  }
+  .install-app-card{
+    width:100%;
+    max-height:92vh;
+    border-radius:22px 22px 0 0;
+    padding:28px 18px calc(18px + env(safe-area-inset-bottom));
+  }
+}
+
+
+/* APONTA P3 v2.12.0 — fluxo Projeto > Área > Referência > Atividade */
+.entry-flow-form .flow-step > span{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--primary)}
+.entry-flow-form .flow-step > span b{display:inline-grid;place-items:center;width:23px;height:23px;border-radius:50%;background:var(--primary);color:#fff;font-size:12px}
+.conditional-flow-field{padding:10px;border-radius:12px;background:#f3f8f6;border:1px solid #bdd8cf}
+.activity-context-help{display:flex;flex-direction:column;gap:4px;padding:11px 12px;border-left:4px solid #3c8b72;border-radius:8px;background:#edf8f4;color:#344054;font-size:13px}
+.activity-context-help strong{color:var(--primary)}
+.field-rule{float:right;padding:2px 7px;border-radius:999px;background:#eef2f6;color:#52606d;font-size:11px;font-weight:700}
+.field-rule.required{background:#fee4e2;color:#b42318}
+.field-title{display:block;margin-bottom:7px;font-weight:700}
+.area-checkbox-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+.area-checkbox-grid label{display:flex;align-items:center;gap:6px;padding:9px;border:1px solid var(--border);border-radius:9px;background:#fff;font-size:13px}
+.flow-catalog-card{overflow:hidden}
+.flow-catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.flow-catalog-section{min-width:0;padding:14px;border:1px solid var(--border);border-radius:14px;background:#f8faf9}
+.flow-catalog-section h4{margin:0 0 10px;color:var(--primary)}
+.mini-catalog-form{display:grid;grid-template-columns:minmax(80px,.7fr) minmax(140px,1.4fr) auto;gap:7px;margin-bottom:10px}
+.flow-catalog-section:nth-child(2) .mini-catalog-form{grid-template-columns:1fr .6fr 1fr auto}
+.app-version-badge{background:#d1fae5!important;color:#065f46!important;border:1px solid #6ee7b7!important}
+@media(max-width:900px){.area-checkbox-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.flow-catalog-grid{grid-template-columns:1fr}.mini-catalog-form,.flow-catalog-section:nth-child(2) .mini-catalog-form{grid-template-columns:1fr}.mini-catalog-form .btn{width:100%}}
+@media(max-width:720px){.entry-flow-form{display:block}.entry-flow-form label,.entry-flow-form .activity-context-help{margin-bottom:12px}.conditional-flow-field{padding:10px}.area-checkbox-grid{grid-template-columns:1fr}.flow-catalog-section{padding:11px}.flow-catalog-card{padding:12px}}
+
+
+/* APONTA P3 v2.12.1 — correção de layout dos cadastros */
+.grid > *{min-width:0;}
+.card{min-width:0;}
+.flow-catalog-card,.flow-catalog-grid,.flow-catalog-section,.table-wrap{min-width:0;}
+.table-wrap table{min-width:100%;}
+#catalogs .grid{align-items:start;}
+#catalogs .mini-catalog-form input,#catalogs .mini-catalog-form select,#catalogs .mini-catalog-form .btn{min-width:0;}
+#catalogs .flow-catalog-section .table-wrap{overflow:auto hidden; max-width:100%;}
+#catalogs .flow-catalog-section table th,#catalogs .flow-catalog-section table td{white-space:normal; overflow-wrap:anywhere;}
+@media(max-width:1180px){#catalogs .span-4,#catalogs .span-8{grid-column:span 12;}.flow-catalog-grid{grid-template-columns:1fr;}}
+@media(max-width:900px){#catalogs .page-title{align-items:flex-start;}#catalogs .card{padding:14px;}}
+@media(max-width:720px){main{padding:16px 10px 32px;}#catalogs .table-wrap.compact{max-height:none;}#catalogs .section-heading{align-items:flex-start;flex-direction:column;gap:8px;}}
+
+
+/* APONTA P3 v2.12.2 — subabas da área Cadastros */
+.catalog-tabs{
+  max-width:680px;
+  margin-bottom:16px;
+}
+
+.catalog-tabs .tab{
+  min-height:46px;
+}
+
+.catalog-panel{
+  display:block;
+  min-width:0;
+}
+
+.catalog-panel[hidden]{
+  display:none!important;
+}
+
+.catalog-panel > .grid{
+  align-items:start;
+}
+
+.holiday-catalog-form{
+  display:grid;
+  grid-template-columns:minmax(170px,.6fr) minmax(260px,1.4fr) auto;
+  align-items:end;
+  gap:11px;
+  margin-top:14px;
+}
+
+.holiday-catalog-form label{
+  display:grid;
+  gap:5px;
+  color:#475467;
+  font-weight:700;
+  font-size:13px;
+}
+
+.holiday-catalog-form .btn{
+  min-height:42px;
+}
+
+.catalog-structure-heading{
+  margin-bottom:14px;
+}
+
+.catalog-section-help{
+  min-height:38px;
+  margin:-3px 0 12px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.4;
+}
+
+@media(max-width:900px){
+  .catalog-tabs{
+    max-width:none;
+  }
+
+  .holiday-catalog-form{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .holiday-catalog-form .btn{
+    grid-column:1/-1;
+  }
+}
+
+@media(max-width:620px){
+  .catalog-tabs{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  .catalog-tabs .tab{
+    width:100%;
+    min-height:48px;
+  }
+
+  .holiday-catalog-form{
+    grid-template-columns:1fr;
+  }
+
+  .holiday-catalog-form .btn{
+    grid-column:auto;
+    width:100%;
+  }
+
+  .catalog-section-help{
+    min-height:0;
+  }
+}

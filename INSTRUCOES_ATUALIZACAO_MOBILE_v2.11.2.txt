@@ -1,0 +1,30 @@
+APONTA P3 v2.11.2 — CORREÇÃO MOBILE DA ABA EQUIPE
+==================================================
+
+PROBLEMA CORRIGIDO
+------------------
+No celular, a coluna Ações ficava fora da área visível da tabela.
+Por isso o botão Aprovar parecia não existir.
+
+COMO ATUALIZAR
+--------------
+1. Faça uma cópia da versão publicada.
+2. No Netlify, substitua:
+   - index.html
+   - app.js
+   - style.css
+   - sw.js
+3. Não substitua config.js.
+4. Publique novamente.
+5. No celular:
+   - feche o Aponta P3;
+   - abra novamente;
+   - atualize a página;
+   - se estiver instalado como PWA, feche completamente e reabra.
+
+RESULTADO
+---------
+Na aba Equipe, cada integrante será mostrado como um cartão.
+Os botões Aprovar/Rejeitar estarão no final do cartão e sempre visíveis.
+
+Não é necessário executar SQL no Supabase.

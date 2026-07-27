@@ -1,0 +1,119 @@
+APONTa P3 v2.3 — CONFIGURAR E-MAIL DE APROVAÇÃO
+
+O aplicativo agora chama uma Edge Function do Supabase chamada:
+
+enviar-aprovacao
+
+A função envia e-mail para:
+- todos os Administradores ativos;
+- todos os Gestores ativos.
+
+Também é possível definir endereços fixos usando o segredo APPROVAL_EMAILS.
+
+============================================================
+1. CRIAR UMA CONTA NO RESEND
+============================================================
+
+1. Acesse https://resend.com pelo navegador.
+2. Crie a conta.
+3. Abra API Keys.
+4. Crie uma chave com permissão de envio.
+5. Copie a chave, que começa normalmente com:
+
+re_
+
+Guarde a chave. Não coloque essa chave no config.js nem no Netlify.
+
+Para enviar para toda a equipe, verifique um domínio seu no Resend.
+O endereço de remetente pode ser, por exemplo:
+
+Aponta P3 <apontamento@seudominio.com.br>
+
+Para teste, onboarding@resend.dev só consegue enviar para o e-mail
+associado à conta Resend.
+
+============================================================
+2. CRIAR A EDGE FUNCTION PELO NAVEGADOR
+============================================================
+
+1. Entre no projeto do Supabase.
+2. No menu lateral, abra Edge Functions.
+3. Clique em Deploy a new function.
+4. Escolha Via Editor.
+5. Nome da função:
+
+enviar-aprovacao
+
+6. Apague o código de exemplo.
+7. Abra o arquivo FUNCAO_EMAIL_APROVACAO.ts.
+8. Copie todo o conteúdo e cole no editor.
+9. Clique em Deploy function.
+
+Mantenha a verificação de JWT habilitada, pois somente usuários
+conectados ao aplicativo podem solicitar o envio.
+
+============================================================
+3. CONFIGURAR OS SEGREDOS
+============================================================
+
+No Supabase, abra:
+
+Edge Functions → Secrets
+
+Adicione:
+
+RESEND_API_KEY
+Valor: sua chave re_...
+
+EMAIL_FROM
+Valor de produção:
+Aponta P3 <apontamento@seudominio.com.br>
+
+APP_URL
+Valor:
+https://SEU-SITE.netlify.app/
+
+Opcional:
+
+APPROVAL_EMAILS
+Valor:
+gestor@empresa.com.br,administrador@empresa.com.br
+
+Se APPROVAL_EMAILS não for definido, a função usa automaticamente os
+e-mails dos perfis Gestor e Administrador cadastrados no Aponta P3.
+
+============================================================
+4. ATUALIZAR O SITE
+============================================================
+
+1. Não substitua o seu config.js.
+2. Substitua na pasta atual:
+   - app.js
+   - sw.js
+3. Faça novo deploy da pasta completa no mesmo projeto do Netlify.
+4. Abra o aplicativo e pressione Ctrl + F5.
+
+Não é necessário executar SQL.
+
+============================================================
+5. TESTAR
+============================================================
+
+1. Entre no aplicativo.
+2. Confirme que existe pelo menos um usuário ativo com perfil:
+   - Gestor; ou
+   - Administrador.
+3. Abra Fechamento.
+4. Escolha o mês.
+5. Clique em Enviar para aprovação.
+
+Resultado esperado:
+
+Mês enviado para aprovação. E-mail enviado para 1 aprovador.
+
+Se aparecer que o mês foi enviado, mas o e-mail falhou:
+- abra Supabase → Edge Functions → enviar-aprovacao → Logs;
+- confira RESEND_API_KEY;
+- confira EMAIL_FROM;
+- confira se o domínio foi verificado no Resend;
+- confira os e-mails dos administradores e gestores.

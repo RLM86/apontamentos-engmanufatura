@@ -1,0 +1,51 @@
+﻿APONTa P3 v2.8.1 — AGENTE DE BACKUP AUTOMATICO
+================================================
+
+POR QUE O BACKUP PODE NAO TER SIDO BAIXADO AS 18H
+--------------------------------------------------
+O backup automatico nao e executado pelo navegador, Netlify ou pelo aplicativo
+quando ele esta fechado. Ele depende de uma tarefa instalada no Windows.
+
+A versao anterior tinha apenas a Edge Function e as instrucoes, mas o pacote do
+agente do Windows nao estava dentro do ZIP completo. Este pacote corrige isso.
+
+MELHORIAS DESTA VERSAO
+----------------------
+- Tarefa diaria no horario escolhido.
+- Recuperacao no proximo login se o computador estava desligado.
+- 3 tentativas quando a internet ou o Supabase falham.
+- Pasta Pendentes se a unidade Y: estiver desconectada.
+- Copia automatica dos pendentes quando a unidade voltar.
+- Logs mensais e arquivo ultimo_status.json.
+- Evita duplicar o backup do mesmo dia.
+
+ANTES DE INSTALAR
+-----------------
+No Supabase, confira a funcao backup-aponta-p3:
+1. Ela deve estar publicada com o codigo FUNCAO_BACKUP_APONTA_P3.ts.
+2. Em Settings, deixe Verify JWT DESATIVADO somente para backup-aponta-p3.
+3. Em Edge Functions > Secrets, crie BACKUP_TOKEN com pelo menos 32 caracteres.
+
+O token digitado no instalador deve ser exatamente igual ao Secret.
+
+COMO INSTALAR
+-------------
+1. Execute Configurar_Backup_Diario.bat.
+2. Confirme a URL do Supabase.
+3. Cole o BACKUP_TOKEN.
+4. Confirme a pasta de destino e o horario 18:00.
+5. Escolha testar o backup imediatamente.
+
+COMO CONFERIR
+-------------
+- Execute Ver_Ultimo_Status.bat.
+- Abra o Agendador de Tarefas do Windows.
+- Procure:
+  Aponta P3 - Backup Diario
+  Aponta P3 - Recuperar Backup Perdido
+
+Se a pasta Y: estiver indisponivel, o backup fica temporariamente em:
+%LOCALAPPDATA%\ApontaP3Backup\Pendentes
+
+Ao voltar a ter acesso ao Y:, o proximo funcionamento copia os pendentes para a
+pasta principal.

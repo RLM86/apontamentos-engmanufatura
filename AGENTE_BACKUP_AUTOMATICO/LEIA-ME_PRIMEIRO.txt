@@ -1,0 +1,45 @@
+﻿BACKUP APONTA P3 — CONFIGURAÇÃO DO ZERO v2.8.4
+================================================
+
+Use os arquivos na ordem numérica:
+
+1_RESETAR_TUDO.bat
+- Remove as duas tarefas agendadas antigas.
+- Preserva a pasta antiga com outro nome.
+
+2_GERAR_NOVO_TOKEN.bat
+- Gera um token novo e seguro.
+- Copia o token para a área de transferência.
+- Salva temporariamente em NOVO_BACKUP_TOKEN.txt.
+
+NO SUPABASE
+- Edge Functions > Secrets.
+- Edite BACKUP_TOKEN.
+- No campo Valor, pressione Ctrl+V.
+- Salve.
+- Não copie o DIGEST SHA256.
+
+CONFIRA A FUNÇÃO
+- Edge Functions > backup-aponta-p3.
+- O index.ts deve conter a versão v2.8.3 incluída neste pacote.
+- Em Settings, Verify JWT deve estar desativado apenas nesta função.
+
+3_CONFIGURAR_AGENTE.bat
+- Usa automaticamente o mesmo token gerado.
+- URL correta:
+  https://djmtyraadaogqsbogjwp.supabase.co
+- Destino:
+  Y:\PLANTA 3\GESTÃO (APONTAMENTOS, HORAS...)\Apontamento Horas\2026
+- Horário: 18:00
+
+4_TESTAR_BACKUP_AGORA.bat
+- O resultado esperado é “Backup concluído”.
+
+5_APAGAR_TOKEN_VISIVEL.bat
+- Execute somente após o teste funcionar.
+- Apaga o arquivo temporário do token e limpa a área de transferência.
+
+IMPORTANTE
+- Não envie o token por mensagem ou print.
+- A função excluir-cadastro continua com Verify JWT ativado.
+- Somente backup-aponta-p3 fica com Verify JWT desativado.

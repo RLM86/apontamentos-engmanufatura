@@ -1,0 +1,9 @@
+APONTA P3 v2.12.1
+
+Esta atualização corrige a desconfiguração visual da aba Cadastros.
+
+COMO ATUALIZAR
+1. Publique os arquivos da versão completa no Netlify, ou use o pacote de atualização.
+2. Se usar o pacote de atualização, mantenha o seu config.js atual.
+3. Depois da publicação, abra /limpar-cache.html e limpe o cache antigo.
+4. Reabra o sistema e confirme a versão v2.12.1 no topo da tela.

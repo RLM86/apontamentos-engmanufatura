@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Configurar Aponta P3</title>
+<style>
+body{font-family:Segoe UI,Arial;background:#f4f7fb;margin:0;padding:24px;color:#1f2937}.box{max-width:720px;margin:auto;background:#fff;padding:22px;border:1px solid #d8e1eb;border-radius:15px}
+label{display:grid;gap:6px;margin:14px 0;font-weight:700}input{padding:11px;border:1px solid #d8e1eb;border-radius:8px}.btn{border:0;border-radius:8px;padding:11px 15px;background:#174a73;color:#fff;font-weight:700;cursor:pointer}
+code{background:#edf3f8;padding:2px 5px;border-radius:4px}.warn{background:#fff7ed;border:1px solid #fed7aa;padding:12px;border-radius:9px}
+</style>
+</head>
+<body><div class="box">
+<h1>Configurar Aponta P3</h1>
+<p>Informe os dados públicos encontrados no painel do Supabase, em <strong>Project Settings → API</strong>.</p>
+<div class="warn"><strong>Não use a chave service_role.</strong> Use somente a chave pública/publishable ou anon.</div>
+<label>URL do projeto<input id="url" placeholder="https://xxxxxxxx.supabase.co"></label>
+<label>Chave pública<input id="key" placeholder="sb_publishable_... ou chave anon"></label>
+<button class="btn" id="download">Gerar config.js</button>
+<p>Depois substitua o arquivo <code>config.js</code> da pasta do aplicativo pelo arquivo baixado e publique novamente.</p>
+</div>
+<script>
+document.getElementById('download').onclick=()=>{
+ const url=document.getElementById('url').value.trim(), key=document.getElementById('key').value.trim();
+ if(!/^https:\/\/.+\.supabase\.co$/.test(url)) return alert('Confira a URL do projeto.');
+ if(key.length<30) return alert('Confira a chave pública.');
+ const txt=`window.APONTA_CONFIG = {\n  supabaseUrl: ${JSON.stringify(url)},\n  supabaseAnonKey: ${JSON.stringify(key)}\n};\n`;
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/javascript'}));a.download='config.js';a.click();URL.revokeObjectURL(a.href);
+};
+</script></body></html>

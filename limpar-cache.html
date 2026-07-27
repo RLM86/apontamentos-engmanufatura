@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Atualizar Aponta P3</title>
+  <style>
+    body{font-family:Arial,sans-serif;background:#eef5f2;color:#073642;margin:0;padding:24px}
+    main{max-width:620px;margin:40px auto;background:#fff;border-radius:16px;padding:24px;
+      box-shadow:0 12px 35px rgba(15,23,42,.12)}
+    h1{margin-top:0}
+    .status{padding:14px;border-radius:10px;background:#ecfdf3;border:1px solid #86efac}
+    a{display:inline-block;margin-top:18px;background:#063642;color:#fff;text-decoration:none;
+      padding:13px 18px;border-radius:10px;font-weight:700}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Atualização do Aponta P3</h1>
+  <p id="status" class="status">Limpando a versão antiga...</p>
+  <a id="openApp" href="./?build=2122" hidden>Abrir Aponta P3 v2.12.2</a>
+</main>
+<script>
+(async()=>{
+  const status=document.getElementById("status");
+  try{
+    if("serviceWorker" in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r=>r.unregister()));
+    }
+    if("caches" in window){
+      const names=await caches.keys();
+      await Promise.all(names.map(n=>caches.delete(n)));
+    }
+    status.textContent="Cache antigo removido. Agora abra a versão v2.12.2.";
+  }catch(e){
+    status.textContent="Atualização preparada. Toque no botão para abrir a nova versão.";
+  }
+  document.getElementById("openApp").hidden=false;
+})();
+</script>
+</body>
+</html>
