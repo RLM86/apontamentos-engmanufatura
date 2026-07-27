@@ -8,7 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest?v=2.12.0">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.12.2.css?build=2122">
+  <link rel="stylesheet" href="style-v2.13.0.css?build=2130">
   <title>Modular | Apontamento de Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -111,7 +111,7 @@
         <span id="currentUser"></span>
         <span id="currentRole" class="badge"></span>
         <span id="currentRegistration" class="badge registration-top-badge"></span>
-        <span class="badge app-version-badge">v2.12.2</span>
+        <span class="badge app-version-badge">v2.13.0</span>
         <button id="logoutBtn" class="btn ghost small">Sair</button>
       </div>
     </header>
@@ -216,11 +216,11 @@
               <label class="full manager-user-field">Colaborador<select id="entryUser"></select></label>
               <label class="full flow-step"><span><b>1</b> Projeto</span><select id="entryProject" required></select></label>
               <label class="full flow-step"><span><b>2</b> Área</span><select id="entryArea" required></select></label>
-              <label id="entrySectorField" class="full flow-step conditional-flow-field" hidden><span><b>3</b> Setor de fabricação</span><select id="entrySector"></select></label>
-              <label id="entryModuleField" class="full flow-step conditional-flow-field" hidden><span><b>3</b> Módulo estrutural</span><select id="entryModule"></select></label>
-              <label id="entryPanelTypeField" class="full flow-step conditional-flow-field" hidden><span><b>3</b> Tipo de painel</span><select id="entryPanelType"></select></label>
-              <label id="entryRoomField" class="full flow-step conditional-flow-field" hidden><span><b>3</b> Sala da montagem final</span><select id="entryRoom"></select></label>
-              <label class="full flow-step"><span><b>4</b> Atividade</span><select id="entryActivity" required></select></label>
+              <label id="entrySectorField" class="full flow-step conditional-flow-field" hidden><span><b id="entrySectorStep">3</b> Setor de fabricação</span><select id="entrySector"></select></label>
+              <label id="entryPanelTypeField" class="full flow-step conditional-flow-field" hidden><span><b id="entryPanelTypeStep">3</b> Tipo de painel</span><select id="entryPanelType"></select></label>
+              <label id="entryRoomField" class="full flow-step conditional-flow-field" hidden><span><b id="entryRoomStep">3</b> <span id="entryRoomLabel">Sala do projeto</span></span><select id="entryRoom"></select></label>
+              <label id="entryModuleField" class="full flow-step conditional-flow-field" hidden><span><b id="entryModuleStep">4</b> Módulo da sala</span><select id="entryModule"></select></label>
+              <label class="full flow-step"><span><b id="entryActivityStep">4</b> Atividade</span><select id="entryActivity" required></select></label>
               <div id="entryActivityHelp" class="activity-context-help full" hidden></div>
               <label>Data<input id="entryDate" type="date" max="" required></label>
               <label>Horas<input id="entryHours" type="number" min="0.25" max="24" step="0.25" required></label>
@@ -386,17 +386,14 @@
         <div class="page-title">
           <div>
             <h2>Cadastros</h2>
-            <p>Gerencie os cadastros gerais e a estrutura utilizada nos apontamentos.</p>
+            <p>Cadastros gerais, referências por área e estrutura específica de cada projeto.</p>
           </div>
         </div>
 
-        <div class="tabs report-tabs catalog-tabs" role="tablist" aria-label="Tipos de cadastro">
-          <button class="tab active" type="button" data-catalog-view="general">
-            Cadastros gerais
-          </button>
-          <button class="tab" type="button" data-catalog-view="structure">
-            Estrutura do apontamento
-          </button>
+        <div class="tabs report-tabs catalog-tabs catalog-tabs-three" role="tablist" aria-label="Tipos de cadastro">
+          <button class="tab active" type="button" data-catalog-view="general">1. Cadastros gerais</button>
+          <button class="tab" type="button" data-catalog-view="references">2. Referências por área</button>
+          <button class="tab" type="button" data-catalog-view="projects">3. Estrutura por projeto</button>
         </div>
 
         <section id="generalCatalogPanel" class="catalog-panel">
@@ -410,163 +407,114 @@
                 <label class="full">Descrição<input id="projectDescription"></label>
                 <button class="btn primary full">Adicionar projeto</button>
               </form>
-              <div class="table-wrap compact">
-                <table>
-                  <thead><tr><th>Código</th><th>Projeto</th><th>Status</th><th>Ações</th></tr></thead>
-                  <tbody id="projectsTable"></tbody>
-                </table>
-              </div>
+              <div class="table-wrap compact"><table><thead><tr><th>Código</th><th>Projeto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="projectsTable"></tbody></table></div>
             </article>
 
             <article class="card span-8">
               <div class="section-heading">
-                <div>
-                  <h3>Atividades</h3>
-                  <p>Cadastre a atividade e indique em quais áreas ela pode ser utilizada.</p>
-                </div>
+                <div><h3>Atividades</h3><p>Defina as áreas em que cada atividade pode ser utilizada.</p></div>
                 <span id="activityCatalogCount" class="badge">0</span>
               </div>
-
               <form id="activityForm" class="form-grid">
                 <label>Código<input id="activityCode" placeholder="EM-MES-001"></label>
                 <label>Disciplina<input id="activityDiscipline" placeholder="Montagem Estrutural"></label>
                 <label class="full">Nome<input id="activityName" required></label>
                 <label>Natureza<input id="activityNature" placeholder="Rotina / Demanda"></label>
-                <label>
-                  Observação
-                  <select id="activityObservationRequirement">
-                    <option>Recomendado</option>
-                    <option>Sim</option>
-                  </select>
-                </label>
-                <div class="full">
-                  <span class="field-title">Áreas aplicáveis</span>
-                  <div id="activityAreasCheckboxes" class="area-checkbox-grid"></div>
-                </div>
-                <label class="full">
-                  Orientação de uso
-                  <textarea id="activityUsageDescription" maxlength="500"></textarea>
-                </label>
+                <label>Observação<select id="activityObservationRequirement"><option>Recomendado</option><option>Sim</option></select></label>
+                <div class="full"><span class="field-title">Áreas aplicáveis</span><div id="activityAreasCheckboxes" class="area-checkbox-grid"></div></div>
+                <label class="full">Orientação de uso<textarea id="activityUsageDescription" maxlength="500"></textarea></label>
                 <button class="btn primary full">Adicionar atividade</button>
               </form>
-
-              <div class="table-wrap compact">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Código</th>
-                      <th>Atividade</th>
-                      <th>Áreas</th>
-                      <th>Disciplina</th>
-                      <th>Status</th>
-                      <th>Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody id="activitiesTable"></tbody>
-                </table>
-              </div>
+              <div class="table-wrap compact"><table><thead><tr><th>Código</th><th>Atividade</th><th>Áreas</th><th>Disciplina</th><th>Status</th><th>Ações</th></tr></thead><tbody id="activitiesTable"></tbody></table></div>
             </article>
 
             <article class="card span-12 holiday-catalog-card">
-              <div class="section-heading">
-                <div>
-                  <h3>Feriados</h3>
-                  <p>Cadastre os dias que não deverão compor a jornada normal da equipe.</p>
-                </div>
-              </div>
-
-              <form id="holidayForm" class="form-grid holiday-catalog-form">
+              <div class="section-heading"><div><h3>Feriados</h3><p>Dias que não compõem a jornada normal.</p></div></div>
+              <form id="holidayForm" class="holiday-catalog-form">
                 <label>Data<input id="holidayDate" type="date" required></label>
                 <label>Descrição<input id="holidayName" required></label>
                 <button class="btn primary">Adicionar feriado</button>
               </form>
-
-              <div class="table-wrap compact">
-                <table>
-                  <thead><tr><th>Data</th><th>Descrição</th><th>Ações</th></tr></thead>
-                  <tbody id="holidaysTable"></tbody>
-                </table>
-              </div>
+              <div class="table-wrap compact"><table><thead><tr><th>Data</th><th>Descrição</th><th>Ações</th></tr></thead><tbody id="holidaysTable"></tbody></table></div>
             </article>
           </div>
         </section>
 
-        <section id="structureCatalogPanel" class="catalog-panel" hidden>
-          <article class="card span-12 flow-catalog-card">
-            <div class="section-heading catalog-structure-heading">
-              <div>
-                <h3>Estrutura do apontamento</h3>
-                <p>Cadastros exibidos no terceiro passo, conforme a área selecionada.</p>
+        <section id="referenceCatalogPanel" class="catalog-panel" hidden>
+          <div class="grid">
+            <article class="card span-4 reference-card">
+              <h3>Fabricação — Setores</h3>
+              <p class="catalog-section-help">Aparecem quando a área escolhida é Fabricação.</p>
+              <form id="sectorForm" class="mini-catalog-form">
+                <input id="sectorCode" placeholder="Código" required>
+                <input id="sectorName" placeholder="Nome do setor" required>
+                <button class="btn primary small">Adicionar</button>
+              </form>
+              <div class="table-wrap compact"><table><thead><tr><th>Setor</th><th>Status</th><th>Ação</th></tr></thead><tbody id="sectorsTable"></tbody></table></div>
+            </article>
+
+            <article class="card span-4 reference-card">
+              <h3>Painéis — Tipos</h3>
+              <p class="catalog-section-help">UPS, BMS, RPP, QGBT, PDU, ATS e outros.</p>
+              <form id="panelTypeForm" class="mini-catalog-form">
+                <input id="panelTypeCode" placeholder="Código" required>
+                <input id="panelTypeName" placeholder="Tipo de painel" required>
+                <button class="btn primary small">Adicionar</button>
+              </form>
+              <div class="table-wrap compact"><table><thead><tr><th>Tipo</th><th>Status</th><th>Ação</th></tr></thead><tbody id="panelTypesTable"></tbody></table></div>
+            </article>
+
+            <article class="card span-4 reference-card">
+              <h3>Catálogo de salas</h3>
+              <p class="catalog-section-help">Salas disponíveis para vínculo com os projetos.</p>
+              <form id="roomForm" class="mini-catalog-form">
+                <input id="roomCode" placeholder="Código" required>
+                <input id="roomName" placeholder="Nome da sala" required>
+                <button class="btn primary small">Adicionar</button>
+              </form>
+              <div class="table-wrap compact"><table><thead><tr><th>Sala</th><th>Status</th><th>Ação</th></tr></thead><tbody id="roomsTable"></tbody></table></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="projectStructureCatalogPanel" class="catalog-panel" hidden>
+          <div class="structure-explanation">
+            <strong>Regra aplicada:</strong>
+            cada projeto possui suas próprias salas e cada sala possui uma quantidade específica de módulos.
+          </div>
+
+          <div class="grid">
+            <article class="card span-5">
+              <div class="section-heading">
+                <div><h3>Salas por projeto</h3><p>Vincule somente as salas que realmente existem no projeto.</p></div>
+                <span id="projectRoomsCount" class="badge">0</span>
               </div>
-            </div>
+              <form id="projectRoomForm" class="form-grid">
+                <label class="full">Projeto<select id="projectRoomProject" required></select></label>
+                <label class="full">Sala do catálogo<select id="projectRoomRoom" required></select></label>
+                <label>Nome exibido<input id="projectRoomDisplayName" placeholder="Opcional"></label>
+                <label>Ordem<input id="projectRoomOrder" type="number" min="0" value="0"></label>
+                <button class="btn primary full">Vincular sala ao projeto</button>
+              </form>
+              <div class="table-wrap compact"><table><thead><tr><th>Projeto</th><th>Sala</th><th>Status</th><th>Ação</th></tr></thead><tbody id="projectRoomsTable"></tbody></table></div>
+            </article>
 
-            <div class="flow-catalog-grid">
-              <section class="flow-catalog-section">
-                <h4>Fabricação — Setores</h4>
-                <p class="catalog-section-help">Exibidos quando a área selecionada for Fabricação.</p>
-                <form id="sectorForm" class="mini-catalog-form">
-                  <input id="sectorCode" placeholder="Código" required>
-                  <input id="sectorName" placeholder="Nome do setor" required>
-                  <button class="btn primary small">Adicionar</button>
-                </form>
-                <div class="table-wrap compact">
-                  <table>
-                    <thead><tr><th>Setor</th><th>Status</th><th>Ação</th></tr></thead>
-                    <tbody id="sectorsTable"></tbody>
-                  </table>
-                </div>
-              </section>
-
-              <section class="flow-catalog-section">
-                <h4>Montagem Estrutural — Módulos</h4>
-                <p class="catalog-section-help">Os módulos são vinculados individualmente a cada projeto.</p>
-                <form id="projectModuleForm" class="mini-catalog-form">
-                  <select id="projectModuleProject" required></select>
-                  <input id="moduleCode" placeholder="Código" required>
-                  <input id="moduleName" placeholder="Nome do módulo" required>
-                  <button class="btn primary small">Adicionar</button>
-                </form>
-                <div class="table-wrap compact">
-                  <table>
-                    <thead><tr><th>Projeto</th><th>Módulo</th><th>Status</th><th>Ação</th></tr></thead>
-                    <tbody id="projectModulesTable"></tbody>
-                  </table>
-                </div>
-              </section>
-
-              <section class="flow-catalog-section">
-                <h4>Montagem de Painéis — Tipos</h4>
-                <p class="catalog-section-help">Exemplos: UPS, BMS, RPP, QGBT, PDU e ATS.</p>
-                <form id="panelTypeForm" class="mini-catalog-form">
-                  <input id="panelTypeCode" placeholder="Código" required>
-                  <input id="panelTypeName" placeholder="Tipo de painel" required>
-                  <button class="btn primary small">Adicionar</button>
-                </form>
-                <div class="table-wrap compact">
-                  <table>
-                    <thead><tr><th>Tipo</th><th>Status</th><th>Ação</th></tr></thead>
-                    <tbody id="panelTypesTable"></tbody>
-                  </table>
-                </div>
-              </section>
-
-              <section class="flow-catalog-section">
-                <h4>Montagem Final — Salas</h4>
-                <p class="catalog-section-help">Exibidas quando a área selecionada for Montagem Final.</p>
-                <form id="roomForm" class="mini-catalog-form">
-                  <input id="roomCode" placeholder="Código" required>
-                  <input id="roomName" placeholder="Nome da sala" required>
-                  <button class="btn primary small">Adicionar</button>
-                </form>
-                <div class="table-wrap compact">
-                  <table>
-                    <thead><tr><th>Sala</th><th>Status</th><th>Ação</th></tr></thead>
-                    <tbody id="roomsTable"></tbody>
-                  </table>
-                </div>
-              </section>
-            </div>
-          </article>
+            <article class="card span-7">
+              <div class="section-heading">
+                <div><h3>Módulos por sala</h3><p>Selecione primeiro o projeto e a sala; depois cadastre os módulos daquela sala.</p></div>
+                <span id="projectRoomModulesCount" class="badge">0</span>
+              </div>
+              <form id="projectRoomModuleForm" class="form-grid">
+                <label>Projeto<select id="projectRoomModuleProject" required></select></label>
+                <label>Sala<select id="projectRoomModuleRoom" required></select></label>
+                <label>Código do módulo<input id="projectRoomModuleCode" placeholder="MOD1" required></label>
+                <label>Nome exibido<input id="projectRoomModuleName" placeholder="Módulo 01" required></label>
+                <label>Ordem<input id="projectRoomModuleOrder" type="number" min="0" value="0"></label>
+                <button class="btn primary">Adicionar módulo à sala</button>
+              </form>
+              <div class="table-wrap compact"><table><thead><tr><th>Projeto</th><th>Sala</th><th>Módulo</th><th>Status</th><th>Ação</th></tr></thead><tbody id="projectRoomModulesTable"></tbody></table></div>
+            </article>
+          </div>
         </section>
       </section>
 
@@ -822,9 +770,9 @@
       <label>Projeto<select id="editEntryProject" required></select></label>
       <label>Área<select id="editEntryArea" required></select></label>
       <label id="editEntrySectorField" class="conditional-flow-field" hidden>Setor<select id="editEntrySector"></select></label>
-      <label id="editEntryModuleField" class="conditional-flow-field" hidden>Módulo<select id="editEntryModule"></select></label>
       <label id="editEntryPanelTypeField" class="conditional-flow-field" hidden>Tipo de painel<select id="editEntryPanelType"></select></label>
-      <label id="editEntryRoomField" class="conditional-flow-field" hidden>Sala<select id="editEntryRoom"></select></label>
+      <label id="editEntryRoomField" class="conditional-flow-field" hidden><span id="editEntryRoomLabel">Sala do projeto</span><select id="editEntryRoom"></select></label>
+      <label id="editEntryModuleField" class="conditional-flow-field" hidden>Módulo da sala<select id="editEntryModule"></select></label>
       <label>Atividade<select id="editEntryActivity" required></select></label>
       <div id="editEntryActivityHelp" class="activity-context-help" hidden></div>
       <label>Data<input id="editEntryDate" type="date" max="" required></label>
@@ -837,7 +785,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.12.2.js?build=2122"></script>
+  <script src="app-v2.13.0.js?build=2130"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">

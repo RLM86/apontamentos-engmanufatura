@@ -1,9 +1,11 @@
-# Aponta P3 Equipe Online v2.9
+# Aponta P3 Equipe Online v2.13.0
 
 Aplicativo web compartilhado para apontamento de horas. Toda a equipe utiliza o mesmo banco de dados online.
 
 ## O que esta versão possui
 
+- Fluxo Projeto → Área → Sala → Módulo para Montagem Estrutural.
+- Cadastros divididos em três subabas.
 - Login individual por e-mail e senha.
 - Primeiro usuário como Administrador.
 - Perfis Administrador, Gestor e Colaborador.

@@ -1,0 +1,39 @@
+RESUMO DA INTERPRETAÇÃO DA PLANILHA REVISADA
+================================================
+
+Fluxo aplicado:
+Projeto > Área > Sala (quando aplicável) > Módulo (Montagem Estrutural) > Atividade
+
+AWS:
+  - DATAHALL: 8 módulo(s) — MOD1, MOD2, MOD3, MOD4, MOD5, MOD6, MOD7, MOD8
+  - SALA CATCHER: 6 módulo(s) — MOD1, MOD2, MOD3, MOD4, MOD5, MOD6
+  - SALA DE MAQUINAS: 8 módulo(s) — MOD1, MOD2, MOD3, MOD4, MOD5, MOD6, MOD7, MOD8
+  - SALA ELETRICA: 6 módulo(s) — MOD1, MOD2, MOD3, MOD4, MOD5, MOD6
+  - SALA MEDIA: 6 módulo(s) — MOD1, MOD2, MOD3, MOD4, MOD5, MOD6
+
+TB11:
+  - Geral do projeto: 13 módulo(s) — Módulo 04, Módulo 05, Módulo 06, Módulo 07, Módulo 08, Módulo 09, Módulo 10, Módulo 11, Módulo 12, Módulo 13, Módulo 14, Módulo 15, Módulo 16
+
+UFG:
+  - MONOBLOCO: 1 módulo(s) — MOD1
+
+PRODEB:
+  - MONOBLOCO: 1 módulo(s) — MOD1
+
+BARBADOS:
+  - MONOBLOCO: 1 módulo(s) — MOD1
+
+FOR:
+  - Geral do projeto: 17 módulo(s) — Geral do projeto, Módulo 01, Módulo 02, Módulo 03, Módulo 04, Módulo 05, Módulo 06, Módulo 07, Módulo 08, Módulo 09, Módulo 10, Módulo 11, Módulo 12, Módulo 13, Módulo 14, Módulo 15, Módulo 16
+
+BOG:
+  - Geral do projeto: 17 módulo(s) — Geral do projeto, Módulo 01, Módulo 02, Módulo 03, Módulo 04, Módulo 05, Módulo 06, Módulo 07, Módulo 08, Módulo 09, Módulo 10, Módulo 11, Módulo 12, Módulo 13, Módulo 14, Módulo 15, Módulo 16
+
+CRUSOE:
+  - Geral do projeto: 17 módulo(s) — Geral do projeto, Módulo 01, Módulo 02, Módulo 03, Módulo 04, Módulo 05, Módulo 06, Módulo 07, Módulo 08, Módulo 09, Módulo 10, Módulo 11, Módulo 12, Módulo 13, Módulo 14, Módulo 15, Módulo 16
+
+AJUSTES DE CONSISTÊNCIA APLICADOS:
+- UFG, PRODEB e BARBADOS possuíam várias linhas repetidas de MOD1 em MONOBLOCO; foram consolidadas em um único módulo.
+- TB11, FOR, BOG e CRUSOE não tinham sala preenchida; foram vinculados à sala 'Geral do projeto'.
+- Os dois setores com código PINT receberam códigos exclusivos para preservar Pintura Líquida e Pintura Eletrostática.
+- Um código de atividade duplicado e um nome de atividade duplicado receberam identificação complementar para respeitar a unicidade do banco.

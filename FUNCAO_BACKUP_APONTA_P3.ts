@@ -18,6 +18,8 @@ const TABLES = [
   "panel_types",
   "activity_area_links",
   "project_modules",
+  "project_rooms",
+  "project_room_modules",
   "time_entries",
   "absences",
   "monthly_closings",
@@ -140,6 +142,8 @@ async function upsertRows(
       work_areas: "code",
       activity_area_links: "activity_id,area_code",
       project_modules: "project_id,module_id",
+      project_rooms: "project_id,room_id",
+      project_room_modules: "project_id,room_id,module_id",
     };
     const {error} = await admin
       .from(table)
@@ -280,6 +284,8 @@ Deno.serve(async (request: Request) => {
     restoredRecords += await upsertRows(admin, "panel_types", backupTables.panel_types || []);
     restoredRecords += await upsertRows(admin, "activity_area_links", backupTables.activity_area_links || []);
     restoredRecords += await upsertRows(admin, "project_modules", backupTables.project_modules || []);
+    restoredRecords += await upsertRows(admin, "project_rooms", backupTables.project_rooms || []);
+    restoredRecords += await upsertRows(admin, "project_room_modules", backupTables.project_room_modules || []);
 
     restoredRecords += await upsertRows(
       admin,

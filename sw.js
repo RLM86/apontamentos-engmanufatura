@@ -1,10 +1,10 @@
-const CACHE = "aponta-p3-v2.12.2";
+const CACHE = "aponta-p3-v2.13.0";
 const ASSETS = [
   "./",
   "./index.html",
-  "./app-v2.12.2.js?build=2122",
-  "./style-v2.12.2.css?build=2122",
-  "./manifest.webmanifest?v=2.12.2",
+  "./app-v2.13.0.js?build=2130",
+  "./style-v2.13.0.css?build=2130",
+  "./manifest.webmanifest?v=2.13.0",
   "./modular-app-icon-192-v2116.png",
   "./modular-app-icon-512-v2116.png"
 ];

@@ -93,3 +93,19 @@
   for = "/style-v2.12.2.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+
+[[headers]]
+  for = "/app-v2.13.0.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/style-v2.13.0.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/ATUALIZAR_BANCO_v2.13_ESTRUTURA_SALA_MODULO.sql"
+  [headers.values]
+    Cache-Control = "no-store"

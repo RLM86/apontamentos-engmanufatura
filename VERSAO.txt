@@ -1,2 +1,3 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.12.2
-Cadastros divididos em duas subabas.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.13.0
+Fluxo estrutural: Projeto > Sala > Modulo.
+Cadastros divididos em tres subabas.
