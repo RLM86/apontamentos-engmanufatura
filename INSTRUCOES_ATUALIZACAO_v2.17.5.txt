@@ -1,0 +1,38 @@
+APONTA P3 v2.17.5 — ATUALIZAÇÃO
+=================================
+
+IMPORTAÇÃO
+----------
+A importação agora mostra o erro real:
+- etapa em que parou;
+- registro que causou a falha;
+- mensagem e código retornados pelo Supabase.
+
+EXCLUSÃO DE APONTAMENTOS
+------------------------
+Na tela Apontamentos > Histórico:
+
+1. Marque os apontamentos.
+2. Use Selecionar todos os apontamentos editáveis visíveis, quando necessário.
+3. Clique em Excluir selecionados.
+4. Confirme a operação.
+
+Apontamentos enviados, aprovados ou pertencentes a períodos fechados
+podem ser bloqueados pelas regras do banco.
+
+ATUALIZAÇÃO
+-----------
+Substitua:
+- index.html
+- app-v2.17.5.js
+- style-v2.17.5.css
+- sw.js
+- limpar-cache.html
+- netlify.toml
+- VERSAO.txt
+
+Mantenha o config.js atual.
+Não é necessário executar SQL.
+
+Depois da publicação, abra:
+https://ENDERECO-DO-APP/limpar-cache.html
