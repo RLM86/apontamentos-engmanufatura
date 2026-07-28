@@ -1,0 +1,46 @@
+APONTA P3 v2.17.7 — LISTA DE ATIVIDADES
+=========================================
+
+NOVA ÁREA
+---------
+Cadastros > Projetos e atividades > Atividades
+
+Disponível somente para Administrador.
+
+EXCLUSÃO EM MASSA
+-----------------
+1. Marque as atividades.
+2. Use Excluir selecionadas.
+3. Atividades sem apontamentos serão excluídas.
+4. Atividades com histórico permanecerão no sistema e deverão ser inativadas.
+
+DOWNLOAD E UPLOAD
+-----------------
+Baixar lista atual:
+- gera um Excel com todas as atividades;
+- mantém o ID para reconhecer os registros existentes.
+
+Enviar lista atualizada:
+- atualiza registros pelo ID, código ou nome;
+- cria nova atividade quando o ID está vazio e não existe correspondência;
+- atualiza áreas e status;
+- não exclui linhas ausentes do Excel.
+
+ORDEM DA ATUALIZAÇÃO
+--------------------
+1. Execute no Supabase:
+   ATUALIZAR_BANCO_v2.17.7_GESTAO_LISTA_ATIVIDADES.sql
+
+2. Publique:
+   - index.html
+   - app-v2.17.7.js
+   - style-v2.17.7.css
+   - sw.js
+   - limpar-cache.html
+   - netlify.toml
+   - VERSAO.txt
+
+3. Preserve o config.js atual.
+
+4. Abra:
+   https://ENDERECO-DO-APP/limpar-cache.html

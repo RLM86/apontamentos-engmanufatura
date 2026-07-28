@@ -18,7 +18,7 @@
 <main>
   <h1>Atualização do Aponta P3</h1>
   <p id="status" class="status">Limpando a versão antiga...</p>
-  <a id="openApp" href="./?build=2176" hidden>Abrir Aponta P3 v2.17.6</a>
+  <a id="openApp" href="./?build=2177" hidden>Abrir Aponta P3 v2.17.7</a>
 </main>
 <script>
 (async()=>{
@@ -32,7 +32,7 @@
       const names=await caches.keys();
       await Promise.all(names.map(n=>caches.delete(n)));
     }
-    status.textContent="Cache antigo removido. Agora abra a versão v2.17.6.";
+    status.textContent="Cache antigo removido. Agora abra a versão v2.17.7.";
   }catch(e){
     status.textContent="Atualização preparada. Toque no botão para abrir a nova versão.";
   }

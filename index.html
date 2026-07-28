@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
   <meta name="description" content="Apontamento de horas compartilhado da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.17.6">
+  <link rel="manifest" href="manifest.webmanifest?v=2.17.7">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.17.6.css?build=2176">
+  <link rel="stylesheet" href="style-v2.17.7.css?build=2177">
   <title>Modular | Apontamento de Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -478,8 +478,55 @@
                 <label class="full">Orientação de uso<textarea id="activityUsageDescription" maxlength="500"></textarea></label>
                 <button class="btn primary full">Adicionar atividade</button>
               </form>
+
+              <section id="activityListAdminTools" class="activity-list-admin-tools" data-admin-only>
+                <div class="activity-file-actions">
+                  <button id="downloadActivitiesWorkbookBtn" class="btn primary small" type="button">
+                    Baixar lista atual
+                  </button>
+                  <button id="uploadActivitiesWorkbookBtn" class="btn secondary small" type="button">
+                    Enviar lista atualizada
+                  </button>
+                  <input id="activitiesWorkbookFile" type="file" accept=".xlsx,.xls,.csv" hidden>
+                </div>
+
+                <div class="activity-bulk-actions">
+                  <label>
+                    <input id="selectAllVisibleActivities" type="checkbox">
+                    Selecionar todas visíveis
+                  </label>
+                  <span id="selectedActivitiesCount" class="badge">0 selecionadas</span>
+                  <button id="clearSelectedActivitiesBtn" class="btn secondary small" type="button" disabled>
+                    Limpar seleção
+                  </button>
+                  <button id="inactivateSelectedActivitiesBtn" class="btn secondary small" type="button" disabled>
+                    Inativar selecionadas
+                  </button>
+                  <button id="deleteSelectedActivitiesBtn" class="btn danger small" type="button" disabled>
+                    Excluir selecionadas
+                  </button>
+                </div>
+
+                <p id="activityWorkbookStatus" class="help">
+                  O Excel baixado pode ser editado e enviado novamente. Linhas removidas do arquivo não são apagadas automaticamente.
+                </p>
+              </section>
+
               <div class="table-wrap compact catalog-table-wrap">
-                <table class="catalog-data-table activity-catalog-table"><thead><tr><th>Código</th><th>Atividade</th><th>Áreas</th><th>Disciplina</th><th>Status</th><th>Ações</th></tr></thead><tbody id="activitiesTable"></tbody></table>
+                <table class="catalog-data-table activity-catalog-table">
+                  <thead>
+                    <tr>
+                      <th data-admin-only>Selecionar</th>
+                      <th>Código</th>
+                      <th>Atividade</th>
+                      <th>Áreas</th>
+                      <th>Disciplina</th>
+                      <th>Status</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="activitiesTable"></tbody>
+                </table>
               </div>
             </article>
           </div>
@@ -932,7 +979,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.17.6.js?build=2176"></script>
+  <script src="app-v2.17.7.js?build=2177"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -981,7 +1028,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.17.6", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.17.7", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });

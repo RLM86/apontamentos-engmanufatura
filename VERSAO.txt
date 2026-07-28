@@ -1,2 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.17.6
-Administrador pode devolver fechamento aprovado ao colaborador ou ao gestor.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.17.7
+Exclusão em massa e download/upload da lista de atividades.
