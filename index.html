@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
   <meta name="description" content="Apontamento de horas compartilhado da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.17.5">
+  <link rel="manifest" href="manifest.webmanifest?v=2.17.6">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.17.5.css?build=2175">
+  <link rel="stylesheet" href="style-v2.17.6.css?build=2176">
   <title>Modular | Apontamento de Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -319,6 +319,45 @@
             <button id="rejectClosingBtn" class="btn danger" data-manager-only>Devolver</button>
           </div>
           <label>Observação do gestor<textarea id="closingNote" maxlength="500"></textarea></label>
+
+          <section id="adminApprovedReturnPanel" class="admin-approved-return-panel" data-admin-only>
+            <div class="admin-approved-return-heading">
+              <div>
+                <span class="eyebrow">Ação administrativa</span>
+                <h3>Devolver período depois da aprovação</h3>
+                <p id="adminApprovedReturnHelp">
+                  Selecione um período aprovado para liberar correções ou enviá-lo novamente ao gestor.
+                </p>
+              </div>
+              <span id="adminApprovedReturnStatus" class="badge">Aguardando período aprovado</span>
+            </div>
+
+            <label>
+              Motivo da devolução
+              <textarea
+                id="adminApprovedReturnReason"
+                maxlength="500"
+                placeholder="Informe o motivo da devolução. Esta mensagem ficará registrada no fechamento."></textarea>
+            </label>
+
+            <div class="admin-approved-return-options">
+              <article>
+                <h4>Devolver ao colaborador</h4>
+                <p>Os apontamentos passam para “Devolvido” e poderão ser editados, excluídos e enviados novamente.</p>
+                <button id="returnClosingToCollaboratorBtn" class="btn danger" type="button" disabled>
+                  Devolver ao colaborador
+                </button>
+              </article>
+
+              <article>
+                <h4>Voltar para o gestor</h4>
+                <p>O período volta para “Enviado” e permanece bloqueado para edição pelo colaborador.</p>
+                <button id="returnClosingToManagerBtn" class="btn secondary" type="button" disabled>
+                  Voltar para aprovação do gestor
+                </button>
+              </article>
+            </div>
+          </section>
         </article>
       </section>
 
@@ -893,7 +932,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.17.5.js?build=2175"></script>
+  <script src="app-v2.17.6.js?build=2176"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -942,7 +981,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.17.5", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.17.6", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });

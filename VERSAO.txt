@@ -1,2 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.17.5
-Importação corrigida e exclusão múltipla de apontamentos.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.17.6
+Administrador pode devolver fechamento aprovado ao colaborador ou ao gestor.

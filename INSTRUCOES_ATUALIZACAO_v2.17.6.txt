@@ -1,0 +1,43 @@
+APONTA P3 v2.17.6 — DEVOLUÇÃO APÓS APROVAÇÃO
+================================================
+
+NOVA FUNÇÃO
+-----------
+Tela:
+Fechamento mensal
+
+Perfil:
+Administrador
+
+Ao selecionar um fechamento Aprovado, o administrador poderá:
+
+1. Devolver ao colaborador
+   - libera os apontamentos para correção;
+   - permite edição e exclusão;
+   - colaborador deverá enviar novamente.
+
+2. Voltar para aprovação do gestor
+   - mantém os apontamentos bloqueados;
+   - devolve o período para a fila de aprovação;
+   - qualquer gestor autorizado poderá revisar.
+
+O motivo da devolução é obrigatório.
+
+ORDEM DA ATUALIZAÇÃO
+--------------------
+1. Execute no Supabase:
+   ATUALIZAR_BANCO_v2.17.6_DEVOLUCAO_APOS_APROVACAO.sql
+
+2. Publique os arquivos:
+   - index.html
+   - app-v2.17.6.js
+   - style-v2.17.6.css
+   - sw.js
+   - limpar-cache.html
+   - netlify.toml
+   - VERSAO.txt
+
+3. Preserve o config.js atual.
+
+4. Abra:
+   https://ENDERECO-DO-APP/limpar-cache.html
