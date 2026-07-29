@@ -1,0 +1,11 @@
+APONTA P3 v2.18.0
+==================
+
+1. Execute no Supabase:
+   ATUALIZAR_BANCO_v2.18.0_CORRECAO_AREAS_ATIVIDADES.sql
+
+2. Publique os arquivos da atualização.
+3. Preserve o config.js.
+4. Abra /limpar-cache.html após o deploy.
+
+Na lista de atividades, use os filtros por código/nome, área, disciplina, observação e situação.

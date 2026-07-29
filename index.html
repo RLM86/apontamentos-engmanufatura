@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
   <meta name="description" content="Apontamento de horas compartilhado da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.17.8">
+  <link rel="manifest" href="manifest.webmanifest?v=2.18.0">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.17.8.css?build=2178">
+  <link rel="stylesheet" href="style-v2.18.0.css?build=2180">
   <title>Modular | Apontamento de Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -493,6 +493,56 @@
                 <label class="full">Orientação de uso<textarea id="activityUsageDescription" maxlength="500"></textarea></label>
                 <button class="btn primary full">Adicionar atividade</button>
               </form>
+
+
+
+              <section class="activity-catalog-filters" aria-label="Filtros de atividades">
+                <div class="activity-filter-heading">
+                  <div>
+                    <h4>Filtrar atividades</h4>
+                    <p>Localize rapidamente por código, nome, área, disciplina, observação ou situação.</p>
+                  </div>
+                  <span id="activityFilterResultCount" class="badge">0 resultados</span>
+                </div>
+
+                <div class="activity-filter-grid">
+                  <label class="activity-filter-search">Código, nome ou texto
+                    <input id="activityFilterSearch" type="search" placeholder="Ex.: TST-004, FAT, pintura..." autocomplete="off">
+                  </label>
+
+                  <label>Área
+                    <select id="activityFilterArea">
+                      <option value="">Todas as áreas</option>
+                    </select>
+                  </label>
+
+                  <label>Disciplina
+                    <select id="activityFilterDiscipline">
+                      <option value="">Todas as disciplinas</option>
+                    </select>
+                  </label>
+
+                  <label>Observação
+                    <select id="activityFilterObservation">
+                      <option value="">Todas</option>
+                      <option value="Opcional">Opcional</option>
+                      <option value="Obrigatória">Obrigatória</option>
+                    </select>
+                  </label>
+
+                  <label>Situação
+                    <select id="activityFilterStatus">
+                      <option value="">Ativas e inativas</option>
+                      <option value="ativa">Ativas</option>
+                      <option value="inativa">Inativas</option>
+                    </select>
+                  </label>
+
+                  <button id="clearActivityFiltersBtn" class="btn secondary" type="button">
+                    Limpar filtros
+                  </button>
+                </div>
+              </section>
 
               <section id="activityListAdminTools" class="activity-list-admin-tools" data-admin-only>
                 <div class="activity-file-actions">
@@ -1010,7 +1060,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.17.8.js?build=2178"></script>
+  <script src="app-v2.18.0.js?build=2180"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -1059,7 +1109,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.17.8", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.18.0", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });

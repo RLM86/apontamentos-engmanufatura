@@ -1,2 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.17.8
-Áreas das atividades editáveis e observação opcional/obrigatória.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.0
+Correção do salvamento das áreas e filtros da lista de atividades.
