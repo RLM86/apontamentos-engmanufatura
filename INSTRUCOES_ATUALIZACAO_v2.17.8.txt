@@ -1,0 +1,47 @@
+APONTA P3 v2.17.8 — ÁREAS E OBSERVAÇÃO
+=======================================
+
+ALTERAÇÕES
+----------
+Em Cadastros > Projetos e atividades > Atividades:
+
+- marque ou desmarque as áreas aplicáveis;
+- use Marcar todas ou Limpar;
+- escolha Observação: Opcional ou Obrigatória;
+- clique em Salvar.
+
+Ao salvar, os vínculos anteriores são substituídos pelas áreas marcadas.
+
+APONTAMENTO
+-----------
+Atividade Opcional:
+- observação pode ficar vazia.
+
+Atividade Obrigatória:
+- o apontamento não é salvo sem observação;
+- a tela mostra a identificação Obrigatória.
+
+EXCEL
+-----
+A coluna Observação aceita:
+- Opcional
+- Obrigatória
+
+ORDEM DA ATUALIZAÇÃO
+--------------------
+1. Execute no Supabase:
+   ATUALIZAR_BANCO_v2.17.8_AREAS_OBSERVACAO_ATIVIDADES.sql
+
+2. Publique:
+   - index.html
+   - app-v2.17.8.js
+   - style-v2.17.8.css
+   - sw.js
+   - limpar-cache.html
+   - netlify.toml
+   - VERSAO.txt
+
+3. Preserve o config.js atual.
+
+4. Abra:
+   https://ENDERECO-DO-APP/limpar-cache.html

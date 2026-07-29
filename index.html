@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
   <meta name="description" content="Apontamento de horas compartilhado da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.17.7">
+  <link rel="manifest" href="manifest.webmanifest?v=2.17.8">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.17.7.css?build=2177">
+  <link rel="stylesheet" href="style-v2.17.8.css?build=2178">
   <title>Modular | Apontamento de Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -473,8 +473,23 @@
                 <label>Disciplina<input id="activityDiscipline" placeholder="Montagem Estrutural"></label>
                 <label class="full">Nome<input id="activityName" required></label>
                 <label>Natureza<input id="activityNature" placeholder="Rotina / Demanda"></label>
-                <label>Observação<select id="activityObservationRequirement"><option>Opcional</option></select></label>
-                <div class="full"><span class="field-title">Áreas aplicáveis</span><div id="activityAreasCheckboxes" class="area-checkbox-grid"></div></div>
+                <label>Observação
+      <select id="activityObservationRequirement">
+        <option value="Opcional">Opcional</option>
+        <option value="Obrigatória">Obrigatória</option>
+      </select>
+    </label>
+                <div class="full activity-area-editor">
+      <div class="activity-area-editor-header">
+        <span class="field-title">Áreas aplicáveis</span>
+        <div class="activity-area-editor-actions">
+          <button id="selectAllActivityAreasBtn" class="btn secondary small" type="button">Marcar todas</button>
+          <button id="clearActivityAreasBtn" class="btn secondary small" type="button">Limpar</button>
+        </div>
+      </div>
+      <div id="activityAreasCheckboxes" class="area-checkbox-grid"></div>
+      <small>Marque todas as áreas nas quais esta atividade poderá aparecer.</small>
+    </div>
                 <label class="full">Orientação de uso<textarea id="activityUsageDescription" maxlength="500"></textarea></label>
                 <button class="btn primary full">Adicionar atividade</button>
               </form>
@@ -521,6 +536,7 @@
                       <th>Atividade</th>
                       <th>Áreas</th>
                       <th>Disciplina</th>
+                      <th>Observação</th>
                       <th>Status</th>
                       <th>Ações</th>
                     </tr>
@@ -874,8 +890,23 @@
       <label>Disciplina<input id="editActivityDiscipline"></label>
       <label>Nome<input id="editActivityName" required></label>
       <label>Natureza<input id="editActivityNature"></label>
-      <label>Observação<select id="editActivityObservationRequirement"><option>Opcional</option></select></label>
-      <div><span class="field-title">Áreas aplicáveis</span><div id="editActivityAreasCheckboxes" class="area-checkbox-grid"></div></div>
+      <label>Observação
+      <select id="editActivityObservationRequirement">
+        <option value="Opcional">Opcional</option>
+        <option value="Obrigatória">Obrigatória</option>
+      </select>
+    </label>
+      <div class="activity-area-editor">
+      <div class="activity-area-editor-header">
+        <span class="field-title">Áreas aplicáveis</span>
+        <div class="activity-area-editor-actions">
+          <button id="selectAllEditActivityAreasBtn" class="btn secondary small" type="button">Marcar todas</button>
+          <button id="clearEditActivityAreasBtn" class="btn secondary small" type="button">Limpar</button>
+        </div>
+      </div>
+      <div id="editActivityAreasCheckboxes" class="area-checkbox-grid"></div>
+      <small>As áreas marcadas substituem os vínculos anteriores ao salvar.</small>
+    </div>
       <label>Orientação de uso<textarea id="editActivityUsageDescription" maxlength="500"></textarea></label>
       <label>Situação<select id="editActivityActive"><option value="true">Ativa</option><option value="false">Inativa</option></select></label>
       <div class="actions"><button class="btn secondary" value="cancel">Cancelar</button><button id="saveActivityEditBtn" class="btn primary" value="default">Salvar</button></div>
@@ -979,7 +1010,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.17.7.js?build=2177"></script>
+  <script src="app-v2.17.8.js?build=2178"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -1028,7 +1059,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.17.7", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.17.8", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });
