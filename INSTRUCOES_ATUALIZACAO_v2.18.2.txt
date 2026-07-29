@@ -1,0 +1,56 @@
+APONTA P3 v2.18.2 — CADASTRO DE ÁREAS
+======================================
+
+NOVA FUNÇÃO
+-----------
+Cadastros > Referências > Áreas de trabalho
+
+Somente o Administrador pode:
+- adicionar área;
+- editar;
+- ativar/inativar;
+- excluir área sem uso.
+
+FLUXOS DISPONÍVEIS
+------------------
+Sem referência adicional:
+- depois da área, o usuário escolhe a atividade.
+
+Selecionar setor:
+- exige um setor cadastrado.
+
+Selecionar sala, módulo e parte:
+- exige sala do projeto, módulo e parte inferior/superior;
+- MONOBLOCO continua sem divisão por parte.
+
+Selecionar tipo de painel:
+- exige tipo de painel.
+
+Selecionar sala do projeto:
+- exige somente a sala específica do projeto.
+
+REGRAS
+------
+- Código máximo de 12 caracteres.
+- O código não pode ser alterado após a criação.
+- Áreas padrão não podem ser excluídas.
+- Áreas usadas em atividades ou apontamentos devem ser inativadas.
+
+ORDEM DA ATUALIZAÇÃO
+--------------------
+1. Execute no Supabase:
+   ATUALIZAR_BANCO_v2.18.2_CADASTRO_AREAS.sql
+
+2. Publique:
+   - index.html
+   - app-v2.18.2.js
+   - style-v2.18.2.css
+   - sw.js
+   - limpar-cache.html
+   - netlify.toml
+   - VERSAO.txt
+
+3. Preserve o config.js atual.
+
+4. Abra:
+   https://ENDERECO-DO-APP/limpar-cache.html

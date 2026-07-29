@@ -1,2 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.1
-Correção do falso aviso na confirmação das áreas das atividades.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.2
+Cadastro administrativo de áreas e fluxos dinâmicos.

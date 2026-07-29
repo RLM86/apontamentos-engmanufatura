@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
   <meta name="description" content="Apontamento de horas compartilhado da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.18.1">
+  <link rel="manifest" href="manifest.webmanifest?v=2.18.2">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.18.1.css?build=2181">
+  <link rel="stylesheet" href="style-v2.18.2.css?build=2182">
   <title>Modular | Apontamento de Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -601,6 +601,57 @@
         <section id="referenceCatalogPanel" class="catalog-panel" hidden>
           <div class="grid catalog-reference-grid">
             <article class="card span-4 reference-card catalog-compact-card">
+              <div class="section-heading compact-heading">
+                <div>
+                  <h3>Áreas de trabalho</h3>
+                  <p>Cadastre as áreas que aparecerão nos apontamentos e nas atividades.</p>
+                </div>
+                <span id="workAreasCount" class="badge">0 áreas</span>
+              </div>
+
+              <form id="workAreaForm" class="work-area-form" data-admin-only>
+                <label>Código
+                  <input id="workAreaCode" maxlength="12" placeholder="Ex.: QLD" required>
+                </label>
+                <label>Nome
+                  <input id="workAreaName" maxlength="80" placeholder="Ex.: Qualidade" required>
+                </label>
+                <label>Fluxo da referência
+                  <select id="workAreaDetailType" required>
+                    <option value="none">Sem referência adicional</option>
+                    <option value="sector">Selecionar setor</option>
+                    <option value="module">Selecionar sala, módulo e parte</option>
+                    <option value="panel_type">Selecionar tipo de painel</option>
+                    <option value="room">Selecionar sala do projeto</option>
+                  </select>
+                </label>
+                <label>Ordem
+                  <input id="workAreaOrder" type="number" min="0" step="1" value="10" required>
+                </label>
+                <button class="btn primary" type="submit">Adicionar área</button>
+              </form>
+
+              <div class="catalog-note">
+                <strong>Fluxo:</strong> define se o apontamento exigirá setor, sala/módulo, tipo de painel, sala ou nenhuma referência adicional.
+              </div>
+
+              <div class="table-wrap compact catalog-table-wrap">
+                <table class="catalog-data-table work-area-catalog-table">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Área</th>
+                      <th>Fluxo</th>
+                      <th>Ordem</th>
+                      <th>Status</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="workAreasTable"></tbody>
+                </table>
+              </div>
+            </article>
+            <article class="card span-4 reference-card catalog-compact-card">
               <div class="section-heading compact-heading"><div><h3>Setores de fabricação</h3><p>Exibidos quando a área for Fabricação.</p></div></div>
               <form id="sectorForm" class="mini-catalog-form compact-inline-form">
                 <input id="sectorCode" placeholder="Código" required>
@@ -973,6 +1024,42 @@
     </form>
   </dialog>
 
+  <dialog id="editWorkAreaDialog">
+    <form method="dialog" id="editWorkAreaForm" class="dialog-card">
+      <h3>Editar área de trabalho</h3>
+      <input id="editWorkAreaOriginalCode" type="hidden">
+      <label>Código
+        <input id="editWorkAreaCode" readonly>
+      </label>
+      <small>O código não pode ser alterado após o cadastro porque identifica os apontamentos e vínculos históricos.</small>
+      <label>Nome
+        <input id="editWorkAreaName" maxlength="80" required>
+      </label>
+      <label>Fluxo da referência
+        <select id="editWorkAreaDetailType" required>
+          <option value="none">Sem referência adicional</option>
+          <option value="sector">Selecionar setor</option>
+          <option value="module">Selecionar sala, módulo e parte</option>
+          <option value="panel_type">Selecionar tipo de painel</option>
+          <option value="room">Selecionar sala do projeto</option>
+        </select>
+      </label>
+      <label>Ordem
+        <input id="editWorkAreaOrder" type="number" min="0" step="1" required>
+      </label>
+      <label>Situação
+        <select id="editWorkAreaActive">
+          <option value="true">Ativa</option>
+          <option value="false">Inativa</option>
+        </select>
+      </label>
+      <div class="actions">
+        <button class="btn secondary" value="cancel">Cancelar</button>
+        <button id="saveWorkAreaEditBtn" class="btn primary" value="default">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="editSectorDialog">
     <form method="dialog" id="editSectorForm" class="dialog-card">
       <h3>Editar setor de fabricação</h3>
@@ -1060,7 +1147,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.18.1.js?build=2181"></script>
+  <script src="app-v2.18.2.js?build=2182"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -1109,7 +1196,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.18.1", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.18.2", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });
