@@ -1,2 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.0
-Correção do salvamento das áreas e filtros da lista de atividades.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.1
+Correção do falso aviso na confirmação das áreas das atividades.

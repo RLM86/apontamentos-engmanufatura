@@ -1,0 +1,36 @@
+APONTA P3 v2.18.1 — CORREÇÃO DAS ÁREAS
+========================================
+
+PROBLEMA CORRIGIDO
+------------------
+Após salvar uma atividade, o banco confirmava as áreas, mas a tela podia
+consultar temporariamente a lista anterior e mostrar o aviso:
+
+"As áreas exibidas não correspondem às áreas selecionadas."
+
+A versão 2.18.1 usa a resposta confirmada pela própria transação do banco
+e carrega os vínculos por uma função específica.
+
+ATUALIZAÇÃO
+-----------
+1. Execute no Supabase:
+   ATUALIZAR_BANCO_v2.18.1_CONFIRMACAO_AREAS_ATIVIDADES.sql
+
+2. Publique:
+   - index.html
+   - app-v2.18.1.js
+   - style-v2.18.1.css
+   - sw.js
+   - limpar-cache.html
+   - netlify.toml
+   - VERSAO.txt
+
+3. Preserve o config.js atual.
+
+4. Abra:
+   https://ENDERECO-DO-APP/limpar-cache.html
+
+TESTE
+-----
+Edite TST-004, marque Fabricação e salve.
+A janela deve fechar e a coluna Áreas deve mostrar Fabricação.
