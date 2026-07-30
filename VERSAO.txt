@@ -1,2 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.2
-Cadastro administrativo de áreas e fluxos dinâmicos.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.3
+Carga completa das áreas agrupada por atividade, sem limite de 1.000 vínculos.

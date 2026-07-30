@@ -1,0 +1,44 @@
+APONTA P3 v2.18.3 — CARGA COMPLETA DAS ÁREAS
+================================================
+
+PROBLEMA
+--------
+O sistema possui centenas de atividades e mais de 1.000 vínculos com áreas.
+A consulta anterior era limitada aos primeiros 1.000 vínculos.
+
+Por isso:
+- algumas atividades apareciam sem área;
+- depois de editar uma atividade, outras pareciam perder suas áreas;
+- os dados podiam continuar no banco, mas não apareciam na tela.
+
+CORREÇÃO
+--------
+A nova consulta retorna uma linha por atividade e agrupa todas as áreas.
+Assim, 392 atividades geram aproximadamente 392 linhas, e não milhares.
+
+ATUALIZAÇÃO
+-----------
+1. Execute no Supabase:
+   ATUALIZAR_BANCO_v2.18.3_CARGA_COMPLETA_AREAS.sql
+
+2. Publique:
+   - index.html
+   - app-v2.18.3.js
+   - style-v2.18.3.css
+   - sw.js
+   - limpar-cache.html
+   - netlify.toml
+   - VERSAO.txt
+
+3. Preserve o config.js.
+
+4. Abra:
+   https://ENDERECO-DO-APP/limpar-cache.html
+
+TESTE
+-----
+1. Filtre por TST.
+2. Edite TST-004 e marque uma ou mais áreas.
+3. Salve.
+4. Edite TST-008 ou TST-009.
+5. As áreas das duas atividades devem permanecer independentes.
