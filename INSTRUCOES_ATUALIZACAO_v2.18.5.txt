@@ -1,0 +1,41 @@
+APONTA P3 v2.18.5 — COM E MFI SOMENTE SALA
+=============================================
+
+FLUXO CORRETO
+-------------
+Comissionamento:
+Projeto > Área > Sala > Atividade
+
+Montagem Final:
+Projeto > Área > Sala > Atividade
+
+Não serão solicitados:
+- módulo;
+- parte inferior;
+- parte superior.
+
+ATUALIZAÇÃO
+-----------
+1. Execute no Supabase:
+   ATUALIZAR_BANCO_v2.18.5_COMISSIONAMENTO_MONTAGEM_FINAL_SOMENTE_SALA.sql
+
+2. Publique:
+   - index.html
+   - app-v2.18.5.js
+   - style-v2.18.5.css
+   - sw.js
+   - limpar-cache.html
+   - netlify.toml
+   - VERSAO.txt
+
+3. Preserve o config.js.
+
+4. Abra:
+   https://ENDERECO-DO-APP/limpar-cache.html
+
+TESTE
+-----
+1. Abra Novo apontamento.
+2. Selecione Comissionamento.
+3. O sistema deve mostrar somente Sala e depois Atividade.
+4. Repita o teste com Montagem Final.

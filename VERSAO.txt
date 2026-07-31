@@ -1,2 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.4
-Áreas cadastradas dinamicamente liberadas nos apontamentos.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.5
+Comissionamento e Montagem Final utilizam somente a sala do projeto.
