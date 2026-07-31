@@ -1,0 +1,14 @@
+APONTA P3 v2.18.4 — ÁREAS DINÂMICAS
+
+1. Execute no Supabase:
+   ATUALIZAR_BANCO_v2.18.4_APONTAMENTO_AREAS_DINAMICAS.sql
+
+2. Publique index.html, app-v2.18.4.js, style-v2.18.4.css,
+   sw.js, limpar-cache.html, netlify.toml e VERSAO.txt.
+
+3. Preserve o config.js.
+
+4. Limpe o cache do aplicativo.
+
+Teste:
+Projeto > Comissionamento > Sala > Módulo > Parte > Atividade > Salvar.

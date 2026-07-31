@@ -1,2 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.3
-Carga completa das áreas agrupada por atividade, sem limite de 1.000 vínculos.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.4
+Áreas cadastradas dinamicamente liberadas nos apontamentos.
