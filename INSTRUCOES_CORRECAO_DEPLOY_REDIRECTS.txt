@@ -1,0 +1,27 @@
+CORREÇÃO DO DEPLOY CLOUDFLARE — APONTA HORAS v2.19.2
+======================================================
+
+CAUSA
+-----
+A regra abaixo causava loop infinito no Cloudflare:
+
+/* /index.html 200
+
+CORREÇÃO
+--------
+O arquivo _redirects foi substituído e agora possui apenas:
+
+/redefinir-senha /redefinir-senha.html 200
+/redefinir-senha/ /redefinir-senha.html 200
+
+COMO PUBLICAR
+-------------
+1. Extraia este ZIP na pasta do projeto e substitua os arquivos.
+2. Preserve o config.js.
+3. Execute:
+
+git add -A
+git commit -m "corrigir redirects e publicar v2.19.2"
+git push origin main
+
+4. Aguarde o deploy ficar como Success na Cloudflare.
