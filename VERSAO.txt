@@ -1,3 +1,2 @@
-APONTA HORAS - VERSAO PUBLICADA: 2.18.9
-Nova subaba: Fechamentos enviados.
-Filtros por colaborador, período, situação, projeto e busca.
+APONTA HORAS - VERSAO PUBLICADA: 2.19.0
+Aprovacao e devolucao em lote na subaba Fechamentos enviados.

@@ -1,0 +1,31 @@
+APONTA HORAS v2.19.0 — APROVAÇÃO E DEVOLUÇÃO EM LOTE
+=========================================================
+
+NOVO RECURSO
+------------
+Fechamento mensal > Fechamentos enviados
+
+Gestor e Administrador podem:
+- selecionar todos os fechamentos enviados visíveis;
+- marcar fechamentos individualmente;
+- aprovar os selecionados;
+- devolver os selecionados.
+
+REGRAS
+------
+- Somente fechamentos com situação Enviado podem ser selecionados.
+- Para devolver, a observação/motivo é obrigatória.
+- Para aprovar, a observação é opcional.
+- A devolução administrativa de períodos já aprovados continua individual.
+
+ATUALIZAÇÃO
+-----------
+1. Execute no Supabase:
+   ATUALIZAR_BANCO_v2.19.0_APROVACAO_DEVOLUCAO_LOTE_FECHAMENTOS.sql
+
+2. Publique os arquivos da atualização.
+
+3. Preserve o config.js atual.
+
+4. Depois do deploy, abra:
+   https://apontamentos-engmanufatura.modulardtc.workers.dev/limpar-cache.html

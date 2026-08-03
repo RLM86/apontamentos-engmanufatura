@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
   <meta name="description" content="Aponta Horas — Gestão de Apontamentos da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.18.9">
+  <link rel="manifest" href="manifest.webmanifest?v=2.19.0">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.18.9.css?build=2189">
+  <link rel="stylesheet" href="style-v2.19.0.css?build=2190">
   <title>Modular | Aponta Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -426,10 +426,31 @@
               <div><span>Aprovados</span><strong id="closingHistoryApproved">0</strong></div>
             </div>
 
+            <section id="closingHistoryBulkActions" class="closing-history-bulk-toolbar" data-manager-only>
+              <label class="closing-history-select-all">
+                <input id="selectAllVisibleClosings" type="checkbox">
+                Selecionar todos os fechamentos enviados visíveis
+              </label>
+
+              <span id="selectedClosingsCount" class="badge">0 selecionados</span>
+              <button id="clearSelectedClosingsBtn" class="btn secondary" type="button" disabled>Limpar seleção</button>
+
+              <label class="closing-history-bulk-note">
+                Observação da análise em lote
+                <textarea id="closingHistoryBulkNote" maxlength="500" placeholder="Obrigatória para devolver. Opcional para aprovar."></textarea>
+              </label>
+
+              <div class="closing-history-bulk-buttons">
+                <button id="approveSelectedClosingsBtn" class="btn success" type="button" disabled>Aprovar selecionados</button>
+                <button id="returnSelectedClosingsBtn" class="btn danger" type="button" disabled>Devolver selecionados</button>
+              </div>
+            </section>
+
             <div class="table-wrap closing-history-table-wrap">
               <table class="responsive-mobile-table">
                 <thead>
                   <tr>
+                    <th data-manager-only>Selecionar</th>
                     <th>Colaborador</th>
                     <th>Mês</th>
                     <th>Horas</th>
@@ -1276,7 +1297,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.18.9.js?build=2189"></script>
+  <script src="app-v2.19.0.js?build=2190"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -1325,7 +1346,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.18.9", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.19.0", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });
