@@ -1,2 +1,2 @@
-APONTA HORAS - VERSAO PUBLICADA: 2.19.4
-Tratamento legivel dos erros de recuperacao de senha.
+APONTA HORAS - VERSAO PUBLICADA: 2.19.5
+Diagnostico robusto para erros de recuperacao de senha.

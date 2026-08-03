@@ -1,0 +1,26 @@
+APONTA HORAS v2.19.5 — DIAGNÓSTICO DE RECUPERAÇÃO
+====================================================
+
+PROBLEMA
+--------
+A mensagem ainda aparecia como:
+Não foi possível enviar o link: {}
+
+CORREÇÃO
+--------
+A versão 2.19.5 lê:
+- status HTTP;
+- código;
+- nome do erro;
+- propriedades internas;
+- objetos de erro aninhados.
+
+PUBLICAÇÃO
+----------
+1. Não precisa executar SQL.
+2. Extraia o ZIP na pasta do projeto.
+3. Preserve o config.js.
+4. Publique pelo Git.
+5. Aguarde Cloudflare = Success.
+6. Abra:
+https://apontamentos-engmanufatura.modulardtc.workers.dev/limpar-cache.html?build=2195

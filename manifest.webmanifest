@@ -2,7 +2,7 @@
   "name": "Aponta Horas — Gestão de Apontamentos",
   "short_name": "Aponta Horas",
   "description": "Gestão de apontamentos da Modular Data Centers.",
-  "start_url": "./?source=pwa&build=2194",
+  "start_url": "./?source=pwa&build=2195",
   "scope": "./",
   "display": "standalone",
   "background_color": "#eef5f2",
