@@ -1,0 +1,29 @@
+APONTA HORAS v2.18.9 — FECHAMENTOS ENVIADOS
+================================================
+
+NOVA SUBABA
+-----------
+Fechamento > Fechamentos enviados
+
+FILTROS
+-------
+- Buscar por nome, projeto ou observação
+- Colaborador
+- Mês inicial e mês final
+- Situação: Enviado, Aprovado ou Devolvido
+- Projeto
+
+RECURSOS
+--------
+- Resumo com quantidade e horas
+- Botão Abrir para analisar o fechamento
+- Exportação CSV
+
+ATUALIZAÇÃO
+-----------
+1. Não precisa executar novo SQL.
+2. Extraia o ZIP de atualização na pasta do projeto.
+3. Preserve o config.js.
+4. Publique os arquivos alterados.
+5. Depois do deploy, abra:
+   https://apontamentos-engmanufatura.modulardtc.workers.dev/limpar-cache.html

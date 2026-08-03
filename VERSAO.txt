@@ -1,4 +1,3 @@
-APONTA HORAS - VERSAO PUBLICADA: 2.18.8
-Nome: Aponta Horas
-Subtitulo: Gestao de Apontamentos
-Endereco do aplicativo: mantido sem alteracoes.
+APONTA HORAS - VERSAO PUBLICADA: 2.18.9
+Nova subaba: Fechamentos enviados.
+Filtros por colaborador, período, situação, projeto e busca.

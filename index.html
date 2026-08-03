@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
   <meta name="description" content="Aponta Horas — Gestão de Apontamentos da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.18.8">
+  <link rel="manifest" href="manifest.webmanifest?v=2.18.9">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.18.8.css?build=2188">
+  <link rel="stylesheet" href="style-v2.18.9.css?build=2189">
   <title>Modular | Aponta Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -302,7 +302,14 @@
       </section>
 
       <section id="closing" class="page">
-        <div class="page-title"><div><h2>Fechamento mensal</h2><p>Envie o período para aprovação do gestor.</p></div></div>
+        <div class="page-title"><div><h2>Fechamento mensal</h2><p>Envie o período para aprovação e acompanhe os fechamentos já enviados.</p></div></div>
+
+        <div class="tabs closing-tabs" role="tablist" aria-label="Opções do fechamento mensal">
+          <button class="tab active" type="button" data-closing-view="current" aria-selected="true">Fechamento do mês</button>
+          <button class="tab" type="button" data-closing-view="history" aria-selected="false">Fechamentos enviados</button>
+        </div>
+
+        <section id="currentClosingPanel" class="closing-panel">
         <article class="card">
           <div class="filters">
             <label class="manager-user-field">Colaborador<select id="closingUser"></select></label>
@@ -359,6 +366,86 @@
             </div>
           </section>
         </article>
+        </section>
+
+        <section id="closingHistoryPanel" class="closing-panel" hidden>
+          <article class="card">
+            <div class="section-heading">
+              <div>
+                <h3>Fechamentos enviados</h3>
+                <p>Consulte períodos enviados, aprovados ou devolvidos e abra qualquer fechamento para análise.</p>
+              </div>
+              <span id="closingHistoryCountBadge" class="badge">0 registros</span>
+            </div>
+
+            <div class="filters closing-history-filters">
+              <label>
+                Buscar
+                <input id="closingHistorySearch" type="search" placeholder="Nome, projeto ou observação" autocomplete="off">
+              </label>
+
+              <label class="manager-user-field">
+                Colaborador
+                <select id="closingHistoryUser"><option value="">Todos</option></select>
+              </label>
+
+              <label>
+                Mês inicial
+                <input id="closingHistoryStartMonth" type="month">
+              </label>
+
+              <label>
+                Mês final
+                <input id="closingHistoryEndMonth" type="month">
+              </label>
+
+              <label>
+                Situação
+                <select id="closingHistoryStatus">
+                  <option value="">Todas as situações</option>
+                  <option value="enviado">Enviado</option>
+                  <option value="aprovado">Aprovado</option>
+                  <option value="devolvido">Devolvido</option>
+                </select>
+              </label>
+
+              <label>
+                Projeto
+                <select id="closingHistoryProject"><option value="">Todos os projetos</option></select>
+              </label>
+
+              <button id="filterClosingHistoryBtn" class="btn secondary" type="button">Filtrar</button>
+              <button id="clearClosingHistoryFiltersBtn" class="btn secondary" type="button">Limpar filtros</button>
+              <button id="exportClosingHistoryBtn" class="btn primary" type="button">Exportar CSV</button>
+            </div>
+
+            <div class="closing-history-summary" aria-label="Resumo dos fechamentos filtrados">
+              <div><span>Fechamentos</span><strong id="closingHistoryTotal">0</strong></div>
+              <div><span>Horas registradas</span><strong id="closingHistoryHours">0,00</strong></div>
+              <div><span>Aguardando aprovação</span><strong id="closingHistoryPending">0</strong></div>
+              <div><span>Aprovados</span><strong id="closingHistoryApproved">0</strong></div>
+            </div>
+
+            <div class="table-wrap closing-history-table-wrap">
+              <table class="responsive-mobile-table">
+                <thead>
+                  <tr>
+                    <th>Colaborador</th>
+                    <th>Mês</th>
+                    <th>Horas</th>
+                    <th>Projetos</th>
+                    <th>Enviado em</th>
+                    <th>Situação</th>
+                    <th>Revisado por</th>
+                    <th>Observação</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="closingHistoryTable"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
       </section>
 
       <section id="reports" class="page">
@@ -1189,7 +1276,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.18.8.js?build=2188"></script>
+  <script src="app-v2.18.9.js?build=2189"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -1238,7 +1325,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.18.8", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.18.9", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });
