@@ -439,3 +439,19 @@
   for = "/style-v2.19.2.css"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+
+[[headers]]
+  for = "/app-v2.19.3.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/auth-recovery-v2.19.3.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/style-v2.19.3.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

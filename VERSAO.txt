@@ -1,3 +1,2 @@
-APONTA HORAS - VERSAO PUBLICADA: 2.19.2
-Correcao do redirecionamento para redefinicao de senha.
-Endereco principal mantido.
+APONTA HORAS - VERSAO PUBLICADA: 2.19.3
+Recuperacao de senha com retorno visivel e pagina propria.

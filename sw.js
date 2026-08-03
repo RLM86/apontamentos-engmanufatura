@@ -1,10 +1,12 @@
-const CACHE = "aponta-horas-v2.19.2";
+const CACHE = "aponta-horas-v2.19.3";
 const ASSETS = [
   "./",
   "./index.html",
-  "./app-v2.19.2.js?build=2192",
-  "./style-v2.19.2.css?build=2192",
-  "./manifest.webmanifest?v=2.19.2",
+  "./app-v2.19.3.js?build=2193",
+  "./style-v2.19.3.css?build=2193",
+  "./redefinir-senha.html",
+  "./auth-recovery-v2.19.3.js?build=2193",
+  "./manifest.webmanifest?v=2.19.3",
   "./modular-app-icon-192-v2116.png",
   "./modular-app-icon-512-v2116.png"
 ];
@@ -19,7 +21,9 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key))))
+      .then(keys => Promise.all(
+        keys.filter(key => key !== CACHE).map(key => caches.delete(key))
+      ))
       .then(() => self.clients.claim())
   );
 });
@@ -28,29 +32,39 @@ self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
 
   const url = new URL(event.request.url);
-
   if (url.origin !== self.location.origin) return;
 
   if (event.request.mode === "navigate") {
+    const isRecovery =
+      url.pathname.endsWith("/redefinir-senha") ||
+      url.pathname.endsWith("/redefinir-senha/") ||
+      url.pathname.endsWith("/redefinir-senha.html");
+
+    const fallback = isRecovery
+      ? "./redefinir-senha.html"
+      : "./index.html";
+
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          const copy = response.clone();
-          caches.open(CACHE).then(cache => cache.put("./index.html", copy));
+          if(response.ok){
+            const copy=response.clone();
+            caches.open(CACHE).then(cache => cache.put(fallback,copy));
+          }
           return response;
         })
-        .catch(() => caches.match("./index.html"))
+        .catch(() => caches.match(fallback))
     );
     return;
   }
 
   event.respondWith(
     caches.match(event.request).then(cached => {
-      const network = fetch(event.request)
+      const network=fetch(event.request)
         .then(response => {
-          if (response.ok) {
-            const copy = response.clone();
-            caches.open(CACHE).then(cache => cache.put(event.request, copy));
+          if(response.ok){
+            const copy=response.clone();
+            caches.open(CACHE).then(cache => cache.put(event.request,copy));
           }
           return response;
         })

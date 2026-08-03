@@ -1,3 +1,3 @@
-# Netlify / Cloudflare Pages — rotas permitidas
+# Aponta Horas — rotas permitidas
 /redefinir-senha /redefinir-senha.html 200
 /redefinir-senha/ /redefinir-senha.html 200

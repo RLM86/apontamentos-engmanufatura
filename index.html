@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
   <meta name="description" content="Aponta Horas — Gestão de Apontamentos da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.19.2">
+  <link rel="manifest" href="manifest.webmanifest?v=2.19.3">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.19.2.css?build=2192">
+  <link rel="stylesheet" href="style-v2.19.3.css?build=2193">
   <title>Modular | Aponta Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -37,8 +37,8 @@
         sessionStorage.setItem(resetKey, "ok");
 
         const url = new URL(window.location.href);
-        if (url.searchParams.get("build") !== "2192") {
-          url.searchParams.set("build", "2192");
+        if (url.searchParams.get("build") !== "2193") {
+          url.searchParams.set("build", "2193");
           window.location.replace(url.toString());
         }
       }
@@ -89,7 +89,7 @@
         <button class="btn primary full" type="submit">Entrar</button>
         <button class="link-button" id="forgotPasswordBtn" type="button">Esqueci minha senha</button>
               </form>
-      <div id="authMessage" class="auth-message" hidden></div>
+      <div id="authMessage" class="auth-message" role="status" aria-live="polite" hidden></div>
 
       <form id="signupForm" class="auth-form">
         <label>Nome completo<input id="signupName" type="text" autocomplete="name" required></label>
@@ -1334,7 +1334,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.19.2.js?build=2192"></script>
+  <script src="app-v2.19.3.js?build=2193"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -1383,7 +1383,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.19.2", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.19.3", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });

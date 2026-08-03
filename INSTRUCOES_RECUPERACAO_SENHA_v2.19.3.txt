@@ -1,0 +1,42 @@
+APONTA HORAS v2.19.3 — RECUPERAÇÃO DE SENHA
+================================================
+
+MELHORIAS
+---------
+- Retorno visível ao clicar em Esqueci minha senha.
+- Página própria para cadastrar a nova senha.
+- Confirmação da nova senha.
+- Mensagens claras para limite de envio, link inválido e link expirado.
+
+SUPABASE
+--------
+Authentication → URL Configuration
+
+Site URL:
+https://apontamentos-engmanufatura.modulardtc.workers.dev/
+
+Redirect URLs:
+https://apontamentos-engmanufatura.modulardtc.workers.dev//**
+https://apontamentosengmanufatura.netlify.app//**
+
+O endereço abaixo precisa estar autorizado pelo curinga acima:
+https://apontamentos-engmanufatura.modulardtc.workers.dev/redefinir-senha.html
+
+PUBLICAÇÃO
+----------
+1. Não precisa executar SQL.
+2. Extraia o ZIP de atualização na pasta do projeto.
+3. Preserve o config.js.
+4. Publique pelo Git.
+5. Aguarde o deploy ficar como Success.
+6. Abra:
+https://apontamentos-engmanufatura.modulardtc.workers.dev/limpar-cache.html?build=2193
+
+TESTE
+-----
+1. Abra a tela de login.
+2. Informe o e-mail.
+3. Clique em Esqueci minha senha.
+4. A tela deve mostrar Enviando link.
+5. Use apenas o e-mail mais recente.
+6. O link deve abrir redefinir-senha.html.
