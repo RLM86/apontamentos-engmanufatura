@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
   <meta name="description" content="Aponta Horas — Gestão de Apontamentos da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.19.0">
+  <link rel="manifest" href="manifest.webmanifest?v=2.19.2">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.19.0.css?build=2190">
+  <link rel="stylesheet" href="style-v2.19.2.css?build=2192">
   <title>Modular | Aponta Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -37,8 +37,8 @@
         sessionStorage.setItem(resetKey, "ok");
 
         const url = new URL(window.location.href);
-        if (url.searchParams.get("build") !== "2120") {
-          url.searchParams.set("build", "2120");
+        if (url.searchParams.get("build") !== "2192") {
+          url.searchParams.set("build", "2192");
           window.location.replace(url.toString());
         }
       }
@@ -557,7 +557,11 @@
           <div class="grid catalog-general-grid">
             <article class="card span-4 catalog-compact-card">
               <div class="section-heading compact-heading">
-                <div><h3>Projetos</h3><p>Inclua e administre todos os projetos.</p></div>
+                <div>
+                  <h3>Projetos</h3>
+                  <p>Inclua, pesquise e administre todos os projetos.</p>
+                </div>
+                <span id="projectCatalogCount" class="badge">0 projetos</span>
               </div>
               <form id="projectForm" class="form-grid compact-form-grid">
                 <label>Código<input id="projectCode" placeholder="TB14"></label>
@@ -566,8 +570,41 @@
                 <label class="full">Descrição<input id="projectDescription"></label>
                 <button class="btn primary full">Adicionar projeto</button>
               </form>
+              <section class="project-catalog-filters" aria-label="Filtros dos projetos cadastrados">
+                <label class="project-filter-search">
+                  Buscar projeto
+                  <input id="projectFilterSearch" type="search"
+                    placeholder="Código, projeto, cliente ou descrição..."
+                    autocomplete="off">
+                </label>
+
+                <label>
+                  Situação
+                  <select id="projectFilterStatus">
+                    <option value="">Ativos e inativos</option>
+                    <option value="active">Somente ativos</option>
+                    <option value="inactive">Somente inativos</option>
+                  </select>
+                </label>
+
+                <button id="clearProjectFiltersBtn" class="btn secondary" type="button">
+                  Limpar filtros
+                </button>
+              </section>
+
               <div class="table-wrap compact catalog-table-wrap">
-                <table class="catalog-data-table project-catalog-table"><thead><tr><th>Código</th><th>Projeto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="projectsTable"></tbody></table>
+                <table class="catalog-data-table project-catalog-table">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Projeto</th>
+                      <th>Cliente</th>
+                      <th>Status</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="projectsTable"></tbody>
+                </table>
               </div>
             </article>
 
@@ -1297,7 +1334,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.19.0.js?build=2190"></script>
+  <script src="app-v2.19.2.js?build=2192"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -1346,7 +1383,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.19.0", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.19.2", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });

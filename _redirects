@@ -1,0 +1,4 @@
+# Netlify / Cloudflare Pages — fallback para aplicativo SPA
+/redefinir-senha /redefinir-senha.html 200
+/redefinir-senha/ /redefinir-senha.html 200
+/* /index.html 200

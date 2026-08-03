@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="theme-color" content="#174a73" />
+  <title>Redefinir senha | Aponta Horas</title>
+  <style>
+    :root {
+      font-family: Inter, Aptos, Arial, sans-serif;
+      color: #182230;
+      background: #eef3f7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top left, #dcebf5 0, transparent 36%),
+        linear-gradient(145deg, #eef3f7, #f8fafc);
+    }
+    .card {
+      width: min(100%, 460px);
+      background: #fff;
+      border: 1px solid #d8e1eb;
+      border-radius: 18px;
+      padding: 30px;
+      box-shadow: 0 18px 50px rgba(23, 74, 115, .14);
+    }
+    .brand {
+      color: #174a73;
+      font-weight: 800;
+      letter-spacing: .02em;
+      margin-bottom: 8px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      color: #17324d;
+      font-size: 26px;
+    }
+    p {
+      margin: 0 0 20px;
+      color: #526271;
+      line-height: 1.5;
+    }
+    label {
+      display: block;
+      margin: 14px 0 7px;
+      font-weight: 700;
+      color: #26384a;
+    }
+    input {
+      width: 100%;
+      border: 1px solid #b9c7d4;
+      border-radius: 10px;
+      padding: 13px 14px;
+      font: inherit;
+      outline: none;
+    }
+    input:focus {
+      border-color: #174a73;
+      box-shadow: 0 0 0 3px rgba(23, 74, 115, .12);
+    }
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      margin-top: 20px;
+      padding: 13px 16px;
+      color: #fff;
+      background: #174a73;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button:disabled {
+      cursor: wait;
+      opacity: .65;
+    }
+    .status {
+      display: none;
+      margin-top: 16px;
+      border-radius: 10px;
+      padding: 12px 14px;
+      line-height: 1.4;
+    }
+    .status.show { display: block; }
+    .status.info { background: #e9f2f8; color: #174a73; }
+    .status.ok { background: #e8f5e9; color: #23652a; }
+    .status.error { background: #fdecec; color: #9d1c1c; }
+    .link {
+      display: block;
+      margin-top: 18px;
+      text-align: center;
+      color: #174a73;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .small {
+      margin-top: 18px;
+      font-size: 12px;
+      color: #718096;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="brand">APONTA HORAS</div>
+    <h1>Crie uma nova senha</h1>
+    <p id="instructions">
+      Aguarde enquanto validamos o link recebido por e-mail.
+    </p>
+
+    <form id="reset-form" hidden>
+      <label for="password">Nova senha</label>
+      <input
+        id="password"
+        type="password"
+        minlength="8"
+        autocomplete="new-password"
+        required
+        placeholder="Mínimo de 8 caracteres"
+      />
+
+      <label for="password-confirm">Confirme a nova senha</label>
+      <input
+        id="password-confirm"
+        type="password"
+        minlength="8"
+        autocomplete="new-password"
+        required
+        placeholder="Digite a senha novamente"
+      />
+
+      <button id="submit-button" type="submit">Salvar nova senha</button>
+    </form>
+
+    <div id="status" class="status info" role="status" aria-live="polite"></div>
+
+    <a id="home-link" class="link" href="/">Voltar ao Aponta Horas</a>
+    <div class="small">O link de recuperação possui prazo de validade.</div>
+  </main>
+
+  <script src="./config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const form = document.getElementById("reset-form");
+      const passwordInput = document.getElementById("password");
+      const confirmInput = document.getElementById("password-confirm");
+      const submitButton = document.getElementById("submit-button");
+      const statusBox = document.getElementById("status");
+      const instructions = document.getElementById("instructions");
+      const homeLink = document.getElementById("home-link");
+
+      homeLink.href = window.location.origin + "/";
+
+      function showStatus(message, type = "info") {
+        statusBox.textContent = message;
+        statusBox.className = `status show ${type}`;
+      }
+
+      function readConfig() {
+        const sources = [
+          window.APP_CONFIG,
+          window.apontaConfig,
+          window.SUPABASE_CONFIG,
+          window.config,
+          window.CONFIG,
+          {},
+        ].filter(Boolean);
+
+        const read = (names) => {
+          for (const source of sources) {
+            for (const name of names) {
+              if (source && typeof source[name] === "string" && source[name]) {
+                return source[name];
+              }
+            }
+          }
+          for (const name of names) {
+            if (typeof window[name] === "string" && window[name]) {
+              return window[name];
+            }
+          }
+          return "";
+        };
+
+        return {
+          url: read([
+            "supabaseUrl",
+            "SUPABASE_URL",
+            "url",
+            "projectUrl",
+          ]),
+          key: read([
+            "supabaseAnonKey",
+            "SUPABASE_ANON_KEY",
+            "anonKey",
+            "publishableKey",
+            "key",
+          ]),
+        };
+      }
+
+      async function establishRecoverySession(client) {
+        const query = new URLSearchParams(window.location.search);
+        const hash = new URLSearchParams(
+          window.location.hash.replace(/^#/, "")
+        );
+
+        const code = query.get("code");
+        const accessToken = hash.get("access_token");
+        const refreshToken = hash.get("refresh_token");
+        const type = query.get("type") || hash.get("type");
+
+        if (code) {
+          const { error } = await client.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+        } else if (accessToken && refreshToken) {
+          const { error } = await client.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (error) throw error;
+        }
+
+        const {
+          data: { session },
+          error: sessionError,
+        } = await client.auth.getSession();
+
+        if (sessionError) throw sessionError;
+
+        if (!session) {
+          throw new Error(
+            type === "recovery"
+              ? "Não foi possível validar o link. Solicite uma nova redefinição."
+              : "Link inválido ou expirado. Solicite uma nova redefinição de senha."
+          );
+        }
+
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname
+        );
+      }
+
+      async function init() {
+        try {
+          if (!window.supabase || typeof window.supabase.createClient !== "function") {
+            throw new Error("Não foi possível carregar a biblioteca do Supabase.");
+          }
+
+          const cfg = readConfig();
+          if (!cfg.url || !cfg.key) {
+            throw new Error(
+              "Configuração do Supabase não encontrada no config.js. Confira os nomes das variáveis."
+            );
+          }
+
+          const client = window.supabase.createClient(cfg.url, cfg.key, {
+            auth: {
+              detectSessionInUrl: true,
+              persistSession: true,
+              autoRefreshToken: true,
+              flowType: "pkce",
+            },
+          });
+
+          window.apontaSupabase = client;
+
+          showStatus("Validando o link de recuperação...", "info");
+          await establishRecoverySession(client);
+
+          statusBox.className = "status";
+          instructions.textContent =
+            "Informe uma nova senha com pelo menos 8 caracteres.";
+          form.hidden = false;
+          passwordInput.focus();
+
+          form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const password = passwordInput.value;
+            const confirmation = confirmInput.value;
+
+            if (password.length < 8) {
+              showStatus("A senha deve possuir pelo menos 8 caracteres.", "error");
+              return;
+            }
+
+            if (password !== confirmation) {
+              showStatus("As senhas informadas não são iguais.", "error");
+              return;
+            }
+
+            submitButton.disabled = true;
+            showStatus("Salvando a nova senha...", "info");
+
+            try {
+              const { error } = await client.auth.updateUser({ password });
+              if (error) throw error;
+
+              await client.auth.signOut();
+              form.hidden = true;
+              instructions.textContent = "Senha alterada com sucesso.";
+              showStatus(
+                "A senha foi atualizada. Você já pode entrar novamente.",
+                "ok"
+              );
+
+              setTimeout(() => {
+                window.location.replace(window.location.origin + "/");
+              }, 2500);
+            } catch (error) {
+              showStatus(
+                error && error.message
+                  ? error.message
+                  : "Não foi possível alterar a senha.",
+                "error"
+              );
+            } finally {
+              submitButton.disabled = false;
+            }
+          });
+        } catch (error) {
+          form.hidden = true;
+          instructions.textContent = "Não foi possível abrir a redefinição.";
+          showStatus(
+            error && error.message
+              ? error.message
+              : "Link inválido ou expirado.",
+            "error"
+          );
+        }
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+APONTA HORAS v2.19.2 — REDEFINIÇÃO DE SENHA
+===============================================
+
+PROBLEMA
+--------
+O e-mail de recuperação estava redirecionando para:
+https://apontamentos-engmanufatura.rmacedo.workers.dev/
+
+Esse domínio antigo não existe mais.
+
+ENDEREÇOS CORRETOS
+------------------
+Principal:
+https://apontamentos-engmanufatura.modulardtc.workers.dev/
+
+Secundário:
+https://apontamentosengmanufatura.netlify.app/
+
+CONFIGURAÇÃO OBRIGATÓRIA NO SUPABASE
+------------------------------------
+Abra:
+Authentication → URL Configuration
+
+Site URL:
+https://apontamentos-engmanufatura.modulardtc.workers.dev/
+
+Redirect URLs:
+https://apontamentos-engmanufatura.modulardtc.workers.dev/**
+https://apontamentosengmanufatura.netlify.app/**
+
+Remova ou deixe de usar:
+https://apontamentos-engmanufatura.rmacedo.workers.dev/
+
+ATUALIZAÇÃO DO APLICATIVO
+-------------------------
+1. Não precisa executar SQL.
+
+2. Extraia o ZIP de atualização na pasta do projeto.
+
+3. Preserve o config.js atual.
+
+4. Publique pelo Git.
+
+5. Após o deploy, abra:
+https://apontamentos-engmanufatura.modulardtc.workers.dev/limpar-cache.html
+
+TESTE
+-----
+1. Abra a tela de login.
+2. Digite o e-mail.
+3. Clique em Esqueci minha senha.
+4. Use somente o e-mail mais recente.
+5. O link deverá abrir no domínio modulardtc.workers.dev.

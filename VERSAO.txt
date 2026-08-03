@@ -1,2 +1,3 @@
-APONTA HORAS - VERSAO PUBLICADA: 2.19.0
-Aprovacao e devolucao em lote na subaba Fechamentos enviados.
+APONTA HORAS - VERSAO PUBLICADA: 2.19.2
+Correcao do redirecionamento para redefinicao de senha.
+Endereco principal mantido.
