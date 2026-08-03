@@ -1,0 +1,32 @@
+APONTA HORAS v2.19.1 — PROJETOS COMPLETOS E FILTRO
+====================================================
+
+LOCAL
+-----
+Cadastros > Projetos e atividades > Projetos
+
+MELHORIAS
+---------
+- Carregamento paginado de todos os projetos.
+- Busca por código, projeto, cliente e descrição.
+- Filtro por situação.
+- Contador de resultados.
+- Coluna Cliente.
+
+ATUALIZAÇÃO
+-----------
+1. Não precisa executar SQL.
+
+2. Extraia o ZIP de atualização na pasta do projeto.
+
+3. Preserve o config.js atual.
+
+4. Publique os arquivos pelo Git.
+
+5. Após o deploy, abra:
+   https://apontamentos-engmanufatura.modulardtc.workers.dev/limpar-cache.html
+
+CONFERÊNCIA
+-----------
+Digite no campo Buscar projeto o código ou nome do projeto que estava ausente.
+O contador mostrará quantos projetos foram carregados e quantos atendem ao filtro.
