@@ -1,0 +1,16 @@
+APONTA HORAS v2.18.8 — NOVA IDENTIDADE
+=========================================
+
+Nome: Aponta Horas
+Subtítulo: Gestão de Apontamentos
+
+O endereço atual será mantido:
+https://apontamentos-engmanufatura.modulardtc.workers.dev/
+
+1. Não precisa executar SQL.
+2. Extraia o ZIP de atualização na pasta do projeto.
+3. Preserve o config.js atual.
+4. Publique os arquivos.
+5. Abra /limpar-cache.html após o deploy.
+
+Quem já instalou o app no celular pode precisar remover o ícone antigo e instalar novamente.

@@ -1,2 +1,4 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.7
-Painel, Histórico e Relatórios gerais corrigidos para Administrador e Gestor.
+APONTA HORAS - VERSAO PUBLICADA: 2.18.8
+Nome: Aponta Horas
+Subtitulo: Gestao de Apontamentos
+Endereco do aplicativo: mantido sem alteracoes.

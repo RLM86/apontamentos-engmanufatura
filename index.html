@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
-  <meta name="description" content="Apontamento de horas compartilhado da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.18.7">
+  <meta name="description" content="Aponta Horas — Gestão de Apontamentos da Modular Data Centers">
+  <link rel="manifest" href="manifest.webmanifest?v=2.18.8">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.18.7.css?build=2187">
-  <title>Modular | Apontamento de Horas</title>
+  <link rel="stylesheet" href="style-v2.18.8.css?build=2188">
+  <title>Modular | Aponta Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Aponta P3">
+  <meta name="apple-mobile-web-app-title" content="Aponta Horas">
 
   <script>
     (function () {
@@ -75,7 +75,7 @@
     <div class="auth-card">
       <div class="brand">
         <img src="assets/brand/modular-symbol.png" class="brand-symbol" alt="Modular">
-        <div><h1>Apontamento de Horas</h1><p>Modular Data Centers</p></div>
+        <div><h1>Aponta Horas</h1><p>Gestão de Apontamentos</p></div>
       </div>
 
       <div class="tabs auth-tabs">
@@ -105,7 +105,7 @@
     <header class="topbar">
       <div class="brand top">
         <img src="assets/brand/modular-logo-white-transparent.png" class="brand-logo-full" alt="Modular Data Centers">
-        <div><strong>Apontamento de Horas</strong><small id="connectionStatus">Banco online</small></div>
+        <div><strong>Aponta Horas</strong><small>Gestão de Apontamentos · <span id="connectionStatus">Banco online</span></small></div>
       </div>
       <div class="user-box">
         <span id="currentUser"></span>
@@ -159,7 +159,7 @@
         <div class="presentation-hero">
           <div class="presentation-hero-text">
             <span class="eyebrow">MODULAR DATA CENTERS</span>
-            <h2>Apontamento de Horas</h2>
+            <h2>Aponta Horas</h2>
             <p>Plataforma compartilhada para registrar horas, acompanhar jornadas, enviar fechamentos e apoiar a aprovação mensal com rastreabilidade.</p>
             <div class="actions">
               <a class="btn primary" href="docs/Apresentacao_Apontamento_Horas_Modular.pptx" download>Baixar apresentação</a>
@@ -886,7 +886,7 @@
         <div class="page-title">
           <div>
             <h2>Backup e restauração</h2>
-            <p>Proteja os dados do Apontamento de Horas e recupere registros em caso de perda.</p>
+            <p>Proteja os dados do Aponta Horas e recupere registros em caso de perda.</p>
           </div>
         </div>
 
@@ -1189,7 +1189,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.18.7.js?build=2187"></script>
+  <script src="app-v2.18.8.js?build=2188"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -1197,9 +1197,9 @@
       <div class="install-app-icon" aria-hidden="true">
         <img src="modular-app-icon-192-v2116.png" alt="Símbolo oficial da Modular Data Centers">
       </div>
-      <h2 id="installAppTitle">Instalar Aponta P3</h2>
+      <h2 id="installAppTitle">Instalar Aponta Horas</h2>
       <p id="installAppMessage">
-        Adicione o Aponta P3 à tela inicial para abrir como aplicativo no Android ou iPhone.
+        Adicione o Aponta Horas à tela inicial para abrir como aplicativo no Android ou iPhone.
       </p>
 
       <div id="androidInstallActions" class="install-app-actions" hidden>
@@ -1238,7 +1238,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.18.7", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.18.8", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });
