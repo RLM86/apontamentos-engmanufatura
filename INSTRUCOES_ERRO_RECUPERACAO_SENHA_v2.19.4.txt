@@ -1,0 +1,32 @@
+APONTA HORAS v2.19.4 — CORREÇÃO DO ERRO {}
+================================================
+
+PROBLEMA
+--------
+Ao clicar em Esqueci minha senha, a caixa de mensagem mostrava apenas:
+{}
+
+CORREÇÃO
+--------
+O aplicativo agora interpreta:
+- status HTTP;
+- código do Supabase;
+- mensagem;
+- detalhes da resposta.
+
+PUBLICAÇÃO
+----------
+1. Não precisa executar SQL.
+2. Extraia o ZIP de atualização na pasta do projeto.
+3. Preserve o config.js.
+4. Publique pelo Git.
+5. Aguarde o deploy ficar como Success.
+6. Abra:
+https://apontamentos-engmanufatura.modulardtc.workers.dev/limpar-cache.html?build=2194
+
+TESTE
+-----
+1. Abra a tela de login.
+2. Informe o e-mail.
+3. Clique em Esqueci minha senha.
+4. A mensagem deverá informar claramente a causa.

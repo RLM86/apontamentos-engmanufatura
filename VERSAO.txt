@@ -1,2 +1,2 @@
-APONTA HORAS - VERSAO PUBLICADA: 2.19.3
-Recuperacao de senha com retorno visivel e pagina propria.
+APONTA HORAS - VERSAO PUBLICADA: 2.19.4
+Tratamento legivel dos erros de recuperacao de senha.
