@@ -1,0 +1,54 @@
+APONTA P3 v2.18.7 — RELATÓRIOS GERAIS DO ADM
+================================================
+
+PROBLEMA
+--------
+O Administrador selecionava:
+- Colaborador: Todos
+- Projeto: Todos
+- Período correto
+
+Mesmo assim, alguns apontamentos de outros colaboradores não apareciam.
+
+CORREÇÃO
+--------
+Painel, Histórico e Relatórios agora consultam os dados por uma função
+segura do Supabase:
+
+aponta_select_time_entries_v2187
+
+REGRAS
+------
+Administrador e Gestor:
+- visualizam todos os colaboradores;
+- podem aplicar filtro por colaborador e projeto;
+- visualizam todos os status.
+
+Colaborador:
+- visualiza somente os próprios apontamentos.
+
+ATUALIZAÇÃO
+-----------
+1. Execute no Supabase:
+   ATUALIZAR_BANCO_v2.18.7_RELATORIOS_GERAIS_ADM.sql
+
+2. Publique:
+   - index.html
+   - app-v2.18.7.js
+   - style-v2.18.7.css
+   - sw.js
+   - limpar-cache.html
+   - netlify.toml
+   - VERSAO.txt
+
+3. Preserve o config.js.
+
+4. Abra:
+   https://ENDERECO-DO-APP/limpar-cache.html
+
+TESTE
+-----
+1. Entre como Administrador.
+2. Abra Relatórios.
+3. Selecione Todos / 01-08-2026 / 31-08-2026 / Todos.
+4. O lançamento do Fernando Augusto Felipe deve aparecer junto com os demais.
