@@ -1,2 +1,2 @@
-APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.5
-Comissionamento e Montagem Final utilizam somente a sala do projeto.
+APONTAMENTO P3 - VERSAO PUBLICADA: 2.18.6
+Filtros de busca na lista de salas cadastradas.
