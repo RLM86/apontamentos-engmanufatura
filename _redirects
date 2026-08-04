@@ -1,3 +1,1 @@
-# Aponta Horas — rotas permitidas
-/redefinir-senha /redefinir-senha.html 200
-/redefinir-senha/ /redefinir-senha.html 200
+# Sem regras de redirecionamento para redefinicao de senha.

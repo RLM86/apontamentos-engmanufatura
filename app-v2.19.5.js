@@ -195,7 +195,7 @@
     return PRIMARY_APP_URL;
   };
 
-  const passwordRecoveryUrl = () => `${PRIMARY_APP_URL}redefinir-senha.html`;
+  const passwordRecoveryUrl = () => `${PRIMARY_APP_URL}redefinir-senha`;
 
   function showAuthMessage(message, error = false) {
     const box = $("authMessage");
