@@ -1,163 +1,227 @@
 (() => {
   "use strict";
 
-  const PRIMARY_APP_URL="https://apontamentos-engmanufatura.modulardtc.workers.dev/";
-  const cfg=window.APONTA_CONFIG||{};
-  const $=id=>document.getElementById(id);
+  const PRIMARY_APP_URL =
+    "https://apontamentos-engmanufatura.modulardtc.workers.dev/";
 
-  const validation=$("recoveryValidation");
-  const form=$("newPasswordForm");
-  const message=$("recoveryMessage");
-  const button=$("saveNewPasswordBtn");
+  const cfg = window.APONTA_CONFIG || {};
+  const $ = id => document.getElementById(id);
 
-  function showMessage(text,error=false){
-    message.textContent=text;
-    message.classList.toggle("error",error);
-    message.hidden=false;
+  const form = $("otpRecoveryForm");
+  const message = $("recoveryMessage");
+  const button = $("saveNewPasswordBtn");
+  const validation = $("recoveryValidation");
+  const loading = $("loading");
+
+  function setLoading(active, text = "Validando código...") {
+    if (!loading) return;
+    const label = loading.querySelector("span");
+    if (label) label.textContent = text;
+    loading.hidden = !active;
   }
 
-  function showInvalidLink(detail=""){
-    validation.innerHTML=
-      "<h2>Link inválido ou expirado</h2>"+
-      "<p>Solicite um novo e-mail em “Esqueci minha senha” e use somente o link mais recente.</p>";
-
-    if(detail)showMessage(detail,true);
-    form.hidden=true;
+  function showMessage(text, error = false) {
+    message.textContent = text;
+    message.classList.toggle("error", error);
+    message.hidden = false;
   }
 
-  const configured=
-    /^https:\/\/.+\.supabase\.co$/.test(cfg.supabaseUrl||"")&&
-    typeof cfg.supabaseAnonKey==="string"&&
-    cfg.supabaseAnonKey.length>30&&
+  function clearMessage() {
+    message.textContent = "";
+    message.hidden = true;
+    message.classList.remove("error");
+  }
+
+  function normalizeError(error) {
+    return String(
+      error?.message ||
+      error?.error_description ||
+      error?.code ||
+      error ||
+      ""
+    ).toLowerCase();
+  }
+
+  function recoveryErrorMessage(error) {
+    const normalized = normalizeError(error);
+
+    if (
+      normalized.includes("expired") ||
+      normalized.includes("invalid") ||
+      normalized.includes("otp") ||
+      normalized.includes("token")
+    ) {
+      return (
+        "Código inválido ou expirado. Solicite um novo código e use somente " +
+        "o código do e-mail mais recente."
+      );
+    }
+
+    if (
+      normalized.includes("rate") ||
+      normalized.includes("too many") ||
+      normalized.includes("429")
+    ) {
+      return (
+        "Muitas tentativas foram realizadas. Aguarde alguns minutos antes " +
+        "de tentar novamente."
+      );
+    }
+
+    if (
+      normalized.includes("fetch") ||
+      normalized.includes("network") ||
+      normalized.includes("connection")
+    ) {
+      return (
+        "Não foi possível conectar ao serviço de autenticação. Verifique a " +
+        "internet e tente novamente."
+      );
+    }
+
+    return error?.message || "Não foi possível alterar a senha.";
+  }
+
+  const configured =
+    /^https:\/\/.+\.supabase\.co$/.test(cfg.supabaseUrl || "") &&
+    typeof cfg.supabaseAnonKey === "string" &&
+    cfg.supabaseAnonKey.length > 30 &&
     !cfg.supabaseAnonKey.includes("COLE_");
 
-  if(!configured){
-    showInvalidLink("A configuração do Supabase não foi carregada.");
+  if (!configured) {
+    form.hidden = true;
+    showMessage("A configuração do Supabase não foi carregada.", true);
     return;
   }
 
-  const url=new URL(window.location.href);
-  const authError=
-    url.searchParams.get("error_description")||
-    url.searchParams.get("error")||
-    new URLSearchParams(url.hash.replace(/^#/,"")).get("error_description")||
-    "";
-
-  if(authError){
-    showInvalidLink(decodeURIComponent(authError.replace(/\+/g," ")));
-    return;
-  }
-
-  const sb=window.supabase.createClient(
+  const sb = window.supabase.createClient(
     cfg.supabaseUrl,
     cfg.supabaseAnonKey,
     {
-      auth:{
-        detectSessionInUrl:true,
-        persistSession:true,
-        autoRefreshToken:true,
-        flowType:"pkce"
+      auth: {
+        detectSessionInUrl: false,
+        persistSession: false,
+        autoRefreshToken: false,
+        flowType: "pkce"
       }
     }
   );
 
-  let recoverySessionReady=false;
+  const currentUrl = new URL(window.location.href);
+  const savedEmail =
+    sessionStorage.getItem("aponta_recovery_email") ||
+    currentUrl.searchParams.get("email") ||
+    "";
 
-  async function validateRecoverySession(){
-    try{
-      const {data,error}=await sb.auth.getSession();
-      if(error)throw error;
+  $("recoveryEmail").value = savedEmail;
 
-      if(data?.session){
-        recoverySessionReady=true;
-        validation.innerHTML=
-          "<h2>Crie sua nova senha</h2>"+
-          "<p>Digite a nova senha duas vezes para confirmar.</p>";
-        form.hidden=false;
-        $("newPassword").focus();
-        return;
-      }
+  $("recoveryCode").addEventListener("input", event => {
+    event.target.value = event.target.value
+      .replace(/\D/g, "")
+      .slice(0, 6);
+  });
 
-      window.setTimeout(async()=>{
-        const {data:retryData,error:retryError}=await sb.auth.getSession();
-
-        if(retryError||!retryData?.session){
-          showInvalidLink();
-          return;
-        }
-
-        recoverySessionReady=true;
-        validation.innerHTML=
-          "<h2>Crie sua nova senha</h2>"+
-          "<p>Digite a nova senha duas vezes para confirmar.</p>";
-        form.hidden=false;
-        $("newPassword").focus();
-      },1200);
-    }catch(error){
-      showInvalidLink(error?.message||"Não foi possível validar o link.");
-    }
+  if (savedEmail) {
+    $("recoveryCode").focus();
+  } else {
+    $("recoveryEmail").focus();
   }
 
-  sb.auth.onAuthStateChange((event,session)=>{
-    if(event==="PASSWORD_RECOVERY"||event==="SIGNED_IN"){
-      if(session){
-        recoverySessionReady=true;
-        validation.innerHTML=
-          "<h2>Crie sua nova senha</h2>"+
-          "<p>Digite a nova senha duas vezes para confirmar.</p>";
-        form.hidden=false;
-      }
-    }
-  });
-
-  form.addEventListener("submit",async event=>{
+  form.addEventListener("submit", async event => {
     event.preventDefault();
+    clearMessage();
 
-    const password=$("newPassword").value;
-    const confirmation=$("confirmNewPassword").value;
+    const email = $("recoveryEmail").value.trim().toLowerCase();
+    const token = $("recoveryCode").value.trim();
+    const password = $("newPassword").value;
+    const confirmation = $("confirmNewPassword").value;
 
-    message.hidden=true;
-
-    if(password.length<6){
-      showMessage("A senha deve possuir pelo menos 6 caracteres.",true);
+    if (!$("recoveryEmail").checkValidity()) {
+      showMessage("Informe um endereço de e-mail válido.", true);
+      $("recoveryEmail").focus();
       return;
     }
 
-    if(password!==confirmation){
-      showMessage("As senhas informadas não são iguais.",true);
-      return;
-    }
-
-    if(!recoverySessionReady){
+    if (!/^\d{6}$/.test(token)) {
       showMessage(
-        "O link ainda não foi validado. Atualize a página ou solicite um novo e-mail.",
+        "Informe exatamente os 6 dígitos recebidos por e-mail.",
         true
       );
+      $("recoveryCode").focus();
       return;
     }
 
-    const originalText=button.textContent;
-    button.disabled=true;
-    button.textContent="Salvando...";
+    if (password.length < 6) {
+      showMessage("A senha deve possuir pelo menos 6 caracteres.", true);
+      $("newPassword").focus();
+      return;
+    }
 
-    try{
-      const {error}=await sb.auth.updateUser({password});
-      if(error)throw error;
+    if (password !== confirmation) {
+      showMessage("As senhas informadas não são iguais.", true);
+      $("confirmNewPassword").focus();
+      return;
+    }
 
-      validation.innerHTML="<h2>Senha atualizada</h2>";
-      form.hidden=true;
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = "Validando código...";
+    setLoading(true, "Validando código...");
+
+    try {
+      const { data: verification, error: verifyError } =
+        await sb.auth.verifyOtp({
+          email,
+          token,
+          type: "recovery"
+        });
+
+      if (verifyError) throw verifyError;
+
+      if (!verification?.session) {
+        throw new Error(
+          "O código foi reconhecido, mas a sessão de recuperação não foi criada."
+        );
+      }
+
+      button.textContent = "Alterando senha...";
+      setLoading(true, "Alterando senha...");
+
+      const { error: updateError } = await sb.auth.updateUser({
+        password
+      });
+
+      if (updateError) throw updateError;
+
+      sessionStorage.removeItem("aponta_recovery_email");
+
+      validation.innerHTML =
+        '<div class="recovery-success">' +
+        "<h2>Senha alterada com sucesso</h2>" +
+        "<p>Você já pode entrar no Aponta Horas usando a nova senha.</p>" +
+        "</div>";
+
+      form.reset();
+      form.hidden = true;
+
       showMessage(
-        "Sua senha foi alterada com sucesso. Volte para a tela de entrada."
+        "A nova senha foi salva. Clique abaixo para voltar à tela de entrada."
       );
 
-      await sb.auth.signOut();
-      $("backToLoginBtn").textContent="Entrar com a nova senha";
-    }catch(error){
-      showMessage(error?.message||"Não foi possível atualizar a senha.",true);
-      button.disabled=false;
-      button.textContent=originalText;
+      $("backToLoginBtn").textContent = "Entrar com a nova senha";
+
+      try {
+        await sb.auth.signOut();
+      } catch (signOutError) {
+        console.warn("Não foi possível encerrar a sessão temporária:", signOutError);
+      }
+    } catch (error) {
+      console.error("Falha na redefinição por código:", error);
+      showMessage(recoveryErrorMessage(error), true);
+      button.disabled = false;
+      button.textContent = originalText;
+    } finally {
+      setLoading(false);
     }
   });
-
-  validateRecoverySession();
 })();

@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
   <meta name="description" content="Aponta Horas — Gestão de Apontamentos da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.19.5">
+  <link rel="manifest" href="manifest.webmanifest?v=2.19.6">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.19.5.css?build=2195">
+  <link rel="stylesheet" href="style-v2.19.5.css?build=2196">
   <title>Modular | Aponta Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,7 +16,7 @@
 
   <script>
     (function () {
-      const BUILD = "2.12.0";
+      const BUILD = "2.19.6";
       const resetKey = "aponta-p3-cache-reset-" + BUILD;
 
       async function removeOldApplicationCache() {
@@ -37,8 +37,8 @@
         sessionStorage.setItem(resetKey, "ok");
 
         const url = new URL(window.location.href);
-        if (url.searchParams.get("build") !== "2195") {
-          url.searchParams.set("build", "2195");
+        if (url.searchParams.get("build") !== "2196") {
+          url.searchParams.set("build", "2196");
           window.location.replace(url.toString());
         }
       }
@@ -1334,7 +1334,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.19.5.js?build=2195"></script>
+  <script src="app-v2.19.5.js?build=2196"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -1383,7 +1383,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.19.5", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.19.6", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });

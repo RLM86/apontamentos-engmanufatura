@@ -195,7 +195,7 @@
     return PRIMARY_APP_URL;
   };
 
-  const passwordRecoveryUrl = () => `${PRIMARY_APP_URL}redefinir-senha`;
+  const recoveryPageUrl = () => `${appBaseUrl()}redefinir-senha`;
 
   function showAuthMessage(message, error = false) {
     const box = $("authMessage");
@@ -397,7 +397,7 @@
     ) {
       return (
         "O limite temporário de envio de e-mails foi atingido. " +
-        "Aguarde aproximadamente 1 hora e solicite somente um novo link."
+        "Aguarde aproximadamente 1 hora e solicite somente um novo código."
       );
     }
 
@@ -461,7 +461,7 @@
       ].filter(Boolean).join(" · ");
 
       return (
-        `Não foi possível enviar o link: ${details.message}` +
+        `Não foi possível enviar o código: ${details.message}` +
         (technical ? ` (${technical})` : "")
       );
     }
@@ -473,7 +473,7 @@
     ].filter(Boolean).join(" · ") || "AUTH-RECOVERY-UNKNOWN";
 
     return (
-      "Não foi possível enviar o link de redefinição. " +
+      "Não foi possível enviar o código de redefinição. " +
       `Código: ${technicalCode}. ` +
       "A causa mais comum é limite temporário de e-mails ou SMTP não configurado."
     );
@@ -1448,65 +1448,67 @@
   };
 
   $("forgotPasswordBtn").onclick = async () => {
-    const button=$("forgotPasswordBtn");
-    const email=$("loginEmail").value.trim();
+    const button = $("forgotPasswordBtn");
+    const email = $("loginEmail").value.trim().toLowerCase();
 
     clearAuthMessage();
 
-    if(!email){
+    if (!email) {
       showAuthMessage(
-        "Informe seu e-mail no campo acima para receber o link de redefinição.",
+        "Informe seu e-mail no campo acima para receber o código de redefinição.",
         true
       );
       $("loginEmail").focus();
       return;
     }
 
-    if(!$("loginEmail").checkValidity()){
-      showAuthMessage("Informe um endereço de e-mail válido.",true);
+    if (!$("loginEmail").checkValidity()) {
+      showAuthMessage("Informe um endereço de e-mail válido.", true);
       $("loginEmail").focus();
       return;
     }
 
-    const originalText=button.textContent;
-    button.disabled=true;
-    button.textContent="Enviando link...";
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = "Enviando código...";
+
     showAuthMessage(
-      "Solicitando o e-mail de redefinição. Aguarde alguns segundos..."
+      "Solicitando o código de redefinição. Aguarde o recebimento do e-mail..."
     );
 
-    try{
-      const {error}=await sb.auth.resetPasswordForEmail(email,{
-        redirectTo:passwordRecoveryUrl()
-      });
+    try {
+      const { error } = await sb.auth.resetPasswordForEmail(email);
 
-      if(error)throw error;
+      if (error) throw error;
+
+      sessionStorage.setItem("aponta_recovery_email", email);
 
       showAuthMessage(
-        "Link de redefinição enviado. Verifique a caixa de entrada e o spam. " +
-        "Use somente o e-mail mais recente."
+        "Código enviado. Ao receber o e-mail, informe os 6 dígitos na próxima tela. " +
+        "Use somente o código do e-mail mais recente."
       );
 
-      button.textContent="Link enviado";
-      window.setTimeout(()=>{
-        button.disabled=false;
-        button.textContent=originalText;
-      },15000);
-    }catch(error){
-      console.error("Erro ao solicitar redefinição de senha:", error, recoveryErrorDetails(error));
+      button.textContent = "Código enviado";
+
+      window.setTimeout(() => {
+        window.location.href = recoveryPageUrl();
+      }, 900);
+    } catch (error) {
+      console.error(
+        "Erro ao solicitar código de redefinição de senha:",
+        error,
+        recoveryErrorDetails(error)
+      );
 
       showAuthMessage(
         recoveryErrorMessage(error),
         true
       );
 
-      button.disabled=false;
-      button.textContent=originalText;
+      button.disabled = false;
+      button.textContent = originalText;
     }
-  };
-
-
-  $("logoutBtn").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+  };  $("logoutBtn").onclick = async () => { await sb.auth.signOut(); location.reload(); };
 
   $("mainNav").onclick = async (e) => {
     const btn = e.target.closest("button[data-page]");

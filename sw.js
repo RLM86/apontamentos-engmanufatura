@@ -1,12 +1,12 @@
-const CACHE = "aponta-horas-v2.19.5";
+const CACHE = "aponta-horas-v2.19.6-otp";
 const ASSETS = [
   "./",
   "./index.html",
-  "./app-v2.19.5.js?build=2195",
-  "./style-v2.19.5.css?build=2195",
+  "./app-v2.19.5.js?build=2196",
+  "./style-v2.19.5.css?build=2196",
   "./redefinir-senha.html",
-  "./auth-recovery-v2.19.5.js?build=2195",
-  "./manifest.webmanifest?v=2.19.5",
+  "./auth-recovery-v2.19.5.js?build=2196",
+  "./manifest.webmanifest?v=2.19.6",
   "./modular-app-icon-192-v2116.png",
   "./modular-app-icon-512-v2116.png"
 ];
@@ -34,6 +34,14 @@ self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
+  if (url.pathname.endsWith("/config.js")) {
+    event.respondWith(
+      fetch(event.request, { cache: "no-store" })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
   if (event.request.mode === "navigate") {
     const isRecovery =
       url.pathname.endsWith("/redefinir-senha") ||
@@ -47,9 +55,9 @@ self.addEventListener("fetch", event => {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          if(response.ok){
-            const copy=response.clone();
-            caches.open(CACHE).then(cache => cache.put(fallback,copy));
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE).then(cache => cache.put(fallback, copy));
           }
           return response;
         })
@@ -60,11 +68,11 @@ self.addEventListener("fetch", event => {
 
   event.respondWith(
     caches.match(event.request).then(cached => {
-      const network=fetch(event.request)
+      const network = fetch(event.request)
         .then(response => {
-          if(response.ok){
-            const copy=response.clone();
-            caches.open(CACHE).then(cache => cache.put(event.request,copy));
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE).then(cache => cache.put(event.request, copy));
           }
           return response;
         })

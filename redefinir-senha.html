@@ -6,11 +6,40 @@
   <meta name="theme-color" content="#052630">
   <title>Aponta Horas | Redefinir senha</title>
   <link rel="icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.19.5.css?build=2195">
+  <link rel="stylesheet" href="style-v2.19.5.css?build=2196">
+  <style>
+    .recovery-card .recovery-intro {
+      margin: 0 0 18px;
+      line-height: 1.5;
+    }
+
+    .recovery-card .otp-input {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: .42rem;
+      text-align: center;
+    }
+
+    .recovery-card .recovery-help {
+      display: block;
+      margin-top: -4px;
+      margin-bottom: 14px;
+      color: #667085;
+      line-height: 1.4;
+    }
+
+    .recovery-card .recovery-success {
+      padding: 14px;
+      border-radius: 10px;
+      background: #edf7e7;
+      color: #194d23;
+      line-height: 1.5;
+    }
+  </style>
 </head>
 <body>
   <div id="loading" class="loading" hidden>
-    <div class="spinner"></div><span>Validando link...</span>
+    <div class="spinner"></div><span>Validando código...</span>
   </div>
 
   <main class="center-screen recovery-screen">
@@ -24,32 +53,81 @@
       </div>
 
       <div id="recoveryValidation">
-        <p>Validando o link de redefinição...</p>
+        <h2>Digite o código recebido</h2>
+        <p class="recovery-intro">
+          Informe o e-mail da conta, o código de 6 dígitos enviado pelo Supabase
+          e escolha uma nova senha.
+        </p>
       </div>
 
-      <form id="newPasswordForm" class="auth-form active" hidden>
+      <form id="otpRecoveryForm" class="auth-form active">
+        <label>
+          E-mail
+          <input
+            id="recoveryEmail"
+            type="email"
+            autocomplete="email"
+            required>
+        </label>
+
+        <label>
+          Código de 6 dígitos
+          <input
+            id="recoveryCode"
+            class="otp-input"
+            type="text"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            minlength="6"
+            maxlength="6"
+            pattern="[0-9]{6}"
+            placeholder="000000"
+            required>
+        </label>
+
+        <small class="recovery-help">
+          Use somente o código do e-mail mais recente.
+        </small>
+
         <label>
           Nova senha
-          <input id="newPassword" type="password" autocomplete="new-password"
-            minlength="6" required>
+          <input
+            id="newPassword"
+            type="password"
+            autocomplete="new-password"
+            minlength="6"
+            required>
         </label>
 
         <label>
           Confirmar nova senha
-          <input id="confirmNewPassword" type="password"
-            autocomplete="new-password" minlength="6" required>
+          <input
+            id="confirmNewPassword"
+            type="password"
+            autocomplete="new-password"
+            minlength="6"
+            required>
         </label>
 
-        <button id="saveNewPasswordBtn" class="btn primary full" type="submit">
-          Salvar nova senha
+        <button
+          id="saveNewPasswordBtn"
+          class="btn primary full"
+          type="submit">
+          Validar código e alterar senha
         </button>
       </form>
 
-      <div id="recoveryMessage" class="auth-message" role="status"
-        aria-live="polite" hidden></div>
+      <div
+        id="recoveryMessage"
+        class="auth-message"
+        role="status"
+        aria-live="polite"
+        hidden></div>
 
-      <a id="backToLoginBtn" class="btn secondary full recovery-back"
-        href="https://apontamentos-engmanufatura.modulardtc.workers.dev/?build=2193">
+      <a
+        id="backToLoginBtn"
+        class="btn secondary full recovery-back"
+        href="https://apontamentos-engmanufatura.modulardtc.workers.dev/?build=2196">
         Voltar para entrar
       </a>
     </section>
@@ -57,6 +135,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
-  <script src="auth-recovery-v2.19.5.js?build=2195"></script>
+  <script src="auth-recovery-v2.19.5.js?build=2196"></script>
 </body>
 </html>
