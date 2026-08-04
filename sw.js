@@ -1,12 +1,12 @@
-const CACHE = "aponta-horas-v2.19.9-cadastro-atividade";
+const CACHE = "aponta-horas-v2.19.10-recuperacao-corrigida";
 const ASSETS = [
   "./",
   "./index.html",
-  "./app-v2.19.5.js?build=2199",
-  "./style-v2.19.5.css?build=2199",
+  "./app-v2.19.5.js?build=2200",
+  "./style-v2.19.5.css?build=2200",
   "./redefinir-senha.html",
-  "./auth-recovery-v2.19.5.js?build=2199",
-  "./manifest.webmanifest?v=2.19.9",
+  "./auth-recovery-v2.19.5.js?build=2200",
+  "./manifest.webmanifest?v=2.19.10",
   "./modular-app-icon-192-v2116.png",
   "./modular-app-icon-512-v2116.png"
 ];

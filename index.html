@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
   <meta name="description" content="Aponta Horas — Gestão de Apontamentos da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.19.9">
+  <link rel="manifest" href="manifest.webmanifest?v=2.19.10">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.19.5.css?build=2199">
+  <link rel="stylesheet" href="style-v2.19.5.css?build=2200">
   <title>Modular | Aponta Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,7 +16,7 @@
 
   <script>
     (function () {
-      const BUILD = "2.19.9";
+      const BUILD = "2.19.10";
       const resetKey = "aponta-p3-cache-reset-" + BUILD;
 
       async function removeOldApplicationCache() {
@@ -37,8 +37,8 @@
         sessionStorage.setItem(resetKey, "ok");
 
         const url = new URL(window.location.href);
-        if (url.searchParams.get("build") !== "2199") {
-          url.searchParams.set("build", "2199");
+        if (url.searchParams.get("build") !== "2200") {
+          url.searchParams.set("build", "2200");
           window.location.replace(url.toString());
         }
       }
@@ -627,23 +627,10 @@
                 <span id="activityCatalogCount" class="badge">0</span>
               </div>
               <form id="activityForm" class="form-grid compact-form-grid">
-                <label class="activity-code-field">Código
-                  <input id="activityCode" placeholder="Selecione primeiro a disciplina" autocomplete="off" required>
-                  <small id="activityCodeSequenceHint" class="activity-code-sequence-hint">
-                    Selecione a disciplina para consultar o último código cadastrado.
-                  </small>
-                </label>
-                <label>Disciplina
-                  <select id="activityDiscipline" required>
-                    <option value="">Selecione a disciplina</option>
-                  </select>
-                </label>
+                <label>Código<input id="activityCode" placeholder="MES-001"></label>
+                <label>Disciplina<input id="activityDiscipline" placeholder="Montagem Estrutural"></label>
                 <label class="full">Nome<input id="activityName" required></label>
-                <label>Natureza
-                  <select id="activityNature" required>
-                    <option value="">Selecione a natureza</option>
-                  </select>
-                </label>
+                <label>Natureza<input id="activityNature" placeholder="Rotina / Demanda"></label>
                 <label>Observação
       <select id="activityObservationRequirement">
         <option value="Opcional">Opcional</option>
@@ -1197,23 +1184,10 @@
     <form method="dialog" id="editActivityForm" class="dialog-card">
       <h3>Editar atividade</h3>
       <input id="editActivityId" type="hidden">
-      <label class="activity-code-field">Código
-        <input id="editActivityCode" autocomplete="off" required>
-        <small id="editActivityCodeSequenceHint" class="activity-code-sequence-hint">
-          Selecione a disciplina para consultar o último código cadastrado.
-        </small>
-      </label>
-      <label>Disciplina
-        <select id="editActivityDiscipline" required>
-          <option value="">Selecione a disciplina</option>
-        </select>
-      </label>
+      <label>Código<input id="editActivityCode"></label>
+      <label>Disciplina<input id="editActivityDiscipline"></label>
       <label>Nome<input id="editActivityName" required></label>
-      <label>Natureza
-        <select id="editActivityNature" required>
-          <option value="">Selecione a natureza</option>
-        </select>
-      </label>
+      <label>Natureza<input id="editActivityNature"></label>
       <label>Observação
       <select id="editActivityObservationRequirement">
         <option value="Opcional">Opcional</option>
@@ -1386,7 +1360,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.19.5.js?build=2199"></script>
+  <script src="app-v2.19.5.js?build=2200"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -1435,7 +1409,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.19.9", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.19.10", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });
