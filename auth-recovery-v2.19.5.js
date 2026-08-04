@@ -118,7 +118,7 @@
   $("recoveryCode").addEventListener("input", event => {
     event.target.value = event.target.value
       .replace(/\D/g, "")
-      .slice(0, 6);
+      .slice(0, 8);
   });
 
   if (savedEmail) {
@@ -142,9 +142,9 @@
       return;
     }
 
-    if (!/^\d{6}$/.test(token)) {
+    if (!/^\d{8}$/.test(token)) {
       showMessage(
-        "Informe exatamente os 6 dígitos recebidos por e-mail.",
+        "Informe exatamente os 8 dígitos recebidos por e-mail.",
         true
       );
       $("recoveryCode").focus();

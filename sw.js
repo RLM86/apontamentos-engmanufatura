@@ -1,12 +1,12 @@
-const CACHE = "aponta-horas-v2.19.6-otp";
+const CACHE = "aponta-horas-v2.19.7-otp8";
 const ASSETS = [
   "./",
   "./index.html",
-  "./app-v2.19.5.js?build=2196",
-  "./style-v2.19.5.css?build=2196",
+  "./app-v2.19.5.js?build=2197",
+  "./style-v2.19.5.css?build=2197",
   "./redefinir-senha.html",
-  "./auth-recovery-v2.19.5.js?build=2196",
-  "./manifest.webmanifest?v=2.19.6",
+  "./auth-recovery-v2.19.5.js?build=2197",
+  "./manifest.webmanifest?v=2.19.7",
   "./modular-app-icon-192-v2116.png",
   "./modular-app-icon-512-v2116.png"
 ];

@@ -1484,7 +1484,7 @@
       sessionStorage.setItem("aponta_recovery_email", email);
 
       showAuthMessage(
-        "Código enviado. Ao receber o e-mail, informe os 6 dígitos na próxima tela. " +
+        "Código enviado. Ao receber o e-mail, informe os 8 dígitos na próxima tela. " +
         "Use somente o código do e-mail mais recente."
       );
 
