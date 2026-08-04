@@ -3831,6 +3831,4100 @@
     }
   }
 
+  /* APONTA P3 v2.19.9 — cadastro padronizado de atividades */
+  const ACTIVITY_DISCIPLINE_DEFAULTS = [
+    {prefix:"GES",name:"Gestão e Coordenação"},
+    {prefix:"DFM",name:"Produto, DFMA e Fusion"},
+    {prefix:"PRC",name:"Processo e Industrialização"},
+    {prefix:"SAP",name:"SAP e Dados de Manufatura"},
+    {prefix:"LTK",name:"Lantek, Nesting e Programação CNC"},
+    {prefix:"FAB",name:"Fabricação Mecânica"},
+    {prefix:"PIN",name:"Pintura, Corrosão e Vedação"},
+    {prefix:"MES",name:"Montagem Estrutural"},
+    {prefix:"MFI",name:"Montagem Final e Integrações"},
+    {prefix:"MPA",name:"Montagem de Painéis"},
+    {prefix:"QLD",name:"Qualidade, Testes e RNC"},
+    {prefix:"SST",name:"Segurança, Ergonomia e Meio Ambiente"},
+    {prefix:"MEL",name:"Lean, Dispositivos e Digitalização"},
+    {prefix:"PCP",name:"PCP e Planejamento da Produção"},
+    {prefix:"MAT",name:"Materiais, Compras Técnicas e Fornecedores"},
+    {prefix:"DOC",name:"Documentação Técnica e Controle de Mudanças"},
+    {prefix:"TST",name:"Testes, FAT e Comissionamento de Fábrica"}
+  ];
+
+  const ACTIVITY_NATURE_DEFAULTS = [
+    "Rotina / Demanda",
+    "Planejada / Demanda",
+    "Demanda / Emergencial",
+    "Demanda / Validação",
+    "Validação / Demanda",
+    "Rotina / Planejada",
+    "Planejada / Rotina",
+    "Melhoria"
+  ];
+
+  function inferActivityDisciplinePrefix(disciplineName){
+    const normalizedDiscipline=normalizeText(disciplineName);
+    const defaultRow=ACTIVITY_DISCIPLINE_DEFAULTS.find(
+      row=>normalizeText(row.name)===normalizedDiscipline
+    );
+    if(defaultRow)return defaultRow.prefix;
+
+    const counts=new Map();
+    activities
+      .filter(activity=>
+        normalizeText(activity.discipline_name)===normalizedDiscipline
+      )
+      .forEach(activity=>{
+        const match=normalizeActivityCode(activity.code).match(/^([A-Z]{2,6})-(\d+)$/);
+        if(!match)return;
+        counts.set(match[1],(counts.get(match[1])||0)+1);
+      });
+
+    return [...counts.entries()]
+      .sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0]))[0]?.[0]||"";
+  }
+
+  function activityDisciplineOptions(){
+    const rows=new Map();
+
+    ACTIVITY_DISCIPLINE_DEFAULTS.forEach(row=>{
+      rows.set(normalizeText(row.name),{...row});
+    });
+
+    activities.forEach(activity=>{
+      const name=String(activity.discipline_name||"").trim();
+      if(!name)return;
+      const key=normalizeText(name);
+      if(!rows.has(key)){
+        rows.set(key,{
+          name,
+          prefix:inferActivityDisciplinePrefix(name)
+        });
+      }
+    });
+
+    return [...rows.values()].sort((a,b)=>
+      String(a.prefix||"").localeCompare(String(b.prefix||""),"pt-BR")||
+      a.name.localeCompare(b.name,"pt-BR")
+    );
+  }
+
+  function activityNatureOptions(){
+    const rows=[];
+    const seen=new Set();
+
+    [...ACTIVITY_NATURE_DEFAULTS,
+      ...activities.map(activity=>String(activity.nature||"").trim())
+    ].forEach(value=>{
+      const clean=String(value||"").trim();
+      const key=normalizeText(clean);
+      if(!clean||seen.has(key))return;
+      seen.add(key);
+      rows.push(clean);
+    });
+
+    return rows;
+  }
+
+  function fillActivityCatalogSelect(selectId,rows,placeholder,labelFn,valueFn,preferredValue=""){
+    const select=$(selectId);
+    if(!select)return;
+
+    const previous=preferredValue||select.value||"";
+    select.innerHTML=
+      `<option value="">${esc(placeholder)}</option>`+
+      rows.map(row=>
+        `<option value="${esc(valueFn(row))}">${esc(labelFn(row))}</option>`
+      ).join("");
+
+    if([...select.options].some(option=>option.value===previous)){
+      select.value=previous;
+    }else{
+      select.value="";
+    }
+  }
+
+  function populateActivityFormOptions(
+    preferredDiscipline="",
+    preferredNature=""
+  ){
+    const disciplines=activityDisciplineOptions();
+    const natures=activityNatureOptions();
+
+    ["activityDiscipline","editActivityDiscipline"].forEach((id,index)=>{
+      fillActivityCatalogSelect(
+        id,
+        disciplines,
+        "Selecione a disciplina",
+        row=>row.prefix?`${row.prefix} — ${row.name}`:row.name,
+        row=>row.name,
+        index===1?preferredDiscipline:""
+      );
+    });
+
+    ["activityNature","editActivityNature"].forEach((id,index)=>{
+      fillActivityCatalogSelect(
+        id,
+        natures,
+        "Selecione a natureza",
+        value=>value,
+        value=>value,
+        index===1?preferredNature:""
+      );
+    });
+
+    updateActivityCodeSequence("create",false);
+    updateActivityCodeSequence("edit",false);
+  }
+
+  function activityCodeSequence(disciplineName){
+    const discipline=String(disciplineName||"").trim();
+    if(!discipline)return null;
+
+    const prefix=inferActivityDisciplinePrefix(discipline);
+    if(!prefix){
+      return {
+        discipline,
+        prefix:"",
+        latest:"",
+        next:""
+      };
+    }
+
+    let greatest=0;
+    let greatestDigits=3;
+    let latest="";
+
+    activities
+      .filter(activity=>
+        normalizeText(activity.discipline_name)===normalizeText(discipline)
+      )
+      .forEach(activity=>{
+        const code=normalizeActivityCode(activity.code);
+        const match=code.match(
+          new RegExp(`^${prefix.replace(/[.*+?^${}()|[\]\\]/g,"\\  function populateActivityFilterOptions(){")}-(\\d+)(() => {
+  "use strict";
+
+  const cfg = window.APONTA_CONFIG || {};
+  const configured =
+    /^https:\/\/.+\.supabase\.co$/.test(cfg.supabaseUrl || "") &&
+    typeof cfg.supabaseAnonKey === "string" &&
+    cfg.supabaseAnonKey.length > 30 &&
+    !cfg.supabaseAnonKey.includes("COLE_");
+
+  const $ = (id) => document.getElementById(id);
+  const setupScreen = $("setupScreen");
+  const authScreen = $("authScreen");
+  const app = $("app");
+  const loading = $("loading");
+
+  if (!configured) {
+    setupScreen.hidden = false;
+    return;
+  }
+
+  const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+    auth: {
+      detectSessionInUrl: true,
+      persistSession: true,
+      autoRefreshToken: true,
+      flowType: "pkce"
+    }
+  });
+  let session = null;
+  let me = null;
+  let profiles = [];
+  let projects = [];
+  let activities = [];
+  let holidays = [];
+  let workAreas = [];
+  let manufacturingSectors = [];
+  let modules = [];
+  let rooms = [];
+  let panelTypes = [];
+  let activityAreaLinks = [];
+  let projectModules = [];
+  let projectRooms = [];
+  let projectRoomModules = [];
+  let projectRoomInstances = [];
+  let projectRoomInstanceModules = [];
+  let absences = [];
+  let lastReportRows = [];
+  let lastPeopleReportRows = [];
+  let lastPeopleAbsenceRows = [];
+  let currentClosing = null;
+  let closingHistoryRows = [];
+  const selectedClosingHistoryIds = new Set();
+  let visibleReviewableClosingIds = [];
+  const selectedEntryIds = new Set();
+  let visibleEditableEntryIds = [];
+  const selectedActivityIds = new Set();
+  let visibleActivityIds = [];
+
+  const MAX_MONOBLOCK_MODULES = 4;
+
+  const STANDARD_PROJECT_ROOMS = [
+    {key:"DH", title:"Data Hall", short:"DH", aliases:["dh","datahall"], order:1},
+    {key:"SE", title:"Sala Elétrica", short:"SE", aliases:["se","salaeletrica"], order:2},
+    {key:"SC", title:"Sala Catcher", short:"SC", aliases:["sc","salacatcher","catcher"], order:3},
+    {key:"SM", title:"Sala de Máquinas", short:"SM", aliases:["sm","salademaquinas","salamaquinas"], order:4},
+    {key:"HVAC", title:"HVAC", short:"HVAC", aliases:["hvac","salahvac"], order:5},
+    {key:"MONOBLOCO", title:"Monobloco", short:"MONO", aliases:["monobloco","mono"], order:6, monoblock:true}
+  ];
+
+  const today = () => new Date().toISOString().slice(0, 10);
+  const monthNow = () => today().slice(0, 7);
+  const firstDay = (month = monthNow()) => `${month}-01`;
+  const nextMonthFirst = (month = monthNow()) => {
+    const [y, m] = month.split("-").map(Number);
+    return new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 10);
+  };
+  const lastDay = (month = monthNow()) => {
+    const [y, m] = month.split("-").map(Number);
+    return new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
+  };
+  const fmt = (n) => Number(n || 0).toLocaleString("pt-BR", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  const dateBR = (d) => d ? d.split("-").reverse().join("/") : "—";
+  const dateTimeBR = (value) => {
+    if (!value) return "—";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+    return date.toLocaleString("pt-BR", {
+      day:"2-digit", month:"2-digit", year:"numeric",
+      hour:"2-digit", minute:"2-digit"
+    });
+  };
+  const monthLabel = (value) => {
+    const month = String(value || "").slice(0, 7);
+    if (!/^\d{4}-\d{2}$/.test(month)) return "—";
+    const date = new Date(`${month}-01T12:00:00`);
+    const label = date.toLocaleDateString("pt-BR", {month:"long", year:"numeric"});
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  };
+  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+  const roleLabel = (r) => ({administrador:"Administrador", gestor:"Gestor", colaborador:"Colaborador"}[r] || r);
+  const statusLabel = (s) => ({rascunho:"Rascunho", enviado:"Enviado", aprovado:"Aprovado", devolvido:"Devolvido", aberto:"Aberto"}[s] || s);
+  const registrationStatus = (profile = me) => profile?.registration_status || "aprovado";
+  const registrationLabel = (status) => ({pendente:"Pendente", aprovado:"Aprovado", rejeitado:"Rejeitado"}[status] || status);
+  const canMakeEntries = (profile = me) => Boolean(profile?.active && registrationStatus(profile) === "aprovado");
+  const registrationFeatureInstalled = () =>
+    profiles.some(profile =>
+      Object.prototype.hasOwnProperty.call(profile, "registration_status")
+    );
+  const absenceTypeLabel = (value) => {
+    const raw = String(value || "").trim();
+    const key = raw.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const labels = {
+      "ferias":"Férias",
+      "atestado":"Atestado médico",
+      "atestado medico":"Atestado médico",
+      "afastamento":"Afastamento",
+      "afastamento pelo inss":"Afastamento pelo INSS",
+      "licenca":"Licença",
+      "licenca-maternidade":"Licença-maternidade",
+      "licenca-paternidade":"Licença-paternidade",
+      "licenca nao remunerada":"Licença não remunerada",
+      "folga":"Folga",
+      "outro":"Outro afastamento",
+      "outro afastamento":"Outro afastamento"
+    };
+    return labels[key] || raw || "—";
+  };
+  const absenceStatus = (row) => {
+    if (today() < row.start_date) return "programado";
+    if (today() > row.end_date) return "encerrado";
+    return "em_andamento";
+  };
+  const absenceStatusLabel = (status) => ({programado:"Programado", em_andamento:"Em andamento", encerrado:"Encerrado"}[status] || status);
+  const absenceApprovalStatus = (row) => row?.approval_status === "aprovado" ? "aprovado" : "pendente";
+  const absenceApprovalLabel = (status) => ({pendente:"Pendente", aprovado:"Aprovado"}[status] || status);
+  const absenceDays = (row) => Math.round((new Date(`${row.end_date}T12:00:00`) - new Date(`${row.start_date}T12:00:00`)) / 86400000) + 1;
+  const normalizeText = (value) => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+  const normalizeActivityCode = (value) => {
+    const code=String(value||"").trim();
+    return code ? code.replace(/^EM-/i,"").toUpperCase() : "";
+  };
+
+  const normalizeObservationRequirement = (value) => {
+    const normalized=normalizeText(value);
+    return (
+      normalized==="sim"||
+      normalized==="s"||
+      normalized==="obrigatoria"||
+      normalized==="obrigatorio"||
+      normalized.includes("obrig")
+    ) ? "Obrigatória" : "Opcional";
+  };
+  const absenceCategory = (value) => {
+    const type = normalizeText(absenceTypeLabel(value));
+    if (type.includes("ferias")) return "vacation";
+    if (type.includes("atestado")) return "medical";
+    if (type.includes("afastamento") || type.includes("licenca")) return "away";
+    if (type.includes("folga")) return "dayoff";
+    return "other";
+  };
+  const overlapDays = (row, start, end) => {
+    const overlapStart = row.start_date > start ? row.start_date : start;
+    const overlapEnd = row.end_date < end ? row.end_date : end;
+    if (overlapEnd < overlapStart) return 0;
+    return Math.round((new Date(`${overlapEnd}T12:00:00`) - new Date(`${overlapStart}T12:00:00`)) / 86400000) + 1;
+  };
+  const isFutureDate = (value) => Boolean(value && value > today());
+  const validateNotFutureDate = (value, fieldName = "data") => {
+    if (!isFutureDate(value)) return true;
+    toast(`Não é permitido informar ${fieldName} futura. A data máxima é ${dateBR(today())}.`, true);
+    return false;
+  };
+  const isManager = () => ["administrador","gestor"].includes(me?.role);
+  const isAdmin = () => me?.role === "administrador";
+  const showLoading = (on) => loading.hidden = !on;
+  const PRIMARY_APP_URL =
+    "https://apontamentos-engmanufatura.modulardtc.workers.dev/";
+
+  const SECONDARY_APP_URL =
+    "https://apontamentosengmanufatura.netlify.app/";
+
+  const APP_ALLOWED_ORIGINS = new Set([
+    new URL(PRIMARY_APP_URL).origin,
+    new URL(SECONDARY_APP_URL).origin
+  ]);
+
+  const appBaseUrl = () => {
+    const current = new URL(window.location.href);
+
+    if(APP_ALLOWED_ORIGINS.has(current.origin)){
+      return `${current.origin}/`;
+    }
+
+    return PRIMARY_APP_URL;
+  };
+
+  const recoveryPageUrl = () => `${appBaseUrl()}redefinir-senha`;
+
+  function showAuthMessage(message, error = false) {
+    const box = $("authMessage");
+    box.textContent = message;
+    box.classList.toggle("error", error);
+    box.hidden = false;
+  }
+
+  function clearAuthMessage() {
+    $("authMessage").hidden = true;
+    $("authMessage").textContent = "";
+  }
+
+  function serializeRecoveryError(value, depth = 0, seen = new WeakSet()) {
+    if (value === null || value === undefined) return value;
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      return value;
+    }
+    if (typeof value === "function") return `[Function ${value.name || "anonymous"}]`;
+    if (depth > 3) return "[Max depth]";
+    if (typeof value !== "object") return String(value);
+
+    if (seen.has(value)) return "[Circular]";
+    seen.add(value);
+
+    const output = {};
+    const keys = new Set([
+      ...Object.keys(value),
+      ...Object.getOwnPropertyNames(value)
+    ]);
+
+    for (const key of keys) {
+      if (key === "stack") continue;
+      try {
+        output[key] = serializeRecoveryError(value[key], depth + 1, seen);
+      } catch (_) {
+        output[key] = "[Unreadable]";
+      }
+    }
+
+    if (!Object.keys(output).length) {
+      try {
+        const text = String(value);
+        if (text && text !== "[object Object]") return text;
+      } catch (_) {}
+    }
+
+    return output;
+  }
+
+  function collectRecoveryStrings(value, output = [], depth = 0, seen = new WeakSet()) {
+    if (value === null || value === undefined || depth > 4) return output;
+
+    if (typeof value === "string") {
+      const text = value.trim();
+      if (
+        text &&
+        text !== "{}" &&
+        text !== "[]" &&
+        text !== "[object Object]" &&
+        text !== "undefined" &&
+        text !== "null"
+      ) {
+        output.push(text);
+      }
+      return output;
+    }
+
+    if (typeof value !== "object") {
+      output.push(String(value));
+      return output;
+    }
+
+    if (seen.has(value)) return output;
+    seen.add(value);
+
+    const keys = new Set([
+      ...Object.keys(value),
+      ...Object.getOwnPropertyNames(value)
+    ]);
+
+    for (const key of keys) {
+      if (key === "stack") continue;
+      try {
+        collectRecoveryStrings(value[key], output, depth + 1, seen);
+      } catch (_) {}
+    }
+
+    return output;
+  }
+
+  function recoveryErrorDetails(error) {
+    const serialized = serializeRecoveryError(error);
+    const strings = collectRecoveryStrings(error);
+
+    const status = Number(
+      error?.status ||
+      error?.context?.status ||
+      serialized?.status ||
+      serialized?.context?.status ||
+      0
+    );
+
+    const code = String(
+      error?.code ||
+      error?.error_code ||
+      error?.context?.code ||
+      serialized?.code ||
+      serialized?.error_code ||
+      ""
+    ).trim();
+
+    const name = String(
+      error?.name ||
+      serialized?.name ||
+      ""
+    ).trim();
+
+    let message = "";
+
+    const directCandidates = [
+      error?.message,
+      error?.error_description,
+      error?.description,
+      error?.details,
+      error?.hint,
+      error?.context?.body?.message,
+      error?.context?.body?.error_description,
+      error?.context?.body?.error
+    ];
+
+    for (const candidate of directCandidates) {
+      if (typeof candidate === "string") {
+        const text = candidate.trim();
+        if (
+          text &&
+          text !== "{}" &&
+          text !== "[]" &&
+          text !== "[object Object]"
+        ) {
+          message = text;
+          break;
+        }
+      }
+    }
+
+    if (!message) {
+      message = strings.find(text => {
+        const normalized = normalizeText(text);
+        return (
+          normalized.includes("rate") ||
+          normalized.includes("email") ||
+          normalized.includes("smtp") ||
+          normalized.includes("fetch") ||
+          normalized.includes("network") ||
+          normalized.includes("redirect") ||
+          normalized.includes("invalid") ||
+          normalized.includes("auth")
+        );
+      }) || "";
+    }
+
+    let raw = "";
+    try {
+      raw = JSON.stringify(serialized);
+    } catch (_) {
+      raw = "";
+    }
+
+    if (
+      message === "{}" ||
+      message === "[]" ||
+      message === "[object Object]"
+    ) {
+      message = "";
+    }
+
+    return {
+      status,
+      code,
+      name,
+      message,
+      raw,
+      normalized: normalizeText(
+        `${name} ${code} ${status} ${message} ${raw}`
+      )
+    };
+  }
+
+  function recoveryErrorMessage(error) {
+    const details = recoveryErrorDetails(error);
+    const value = details.normalized;
+
+    if (
+      details.status === 429 ||
+      value.includes("rate limit") ||
+      value.includes("over email send rate limit") ||
+      value.includes("too many requests")
+    ) {
+      return (
+        "O limite temporário de envio de e-mails foi atingido. " +
+        "Aguarde aproximadamente 1 hora e solicite somente um novo código."
+      );
+    }
+
+    if (
+      value.includes("failed to fetch") ||
+      value.includes("network") ||
+      value.includes("fetch") ||
+      value.includes("connection")
+    ) {
+      return (
+        "Não foi possível conectar ao serviço de autenticação. " +
+        "Verifique a internet e tente novamente."
+      );
+    }
+
+    if (
+      value.includes("redirect") ||
+      value.includes("url not allowed") ||
+      value.includes("redirect_to")
+    ) {
+      return (
+        "O endereço de redefinição não está autorizado no Supabase. " +
+        "Confira Authentication → URL Configuration."
+      );
+    }
+
+    if (
+      value.includes("smtp") ||
+      value.includes("email provider") ||
+      value.includes("error sending") ||
+      value.includes("sending recovery email")
+    ) {
+      return (
+        "O Supabase não conseguiu enviar o e-mail. " +
+        "Confira a configuração SMTP em Authentication → Emails."
+      );
+    }
+
+    if (
+      value.includes("invalid email") ||
+      value.includes("email address is invalid")
+    ) {
+      return "O endereço de e-mail informado é inválido.";
+    }
+
+    if (
+      value.includes("user not found") ||
+      value.includes("email not found")
+    ) {
+      return (
+        "Não foi localizada uma conta com esse e-mail. " +
+        "Confira o endereço informado."
+      );
+    }
+
+    if (details.message) {
+      const technical = [
+        details.status ? `HTTP ${details.status}` : "",
+        details.code || "",
+        details.name || ""
+      ].filter(Boolean).join(" · ");
+
+      return (
+        `Não foi possível enviar o código: ${details.message}` +
+        (technical ? ` (${technical})` : "")
+      );
+    }
+
+    const technicalCode = [
+      details.status ? `HTTP ${details.status}` : "",
+      details.code || "",
+      details.name || ""
+    ].filter(Boolean).join(" · ") || "AUTH-RECOVERY-UNKNOWN";
+
+    return (
+      "Não foi possível enviar o código de redefinição. " +
+      `Código: ${technicalCode}. ` +
+      "A causa mais comum é limite temporário de e-mails ou SMTP não configurado."
+    );
+  }
+
+  function toast(message, error = false) {
+    const el = $("toast");
+    el.textContent = message;
+    el.style.background = error ? "#b42318" : "#101828";
+    el.hidden = false;
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(() => el.hidden = true, 3500);
+  }
+
+  function handleError(error, fallback = "Não foi possível concluir a operação.") {
+    console.error(error);
+    toast(error?.message || fallback, true);
+  }
+
+  function profileName(id) {
+    return profiles.find(p => p.id === id)?.full_name || "—";
+  }
+  function projectName(id) {
+    return projects.find(p => p.id === id)?.name || "—";
+  }
+  function activityName(id) {
+    return activities.find(a => a.id === id)?.name || "—";
+  }
+  function areaName(code) {
+    return workAreas.find(area => area.code === code)?.name || "—";
+  }
+
+  function isRoomOnlyWorkArea(code,name="") {
+    const normalizedCode=String(code||"").trim().toUpperCase();
+    const normalizedName=normalizeText(name);
+
+    return (
+      ["COM","MFI"].includes(normalizedCode)||
+      normalizedName==="comissionamento"||
+      normalizedName==="montagem final"
+    );
+  }
+
+  function enforceWorkAreaDetailType(code,name,detailType) {
+    return isRoomOnlyWorkArea(code,name)
+      ?"room"
+      :(detailType||"none");
+  }
+
+  function areaDefinition(code) {
+    const area=workAreas.find(item=>item.code===code);
+
+    if(area){
+      return {
+        ...area,
+        detail_type:enforceWorkAreaDetailType(
+          area.code,
+          area.name,
+          area.detail_type
+        )
+      };
+    }
+
+    const legacyDetailType={
+      FAB:"sector",
+      MES:"module",
+      MPA:"panel_type",
+      MFI:"room",
+      COM:"room",
+      ADM:"none"
+    };
+
+    return {
+      code,
+      name:code||"Área",
+      detail_type:legacyDetailType[code]||"none",
+      active:true,
+      order_index:999
+    };
+  }
+
+  function areaDetailType(code) {
+    return areaDefinition(code).detail_type||"none";
+  }
+
+  function areaDetailTypeLabel(value) {
+    return ({
+      none:"Sem referência",
+      sector:"Setor",
+      module:"Sala + módulo + parte",
+      panel_type:"Tipo de painel",
+      room:"Sala do projeto"
+    })[value]||"Sem referência";
+  }
+
+  function normalizeWorkAreaCode(value) {
+    return String(value||"")
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9_-]+/g,"-")
+      .replace(/^-+|-+$/g,"");
+  }
+  function sectorName(id) {
+    return manufacturingSectors.find(row => row.id === id)?.name || "—";
+  }
+  function moduleName(id, projectId = "", roomId = "") {
+    const roomLink = projectRoomModules.find(row =>
+      row.project_id === projectId &&
+      row.room_id === roomId &&
+      row.module_id === id
+    );
+    const projectLink = projectModules.find(row =>
+      row.project_id === projectId && row.module_id === id
+    );
+    return roomLink?.display_name ||
+      projectLink?.display_name ||
+      modules.find(row => row.id === id)?.name ||
+      "—";
+  }
+  function roomName(id, projectId = "") {
+    const link = projectRooms.find(row =>
+      row.project_id === projectId && row.room_id === id
+    );
+    return link?.display_name || rooms.find(row => row.id === id)?.name || "—";
+  }
+  function panelTypeName(id) {
+    return panelTypes.find(row => row.id === id)?.name || "—";
+  }
+  function roomInstanceName(id) {
+    const instance=projectRoomInstances.find(row=>row.id===id);
+    if(!instance)return "—";
+    return instance.display_name || rooms.find(row=>row.id===instance.room_id)?.name || "Sala";
+  }
+  function roomInstanceModuleName(id) {
+    const row=projectRoomInstanceModules.find(item=>item.id===id);
+    return row?.display_name || row?.code || "—";
+  }
+  function modulePartName(value){
+    return value==="inferior"?"Parte inferior":value==="superior"?"Parte superior":"—";
+  }
+  function entryReferenceName(entry) {
+    const detailType=areaDetailType(entry.area_code);
+
+    if(detailType==="sector")return sectorName(entry.sector_id);
+
+    if(detailType==="module"){
+      const room=entry.project_room_instance_id
+        ?roomInstanceName(entry.project_room_instance_id)
+        :roomName(entry.room_id,entry.project_id);
+      const module=entry.project_room_instance_module_id
+        ?roomInstanceModuleName(entry.project_room_instance_module_id)
+        :moduleName(entry.module_id,entry.project_id,entry.room_id);
+      const part=modulePartName(entry.module_part);
+      return `${room} / ${module}${part!=="—"?` / ${part}`:""}`;
+    }
+
+    if(detailType==="panel_type")return panelTypeName(entry.panel_type_id);
+
+    if(detailType==="room"){
+      return entry.project_room_instance_id
+        ?roomInstanceName(entry.project_room_instance_id)
+        :roomName(entry.room_id,entry.project_id);
+    }
+
+    return "Não aplicável";
+  }
+  function activityAreas(activityId) {
+    return activityAreaLinks
+      .filter(link => link.activity_id === activityId)
+      .map(link => link.area_code);
+  }
+
+  function applyConfirmedActivityAreas(activityId, areaCodes = []) {
+    const normalizedCodes=[...new Set(
+      (Array.isArray(areaCodes)?areaCodes:[])
+        .map(code=>String(code||"").trim().toUpperCase())
+        .filter(Boolean)
+    )];
+
+    activityAreaLinks=activityAreaLinks.filter(
+      link=>link.activity_id!==activityId
+    );
+
+    normalizedCodes.forEach(area_code=>{
+      activityAreaLinks.push({
+        activity_id:activityId,
+        area_code
+      });
+    });
+
+    return normalizedCodes;
+  }
+
+  async function loadGroupedActivityAreaLinks() {
+    const {data,error}=await sb.rpc(
+      "aponta_list_activity_areas_grouped_v2183"
+    );
+
+    if(error){
+      return {data:null,error};
+    }
+
+    const links=[];
+
+    (data||[]).forEach(row=>{
+      const activityId=row.activity_id;
+      const areaCodes=Array.isArray(row.area_codes)
+        ?row.area_codes
+        :[];
+
+      areaCodes.forEach(area_code=>{
+        const normalized=String(area_code||"").trim().toUpperCase();
+        if(!activityId||!normalized)return;
+
+        links.push({
+          activity_id:activityId,
+          area_code:normalized
+        });
+      });
+    });
+
+    return {
+      data:links,
+      groupedRows:(data||[]).length,
+      linkCount:links.length,
+      error:null
+    };
+  }
+
+  async function loadAllProjects() {
+    const allProjects=[];
+    const pageSize=500;
+    let from=0;
+
+    while(true){
+      const {data,error}=await sb
+        .from("projects")
+        .select("*")
+        .order("name",{ascending:true})
+        .order("id",{ascending:true})
+        .range(from,from+pageSize-1);
+
+      if(error)return {data:null,error};
+
+      const page=data||[];
+      allProjects.push(...page);
+
+      if(page.length<pageSize)break;
+      from+=pageSize;
+    }
+
+    return {data:allProjects,error:null};
+  }
+
+  async function loadBaseData() {
+    const [p, pr, ac, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim] = await Promise.all([
+      sb.from("profiles").select("*").order("full_name"),
+      loadAllProjects(),
+      sb.from("activities").select("*").order("name"),
+      sb.from("holidays").select("*").order("holiday_date"),
+      sb.from("work_areas").select("*").order("order_index"),
+      sb.from("manufacturing_sectors").select("*").order("order_index"),
+      sb.from("modules").select("*").order("order_index"),
+      sb.from("rooms").select("*").order("order_index"),
+      sb.from("panel_types").select("*").order("order_index"),
+      loadGroupedActivityAreaLinks(),
+      sb.from("project_modules").select("*").order("order_index"),
+      sb.from("project_rooms").select("*").order("order_index"),
+      sb.from("project_room_modules").select("*").order("order_index"),
+      sb.from("project_room_instances").select("*").order("order_index"),
+      sb.from("project_room_instance_modules").select("*").order("order_index")
+    ]);
+    for (const result of [p,pr,ac,ho]) if (result.error) throw result.error;
+    if(aal.error){
+      throw new Error(
+        "Não foi possível carregar todas as áreas vinculadas às atividades. " +
+        "Execute o SQL obrigatório da versão 2.18.3 no Supabase."
+      );
+    }
+
+    for (const result of [wa,ms,mo,ro,pt,pm,pro,prm,pri,prim]) {
+      if (result.error) {
+        throw new Error(
+          "Estrutura Projeto > Sala > Módulo não instalada. " +
+          "Execute ATUALIZAR_BANCO_v2.16_SALAS_MULTIPLAS_PARTES_MODULO.sql no Supabase."
+        );
+      }
+    }
+    profiles=p.data||[];
+    projects=pr.data||[];
+    activities=(ac.data||[]).map(activity=>({
+      ...activity,
+      code:normalizeActivityCode(activity.code),
+      observation_requirement:normalizeObservationRequirement(activity.observation_requirement)
+    }));
+    holidays=ho.data||[];
+    workAreas=wa.data||[]; manufacturingSectors=ms.data||[]; modules=mo.data||[];
+    rooms=ro.data||[];
+    panelTypes=pt.data||[];
+
+    const uniqueActivityAreaLinks=new Map();
+    (aal.data||[]).forEach(link=>{
+      const activityId=String(link.activity_id||"").trim();
+      const areaCode=String(link.area_code||"").trim().toUpperCase();
+      if(!activityId||!areaCode)return;
+
+      uniqueActivityAreaLinks.set(
+        `${activityId}|${areaCode}`,
+        {
+          activity_id:activityId,
+          area_code:areaCode
+        }
+      );
+    });
+    activityAreaLinks=[...uniqueActivityAreaLinks.values()];
+
+    projectModules=pm.data||[]; projectRooms=pro.data||[]; projectRoomModules=prm.data||[];
+    projectRoomInstances=pri.data||[]; projectRoomInstanceModules=prim.data||[];
+    me = profiles.find(x => x.id === session.user.id);
+    if (!me) throw new Error("Seu perfil ainda não foi criado. Atualize a página em alguns segundos.");
+    if (!me.active) throw new Error("Seu usuário está inativo. Fale com o administrador.");
+    console.info(
+      "Aponta Horas — áreas das atividades carregadas:",
+      {
+        atividades:activities.length,
+        atividadesComAreas:new Set(
+          activityAreaLinks.map(link=>link.activity_id)
+        ).size,
+        vinculos:activityAreaLinks.length
+      }
+    );
+
+    applyPermissions();
+    fillSelects();
+  }
+
+  function applyPermissions() {
+    document.querySelectorAll("[data-manager-only]").forEach(el => el.hidden = !isManager());
+    document.querySelectorAll("[data-admin-only]").forEach(el => el.hidden = !isAdmin());
+    document.querySelectorAll(".manager-user-field").forEach(el => el.hidden = !isManager());
+
+    const entryApproved = canMakeEntries();
+    document.querySelectorAll("[data-entry-approval-required]").forEach(el => {
+      el.hidden = !entryApproved;
+    });
+
+    $("currentUser").textContent = me.full_name;
+    $("currentRole").textContent = roleLabel(me.role);
+
+    const currentRegistration = $("currentRegistration");
+    if (currentRegistration) {
+      const status = registrationStatus();
+      currentRegistration.textContent = registrationLabel(status);
+      currentRegistration.className = `badge registration-top-badge registration-${status}`;
+    }
+
+    const banner = $("registrationApprovalBanner");
+    if (banner) {
+      const status = registrationStatus();
+      banner.hidden = entryApproved;
+
+      if (!entryApproved) {
+        const rejected = status === "rejeitado";
+        $("registrationApprovalTitle").textContent = rejected
+          ? "Cadastro não autorizado para apontamentos"
+          : "Cadastro pendente de aprovação";
+        $("registrationApprovalMessage").textContent = rejected
+          ? "Um Gestor ou Administrador rejeitou a liberação. Procure a liderança para solicitar uma nova análise."
+          : "Um Gestor ou Administrador precisa liberar seu acesso antes do primeiro apontamento.";
+        $("registrationApprovalBadge").textContent = registrationLabel(status);
+        $("registrationApprovalBadge").className = `badge registration-${status}`;
+      }
+    }
+  }
+
+  function optionList(rows, blank = false, activeOnly = false) {
+    const filtered = activeOnly ? rows.filter(x => x.active) : rows;
+    return (blank ? '<option value="">Todos</option>' : "") +
+      filtered.map(x => `<option value="${x.id}">${esc(x.full_name || x.name)}</option>`).join("");
+  }
+
+  function optionsWithPlaceholder(rows, labelFn = row => row.name, valueFn = row => row.id, placeholder = "Selecione...") {
+    return `<option value="">${esc(placeholder)}</option>` + rows.map(row =>
+      `<option value="${esc(valueFn(row))}">${esc(labelFn(row))}</option>`
+    ).join("");
+  }
+
+  function activeRows(rows) { return rows.filter(row => row.active !== false); }
+
+  function projectRoomOptions(projectId) {
+    return projectRoomInstances
+      .filter(row=>row.project_id===projectId&&row.active!==false)
+      .sort((a,b)=>(a.order_index||0)-(b.order_index||0)||(a.instance_number||0)-(b.instance_number||0))
+      .map(row=>({id:row.id,room_id:row.room_id,name:row.display_name||`${rooms.find(room=>room.id===row.room_id)?.name||"Sala"} ${String(row.instance_number).padStart(2,"0")}`}));
+  }
+
+  function roomInstanceDefinition(roomInstanceId) {
+    const instance=projectRoomInstances.find(row=>row.id===roomInstanceId);
+    if(!instance)return null;
+    return standardRoomDefinitionFor(rooms.find(room=>room.id===instance.room_id));
+  }
+
+  function isMonoblockRoomInstance(roomInstanceId) {
+    return roomInstanceDefinition(roomInstanceId)?.monoblock===true;
+  }
+
+  function projectRoomModuleOptions(projectId, roomInstanceId) {
+    if(!projectId||!roomInstanceId)return [];
+    const instance=projectRoomInstances.find(row=>row.id===roomInstanceId&&row.project_id===projectId);
+    if(!instance)return [];
+    return projectRoomInstanceModules
+      .filter(row=>row.room_instance_id===roomInstanceId&&row.active!==false)
+      .sort((a,b)=>(a.order_index||0)-(b.order_index||0)||(a.module_number||0)-(b.module_number||0))
+      .map(row=>({id:row.id,name:row.display_name||row.code||`Módulo ${row.module_number}`,has_lower_part:row.has_lower_part,has_upper_part:row.has_upper_part}));
+  }
+
+  function setEntryStepNumbers(prefix, areaCode) {
+    if(prefix!=="entry")return;
+    const detailType=areaDetailType(areaCode);
+    const structural=detailType==="module";
+    const noDetail=detailType==="none";
+    const monoblock=structural&&isMonoblockRoomInstance($("entryRoom")?.value);
+
+    if($("entryRoomStep"))$("entryRoomStep").textContent="3";
+    if($("entryModuleStep"))$("entryModuleStep").textContent="4";
+    if($("entryModulePartStep"))$("entryModulePartStep").textContent="5";
+    if($("entrySectorStep"))$("entrySectorStep").textContent="3";
+    if($("entryPanelTypeStep"))$("entryPanelTypeStep").textContent="3";
+    if($("entryActivityStep")){
+      $("entryActivityStep").textContent=structural
+        ?(monoblock?"5":"6")
+        :noDetail?"3":"4";
+    }
+  }
+
+  function refreshModulePart(prefix,selectedPart=""){
+    const moduleId=$(prefix+"Module")?.value;
+    const roomInstanceId=$(prefix+"Room")?.value;
+    const select=$(prefix+"ModulePart");
+    const field=$(prefix+"ModulePartField");
+    if(!select)return;
+
+    const structural=areaDetailType($(prefix+"Area")?.value)==="module";
+    const monoblock=structural&&isMonoblockRoomInstance(roomInstanceId);
+
+    if(monoblock){
+      if(field)field.hidden=true;
+      select.innerHTML='<option value="">Não se aplica ao MONOBLOCO</option>';
+      select.value="";
+      select.required=false;
+      select.disabled=true;
+      setEntryStepNumbers(prefix,$(prefix+"Area")?.value||"");
+      return;
+    }
+
+    if(field)field.hidden=!structural;
+    select.required=structural;
+
+    const module=projectRoomInstanceModules.find(row=>row.id===moduleId);
+    const options=['<option value="">Selecione a parte</option>'];
+    if(module?.has_lower_part!==false)options.push('<option value="inferior">Parte inferior</option>');
+    if(module?.has_upper_part!==false)options.push('<option value="superior">Parte superior</option>');
+    select.innerHTML=options.join("");
+    select.disabled=!moduleId;
+    if(selectedPart)select.value=selectedPart;
+    setEntryStepNumbers(prefix,$(prefix+"Area")?.value||"");
+  }
+
+  function refreshStructuralModule(prefix, selectedModuleId = "", selectedPart="") {
+    const projectId=$(prefix+"Project").value;
+    const roomInstanceId=$(prefix+"Room").value;
+    const select=$(prefix+"Module");
+    if(!select)return;
+    const rows=projectRoomModuleOptions(projectId,roomInstanceId);
+    select.innerHTML=optionsWithPlaceholder(rows,row=>row.name,row=>row.id,roomInstanceId?"Selecione o módulo da sala":"Selecione primeiro a sala");
+    select.disabled=!roomInstanceId;
+    if(selectedModuleId)select.value=selectedModuleId;
+    refreshModulePart(prefix,selectedPart);
+  }
+
+  function setConditionalField(prefix, areaCode, selected = {}) {
+    const projectId=$(prefix+"Project").value;
+    const detailType=areaDetailType(areaCode);
+    const showSector=detailType==="sector";
+    const showPanel=detailType==="panel_type";
+    const showRoom=detailType==="module"||detailType==="room";
+    const showModule=detailType==="module";
+    const showPart=detailType==="module";
+
+    const visibility={
+      Sector:showSector,
+      PanelType:showPanel,
+      Room:showRoom,
+      Module:showModule,
+      ModulePart:showPart
+    };
+
+    Object.entries(visibility).forEach(([suffix,show])=>{
+      const field=$(prefix+suffix+"Field");
+      const select=$(prefix+suffix);
+      if(!field||!select)return;
+
+      field.hidden=!show;
+      select.required=show;
+
+      if(!show){
+        select.value="";
+        select.disabled=false;
+      }
+    });
+
+    if($(prefix+"RoomLabel")){
+      $(prefix+"RoomLabel").textContent=detailType==="module"
+        ?`Sala específica — ${areaName(areaCode)}`
+        :`Sala do projeto — ${areaName(areaCode)}`;
+    }
+
+    if(showSector){
+      const select=$(prefix+"Sector");
+      select.innerHTML=optionsWithPlaceholder(
+        activeRows(manufacturingSectors),
+        row=>row.name,
+        row=>row.id,
+        "Selecione o setor"
+      );
+      if(selected.sector_id)select.value=selected.sector_id;
+    }
+
+    if(showPanel){
+      const select=$(prefix+"PanelType");
+      select.innerHTML=optionsWithPlaceholder(
+        activeRows(panelTypes),
+        row=>row.name,
+        row=>row.id,
+        "Selecione o tipo de painel"
+      );
+      if(selected.panel_type_id)select.value=selected.panel_type_id;
+    }
+
+    if(showRoom){
+      const roomSelect=$(prefix+"Room");
+      const roomRows=projectRoomOptions(projectId);
+      roomSelect.innerHTML=optionsWithPlaceholder(
+        roomRows,
+        row=>row.name,
+        row=>row.id,
+        projectId?"Selecione a sala específica":"Selecione primeiro o projeto"
+      );
+      roomSelect.disabled=!projectId;
+      if(selected.project_room_instance_id){
+        roomSelect.value=selected.project_room_instance_id;
+      }
+    }
+
+    if(showModule){
+      refreshStructuralModule(
+        prefix,
+        selected.project_room_instance_module_id||"",
+        selected.module_part||""
+      );
+    }
+
+    setEntryStepNumbers(prefix,areaCode);
+  }
+
+  function filteredEntryActivities(areaCode) {
+    if (!areaCode) return [];
+    const ids=new Set(activityAreaLinks.filter(link=>link.area_code===areaCode).map(link=>link.activity_id));
+    return activities.filter(activity=>activity.active && ids.has(activity.id));
+  }
+
+  function setActivityOptions(prefix, selectedActivityId = "") {
+    const areaCode=$(prefix+"Area").value;
+    const rows=filteredEntryActivities(areaCode);
+    const select=$(prefix+"Activity");
+    select.innerHTML=optionsWithPlaceholder(rows,row=>`${row.code?row.code+" — ":""}${row.name}`,row=>row.id,areaCode?"Selecione a atividade":"Selecione primeiro a área");
+    select.disabled=!areaCode;
+    if (selectedActivityId) select.value=selectedActivityId;
+    updateActivityHelp(prefix);
+  }
+
+  function updateActivityHelp(prefix) {
+    const activity=activities.find(row=>row.id===$(prefix+"Activity").value);
+    const box=$(prefix+"ActivityHelp");
+    const details=$(prefix+"Details");
+    const rule=$(prefix+"ObservationRule");
+    if (!activity) {
+      if (box) box.hidden=true;
+      if (details) details.required=false;
+      if (rule) {
+        rule.textContent="Opcional";
+        rule.classList.remove("required");
+      }
+      return;
+    }
+    const required=normalizeObservationRequirement(
+      activity.observation_requirement
+    )==="Obrigatória";
+
+    details.required=required;
+    rule.textContent=required?"Obrigatória":"Opcional";
+    rule.classList.toggle("required",required);
+
+    if (box) {
+      box.hidden=false;
+      box.innerHTML=`<strong>${esc(activity.discipline_name||"Atividade")}</strong><span>${esc(activity.usage_description||"Registre objetivamente a ação e o resultado.")}</span>`;
+    }
+    details.placeholder=activity.usage_description||"Descreva a ação executada e o resultado.";
+  }
+
+  function refreshEntryFlow(prefix, selected = {}) {
+    const areaCode=$(prefix+"Area").value;
+    setConditionalField(prefix,areaCode,selected);
+    setActivityOptions(prefix,selected.activity_id||"");
+  }
+
+  function entryFlowPayload(prefix) {
+    const areaCode=$(prefix+"Area").value;
+    const detailType=areaDetailType(areaCode);
+    const usesRoom=["module","room"].includes(detailType);
+    const instanceId=usesRoom?$(prefix+"Room").value:null;
+    const moduleInstanceId=detailType==="module"?$(prefix+"Module").value:null;
+    const instance=projectRoomInstances.find(row=>row.id===instanceId);
+    const module=projectRoomInstanceModules.find(row=>row.id===moduleInstanceId);
+    const monoblock=detailType==="module"&&isMonoblockRoomInstance(instanceId);
+
+    return {
+      area_code:areaCode,
+      sector_id:detailType==="sector"?$(prefix+"Sector").value:null,
+      room_id:instance?.room_id||null,
+      module_id:module?.legacy_module_id||null,
+      panel_type_id:detailType==="panel_type"?$(prefix+"PanelType").value:null,
+      project_room_instance_id:instanceId||null,
+      project_room_instance_module_id:moduleInstanceId||null,
+      module_part:detailType==="module"&&!monoblock
+        ?$(prefix+"ModulePart").value
+        :null
+    };
+  }
+
+  function validateEntryFlow(prefix) {
+    const area=$(prefix+"Area").value;
+    if(!area){
+      toast("Selecione a área do apontamento.",true);
+      $(prefix+"Area").focus();
+      return false;
+    }
+
+    const detailType=areaDetailType(area);
+
+    if(detailType==="sector"&&!$(prefix+"Sector").value){
+      toast(`Selecione o setor para ${areaName(area)}.`,true);
+      $(prefix+"Sector").focus();
+      return false;
+    }
+
+    if(detailType==="module"){
+      if(!$(prefix+"Room").value){
+        toast(`Selecione a sala para ${areaName(area)}.`,true);
+        $(prefix+"Room").focus();
+        return false;
+      }
+
+      if(!$(prefix+"Module").value){
+        toast("Selecione o módulo da sala.",true);
+        $(prefix+"Module").focus();
+        return false;
+      }
+
+      const monoblock=isMonoblockRoomInstance($(prefix+"Room").value);
+      if(!monoblock&&!$(prefix+"ModulePart").value){
+        toast("Selecione a parte inferior ou superior do módulo.",true);
+        $(prefix+"ModulePart").focus();
+        return false;
+      }
+    }
+
+    if(detailType==="panel_type"&&!$(prefix+"PanelType").value){
+      toast(`Selecione o tipo de painel para ${areaName(area)}.`,true);
+      $(prefix+"PanelType").focus();
+      return false;
+    }
+
+    if(detailType==="room"&&!$(prefix+"Room").value){
+      toast(`Selecione a sala para ${areaName(area)}.`,true);
+      $(prefix+"Room").focus();
+      return false;
+    }
+    const selectedActivityId=$(prefix+"Activity").value;
+    if (!selectedActivityId) {
+      toast("Selecione a atividade.",true);
+      $(prefix+"Activity").focus();
+      return false;
+    }
+
+    const activityBelongsToSelectedArea=activityAreaLinks.some(link=>
+      String(link.activity_id||"")===String(selectedActivityId||"")&&
+      String(link.area_code||"").trim().toUpperCase()===
+        String(area||"").trim().toUpperCase()
+    );
+
+    if(!activityBelongsToSelectedArea){
+      toast(
+        "A atividade selecionada não pertence à área informada. "+
+        "Escolha uma atividade exibida para esta área.",
+        true
+      );
+      $(prefix+"Activity").focus();
+      return false;
+    }
+
+    if (
+      $(prefix+"Details").required &&
+      !$(prefix+"Details").value.trim()
+    ) {
+      toast("A observação é obrigatória para esta atividade.",true);
+      $(prefix+"Details").focus();
+      return false;
+    }
+
+    return true;
+  }
+
+  function renderActivityAreaCheckboxes(containerId, selectedCodes = []) {
+    const selected=new Set(selectedCodes);
+    const container=$(containerId);
+    if (!container) return;
+
+    container.innerHTML=activeRows(workAreas).map(area=>`
+      <label class="activity-area-option">
+        <input
+          type="checkbox"
+          value="${esc(area.code)}"
+          ${selected.has(area.code)?"checked":""}>
+        <span>
+          <strong>${esc(area.name)}</strong>
+          <small>${esc(area.code)}</small>
+        </span>
+      </label>
+    `).join("");
+
+    refreshActivityAreaOptionStyles(containerId);
+  }
+
+  function refreshActivityAreaOptionStyles(containerId){
+    const container=$(containerId);
+    if(!container)return;
+
+    container.querySelectorAll(".activity-area-option").forEach(label=>{
+      const input=label.querySelector('input[type="checkbox"]');
+      label.classList.toggle("selected",Boolean(input?.checked));
+    });
+  }
+
+  function checkedAreaCodes(containerId) {
+    return [...$(containerId).querySelectorAll('input[type="checkbox"]:checked')]
+      .map(input=>input.value);
+  }
+
+  function setAllActivityAreas(containerId,checked){
+    const container=$(containerId);
+    if(!container)return;
+
+    container.querySelectorAll('input[type="checkbox"]').forEach(input=>{
+      input.checked=checked;
+    });
+
+    refreshActivityAreaOptionStyles(containerId);
+  }
+
+  ["activityAreasCheckboxes","editActivityAreasCheckboxes"].forEach(containerId=>{
+    const container=$(containerId);
+    if(!container)return;
+
+    container.addEventListener("change",event=>{
+      if(event.target.matches('input[type="checkbox"]')){
+        refreshActivityAreaOptionStyles(containerId);
+      }
+    });
+  });
+
+  function fillProjectStructureSelects() {
+    const projectOptions=optionsWithPlaceholder(activeRows(projects),row=>row.code?`${row.code} — ${row.name}`:row.name,row=>row.id,"Selecione o projeto");
+    ["projectCompositionProject","projectRoomModuleProject"].forEach(id=>{
+      const select=$(id);
+      if(!select)return;
+      const old=select.value;
+      select.innerHTML=projectOptions;
+      if(old&&activeRows(projects).some(row=>row.id===old))select.value=old;
+      else select.value="";
+    });
+
+    const composition=$("projectCompositionProject");
+    const moduleProject=$("projectRoomModuleProject");
+    if(moduleProject&&composition?.value)moduleProject.value=composition.value;
+
+    const roomCatalog=$("projectRoomInstanceRoom");
+    if(roomCatalog){
+      const old=roomCatalog.value;
+      roomCatalog.innerHTML=optionsWithPlaceholder(activeRows(rooms),row=>`${row.code?row.code+" — ":""}${row.name}`,row=>row.id,"Selecione o tipo de sala");
+      if(old&&activeRows(rooms).some(row=>row.id===old))roomCatalog.value=old;
+      else roomCatalog.value="";
+    }
+
+    refreshProjectRoomModuleRoomSelect();
+    renderProjectComposition();
+    renderProjectStructureTables();
+  }
+
+  function updateModulePartsEditorForInstance(instanceId,editMode=false){
+    const editor=$(editMode?"editProjectRoomModulePartsEditor":"projectRoomModulePartsEditor");
+    const lower=$(editMode?"editProjectRoomModuleLower":"projectRoomModuleLower");
+    const upper=$(editMode?"editProjectRoomModuleUpper":"projectRoomModuleUpper");
+    if(!editor||!lower||!upper)return;
+
+    const hasInstance=Boolean(instanceId);
+    const monoblock=hasInstance&&isMonoblockRoomInstance(instanceId);
+
+    editor.hidden=!hasInstance||monoblock;
+    lower.disabled=!hasInstance||monoblock;
+    upper.disabled=!hasInstance||monoblock;
+
+    if(monoblock){
+      lower.checked=false;
+      upper.checked=false;
+    }else if(hasInstance&&!editMode&&!lower.checked&&!upper.checked){
+      lower.checked=true;
+      upper.checked=true;
+    }
+  }
+
+  function refreshProjectRoomModuleRoomSelect() {
+    const projectSelect=$("projectRoomModuleProject");const roomSelect=$("projectRoomModuleRoom");if(!projectSelect||!roomSelect)return;
+    const old=roomSelect.value;const rows=projectRoomOptions(projectSelect.value);
+    roomSelect.innerHTML=optionsWithPlaceholder(rows,row=>row.name,row=>row.id,projectSelect.value?"Selecione a sala específica":"Selecione primeiro o projeto");
+    roomSelect.disabled=!projectSelect.value;
+    if(old&&rows.some(row=>row.id===old))roomSelect.value=old;
+    else roomSelect.value="";
+    updateModulePartsEditorForInstance(roomSelect.value,false);
+  }
+
+  function fillSelects() {
+    const activeProfiles=profiles.filter(p=>p.active);
+    const approvedProfiles=activeProfiles.filter(p=>canMakeEntries(p));
+    ["entryUser","closingUser"].forEach(id=>{const el=$(id);const old=el.value;el.innerHTML=optionList(approvedProfiles);el.value=isManager()?(old||me.id):me.id;if(!isManager())el.disabled=true;});
+    ["absenceUser"].forEach(id=>{const el=$(id);const old=el.value;el.innerHTML=optionList(activeProfiles);el.value=isManager()?(old||me.id):me.id;if(!isManager())el.disabled=true;});
+    ["filterEntryUser","reportUser","absenceFilterUser","peopleReportUser","closingHistoryUser"].forEach(id=>{const el=$(id);if(!el)return;const old=el.value;el.innerHTML=optionList(activeProfiles,true);el.value=isManager()?old:me.id;if(!isManager())el.disabled=true;});
+
+    ["entryProject","editEntryProject"].forEach(id=>$(id).innerHTML=optionsWithPlaceholder(activeRows(projects),row=>row.code?`${row.code} — ${row.name}`:row.name,row=>row.id,"Selecione o projeto"));
+    $("reportProject").innerHTML=optionList(projects,true);
+    if($("closingHistoryProject")){
+      $("closingHistoryProject").innerHTML='<option value="">Todos os projetos</option>'+activeRows(projects).map(row=>`<option value="${row.id}">${esc(row.code?`${row.code} — ${row.name}`:row.name)}</option>`).join("");
+    }
+    ["entryArea","editEntryArea"].forEach(id=>$(id).innerHTML=optionsWithPlaceholder(activeRows(workAreas),row=>row.name,row=>row.code,"Selecione a área"));
+    fillProjectStructureSelects();
+    renderActivityAreaCheckboxes("activityAreasCheckboxes");
+    refreshEntryFlow("entry");
+  }
+
+  function setInitialDates() {
+    $("entryDate").max = today();
+    $("editEntryDate").max = today();
+    $("entryDate").value ||= today();
+    $("absenceStart").value ||= today();
+    $("absenceEnd").value ||= today();
+    $("filterEntryStart").value ||= firstDay();
+    $("filterEntryEnd").value ||= lastDay();
+    $("reportStart").value ||= firstDay();
+    $("reportEnd").value ||= lastDay();
+    $("peopleReportStart").value ||= firstDay();
+    $("peopleReportEnd").value ||= lastDay();
+    $("closingMonth").value ||= monthNow();
+    if($("closingHistoryStartMonth")) $("closingHistoryStartMonth").value ||= `${monthNow().slice(0,4)}-01`;
+    if($("closingHistoryEndMonth")) $("closingHistoryEndMonth").value ||= monthNow();
+  }
+
+  async function showApp() {
+    showLoading(true);
+    try {
+      await loadBaseData();
+      authScreen.hidden = true;
+      setupScreen.hidden = true;
+      app.hidden = false;
+      setInitialDates();
+      renderProfile();
+      await Promise.all([renderDashboard(), renderEntries(), renderAbsences(), renderCatalogs(), renderTeam(), loadClosing(), renderReport(), renderPeopleReport()]);
+    } catch (e) {
+      await sb.auth.signOut();
+      authScreen.hidden = false;
+      app.hidden = true;
+      handleError(e);
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  async function boot() {
+    authScreen.hidden = false;
+    const params = new URLSearchParams(window.location.search);
+    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const authError = params.get("error_description") || hash.get("error_description") || params.get("error") || hash.get("error");
+    const code = params.get("code");
+
+    if (authError) {
+      showAuthMessage(
+        "O link de autenticação não pôde ser concluído.\n\n" +
+        decodeURIComponent(authError) +
+        "\n\nSolicite um novo e-mail de recuperação e confira as URLs em Authentication → URL Configuration.",
+        true
+      );
+      history.replaceState({}, document.title, appBaseUrl());
+    }
+
+    if (code) {
+      showLoading(true);
+      try {
+        const {data, error} = await sb.auth.exchangeCodeForSession(code);
+        if (error) throw error;
+        session = data.session;
+        history.replaceState({}, document.title, appBaseUrl());
+        showAuthMessage("Sessão validada. Abrindo o aplicativo...");
+      } catch (error) {
+        showAuthMessage(
+          "O link de autenticação não pôde ser concluído. Faça o login normalmente com e-mail e senha.",
+          true
+        );
+        history.replaceState({}, document.title, appBaseUrl());
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    if (!session) {
+      const {data, error} = await sb.auth.getSession();
+      if (error) handleError(error);
+      session = data.session;
+    }
+
+    if (session) await showApp();
+    else authScreen.hidden = false;
+  }
+
+  document.querySelectorAll("[data-auth-tab]").forEach(btn => {
+    btn.onclick = () => {
+      clearAuthMessage();
+      document.querySelectorAll("[data-auth-tab]").forEach(x => x.classList.toggle("active", x === btn));
+      $("loginForm").classList.toggle("active", btn.dataset.authTab === "login");
+      $("signupForm").classList.toggle("active", btn.dataset.authTab === "signup");
+    };
+  });
+
+  $("loginForm").onsubmit = async (e) => {
+    e.preventDefault(); showLoading(true);
+    try {
+      const {data, error} = await sb.auth.signInWithPassword({email:$("loginEmail").value.trim(), password:$("loginPassword").value});
+      if (error) throw error;
+      session = data.session;
+      await showApp();
+    } catch (e2) { handleError(e2, "E-mail ou senha inválidos."); }
+    finally { showLoading(false); }
+  };
+
+  $("signupForm").onsubmit = async (e) => {
+    e.preventDefault(); showLoading(true);
+    try {
+      const {data, error} = await sb.auth.signUp({
+        email:$("signupEmail").value.trim(),
+        password:$("signupPassword").value,
+        options:{data:{full_name:$("signupName").value.trim()}}
+      });
+      if (error) throw error;
+
+      if (!data.session) {
+        document.querySelector('[data-auth-tab="login"]').click();
+        $("loginEmail").value = $("signupEmail").value.trim();
+        showAuthMessage(
+          "A conta foi criada, mas a confirmação de e-mail ainda está ativada no Supabase. " +
+          "Desative “Confirm email” em Authentication → Providers → Email para usar a aprovação por Gestor/Administrador.",
+          true
+        );
+        return;
+      }
+
+      session = data.session;
+      await showApp();
+      toast("Conta criada. Aguarde a aprovação de um Gestor ou Administrador.");
+    } catch (e2) { handleError(e2); }
+    finally { showLoading(false); }
+  };
+
+  $("forgotPasswordBtn").onclick = async () => {
+    const button = $("forgotPasswordBtn");
+    const email = $("loginEmail").value.trim().toLowerCase();
+
+    clearAuthMessage();
+
+    if (!email) {
+      showAuthMessage(
+        "Informe seu e-mail no campo acima para receber o código de redefinição.",
+        true
+      );
+      $("loginEmail").focus();
+      return;
+    }
+
+    if (!$("loginEmail").checkValidity()) {
+      showAuthMessage("Informe um endereço de e-mail válido.", true);
+      $("loginEmail").focus();
+      return;
+    }
+
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = "Enviando código...";
+
+    showAuthMessage(
+      "Solicitando o código de redefinição. Aguarde o recebimento do e-mail..."
+    );
+
+    try {
+      const { error } = await sb.auth.resetPasswordForEmail(email);
+
+      if (error) throw error;
+
+      sessionStorage.setItem("aponta_recovery_email", email);
+
+      showAuthMessage(
+        "Código enviado. Ao receber o e-mail, informe os 8 dígitos na próxima tela. " +
+        "Use somente o código do e-mail mais recente."
+      );
+
+      button.textContent = "Código enviado";
+
+      window.setTimeout(() => {
+        window.location.href = recoveryPageUrl();
+      }, 900);
+    } catch (error) {
+      console.error(
+        "Erro ao solicitar código de redefinição de senha:",
+        error,
+        recoveryErrorDetails(error)
+      );
+
+      showAuthMessage(
+        recoveryErrorMessage(error),
+        true
+      );
+
+      button.disabled = false;
+      button.textContent = originalText;
+    }
+  };  $("logoutBtn").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+  $("mainNav").onclick = async (e) => {
+    const btn = e.target.closest("button[data-page]");
+    if (!btn) return;
+    const previousPage=document.querySelector("#mainNav button.active")?.dataset.page||"";
+    if(previousPage==="catalogs"&&btn.dataset.page!=="catalogs"){
+      resetProjectStructureSelection();
+    }
+    if (btn.hasAttribute("data-entry-approval-required") && !canMakeEntries()) {
+      toast("Aguarde a aprovação do Gestor ou Administrador para acessar os apontamentos.", true);
+      return;
+    }
+    document.querySelectorAll("#mainNav button").forEach(x => {
+      const active=x===btn;
+      x.classList.toggle("active",active);
+      if(active)x.setAttribute("aria-current","page");
+      else x.removeAttribute("aria-current");
+    });
+    btn.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
+    document.querySelectorAll(".page").forEach(x => x.classList.toggle("active", x.id === btn.dataset.page));
+    if (btn.dataset.page === "dashboard") await renderDashboard();
+    if (btn.dataset.page === "entries") await renderEntries();
+    if (btn.dataset.page === "absences") await renderAbsences();
+    if (btn.dataset.page === "closing") await renderActiveClosingView();
+    if (btn.dataset.page === "reports") await renderActiveReport();
+    if (btn.dataset.page === "profile") renderProfile();
+    if (btn.dataset.page === "catalogs") await renderCatalogs();
+    if (btn.dataset.page === "importExcel") renderExcelImportPage();
+    if (btn.dataset.page === "backupRestore") renderBackupPage();
+    if (btn.dataset.page === "team") await renderTeam();
+  };
+
+
+  document.querySelectorAll("[data-page-jump]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const page = button.dataset.pageJump;
+      const navButton = document.querySelector(`#mainNav button[data-page="${page}"]`);
+      if (navButton) navButton.click();
+    });
+  });
+
+  function updateEntryBulkActions(){
+    const count=selectedEntryIds.size;
+    const countElement=$("selectedEntriesCount");
+    const clearButton=$("clearSelectedEntriesBtn");
+    const deleteButton=$("deleteSelectedEntriesBtn");
+    const selectAll=$("selectAllVisibleEntries");
+
+    if(countElement){
+      countElement.textContent=`${count} selecionado${count===1?"":"s"}`;
+    }
+
+    if(clearButton)clearButton.disabled=count===0;
+    if(deleteButton)deleteButton.disabled=count===0;
+
+    if(selectAll){
+      const selectedVisible=visibleEditableEntryIds.filter(id=>selectedEntryIds.has(id)).length;
+      selectAll.checked=visibleEditableEntryIds.length>0&&selectedVisible===visibleEditableEntryIds.length;
+      selectAll.indeterminate=selectedVisible>0&&selectedVisible<visibleEditableEntryIds.length;
+      selectAll.disabled=visibleEditableEntryIds.length===0;
+    }
+  }
+
+  function clearEntrySelection(){
+    selectedEntryIds.clear();
+    document.querySelectorAll("[data-select-entry]").forEach(input=>{
+      input.checked=false;
+    });
+    updateEntryBulkActions();
+  }
+
+  async function deleteTimeEntryById(id){
+    const {error}=await sb.rpc("aponta_delete_time_entry_v28",{p_id:id});
+    if(error)throw error;
+  }
+
+  async function selectEntries(start, end, userId = "", projectId = "") {
+    const {data,error}=await sb.rpc(
+      "aponta_select_time_entries_v2187",
+      {
+        p_start_date:start,
+        p_end_date:end,
+        p_user_id:userId||null,
+        p_project_id:projectId||null
+      }
+    );
+
+    if(error){
+      const message=String(error.message||"");
+
+      if(
+        message.includes("aponta_select_time_entries_v2187")||
+        message.includes("Could not find the function")||
+        message.includes("function public.aponta_select_time_entries_v2187")
+      ){
+        throw new Error(
+          "Consulta geral de apontamentos não instalada. " +
+          "Execute o SQL obrigatório da versão 2.18.7 no Supabase."
+        );
+      }
+
+      throw error;
+    }
+
+    return (data||[]).sort((a,b)=>{
+      const dateComparison=String(b.entry_date||"").localeCompare(
+        String(a.entry_date||"")
+      );
+
+      if(dateComparison)return dateComparison;
+
+      return String(b.created_at||"").localeCompare(
+        String(a.created_at||"")
+      );
+    });
+  }
+
+  async function selectAbsencesForReport(start, end, userId = "", typeFilter = "") {
+    let q = sb.from("absences").select("*").lte("start_date", end).gte("end_date", start).order("start_date", {ascending:false});
+    if (userId) q = q.eq("user_id", userId);
+    const {data, error} = await q;
+    if (error) throw error;
+    const normalizedFilter = normalizeText(typeFilter);
+    return (data || []).filter(row => {
+      if (!normalizedFilter) return true;
+      return normalizeText(absenceTypeLabel(row.absence_type)).includes(normalizedFilter);
+    });
+  }
+
+  async function renderDashboard() {
+    try {
+      const start = firstDay(), end = lastDay();
+      const rows = await selectEntries(start, end, isManager() ? "" : me.id);
+      $("dashboardPeriod").textContent = `Período de ${dateBR(start)} a ${dateBR(end)}`;
+      $("metricHours").textContent = fmt(rows.reduce((s,x)=>s+Number(x.hours),0));
+      $("metricEntries").textContent = rows.length;
+      $("metricUsers").textContent = isManager() ? profiles.filter(x=>x.active&&canMakeEntries(x)).length : 1;
+      $("metricProjects").textContent = projects.filter(x=>x.active).length;
+
+      const byUser = {};
+      rows.forEach(x => byUser[x.user_id] = (byUser[x.user_id] || 0) + Number(x.hours));
+      $("dashboardUsers").innerHTML = Object.entries(byUser)
+        .sort((a,b)=>b[1]-a[1])
+        .map(([id,h])=>`<tr><td>${esc(profileName(id))}</td><td>${fmt(h)}</td></tr>`).join("") ||
+        '<tr><td colspan="2" class="empty">Sem lançamentos no período</td></tr>';
+
+      const byProject = {};
+      rows.forEach(x => byProject[x.project_id] = (byProject[x.project_id] || 0) + Number(x.hours));
+      $("dashboardProjects").innerHTML = Object.entries(byProject)
+        .sort((a,b)=>b[1]-a[1])
+        .map(([id,h])=>`<tr><td>${esc(projectName(id))}</td><td>${fmt(h)}</td></tr>`).join("") ||
+        '<tr><td colspan="2" class="empty">Sem lançamentos no período</td></tr>';
+    } catch (e) { handleError(e); }
+  }
+
+  $("refreshDashboard").onclick = renderDashboard;
+
+  async function getDayHours(userId, entryDate) {
+    const rows = await selectEntries(entryDate, entryDate, userId);
+    return rows.reduce((sum, item) => sum + Number(item.hours), 0);
+  }
+
+  async function updateDayTotal() {
+    try {
+      const userId = isManager() ? $("entryUser").value : me.id;
+      if (!validateEntryFlow("entry")) return;
+
+    const entryDate = $("entryDate").value;
+      const box = $("dayTotal");
+
+      if (!userId || !entryDate) {
+        box.textContent = "";
+        box.className = "day-total";
+        return;
+      }
+
+      if (isFutureDate(entryDate)) {
+        box.textContent = `DATA FUTURA BLOQUEADA: escolha uma data até ${dateBR(today())}.`;
+        box.className = "day-total day-total-exceeded";
+        return;
+      }
+
+      const registeredHours = await getDayHours(userId, entryDate);
+      const newHours = Number($("entryHours").value || 0);
+      const projectedHours = registeredHours + newHours;
+      const dailyHours = Number(profiles.find(x => x.id === userId)?.daily_hours || 8);
+      const difference = dailyHours - projectedHours;
+
+      box.className = "day-total";
+
+      if (newHours > 0) {
+        box.textContent =
+          `Já apontado: ${fmt(registeredHours)} h · Novo lançamento: ${fmt(newHours)} h · ` +
+          `Total previsto: ${fmt(projectedHours)} h · ` +
+          (difference > 0
+            ? `Ainda restam ${fmt(difference)} h`
+            : difference === 0
+              ? "Jornada prevista completa"
+              : `ATENÇÃO: excederá a jornada em ${fmt(-difference)} h`);
+      } else {
+        box.textContent =
+          `Total do dia: ${fmt(registeredHours)} h · ` +
+          (difference > 0
+            ? `Faltam ${fmt(difference)} h`
+            : difference === 0
+              ? "Jornada prevista completa"
+              : `ATENÇÃO: jornada excedida em ${fmt(-difference)} h`);
+      }
+
+      if (difference < 0) {
+        box.classList.add("day-total-exceeded");
+      } else if (difference === 0) {
+        box.classList.add("day-total-complete");
+      } else {
+        box.classList.add("day-total-pending");
+      }
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
+  $("entryDate").onchange = async () => {
+    if (isFutureDate($("entryDate").value)) {
+      $("entryDate").value = today();
+      toast(`Datas futuras não são permitidas. A data foi ajustada para ${dateBR(today())}.`, true);
+    }
+    await updateDayTotal();
+  };
+  $("entryUser").onchange = updateDayTotal;
+  $("entryHours").oninput = updateDayTotal;
+  $("entryProject").onchange=()=>refreshEntryFlow("entry");
+  $("entryArea").onchange=()=>refreshEntryFlow("entry");
+  $("entryRoom").onchange=()=>{
+    if(areaDetailType($("entryArea").value)==="module"){
+      refreshStructuralModule("entry");
+    }
+  };
+  $("entryModule").onchange=()=>refreshModulePart("entry");
+  $("entryActivity").onchange=()=>updateActivityHelp("entry");
+  $("editEntryProject").onchange=()=>refreshEntryFlow("editEntry");
+  $("editEntryArea").onchange=()=>refreshEntryFlow("editEntry");
+  $("editEntryRoom").onchange=()=>{
+    if(areaDetailType($("editEntryArea").value)==="module"){
+      refreshStructuralModule("editEntry");
+    }
+  };
+  $("editEntryModule").onchange=()=>refreshModulePart("editEntry");
+  $("editEntryActivity").onchange=()=>updateActivityHelp("editEntry");
+
+  $("entryForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    if (!canMakeEntries()) {
+      toast("Seu cadastro ainda não foi aprovado para realizar apontamentos.", true);
+      return;
+    }
+
+    const entryDate = $("entryDate").value;
+    if (!validateNotFutureDate(entryDate, "uma data")) {
+      $("entryDate").focus();
+      await updateDayTotal();
+      return;
+    }
+
+    showLoading(true);
+
+    try {
+      const userId = isManager() ? $("entryUser").value : me.id;
+      const targetProfile = profiles.find(profile => profile.id === userId);
+      if (!canMakeEntries(targetProfile)) {
+        throw new Error("O colaborador selecionado ainda não está aprovado para realizar apontamentos.");
+      }
+      const hoursToAdd = Number($("entryHours").value);
+      const registeredHours = await getDayHours(userId, entryDate);
+      const dailyHours = Number(profiles.find(x => x.id === userId)?.daily_hours || 8);
+      const projectedHours = registeredHours + hoursToAdd;
+      const exceededHours = projectedHours - dailyHours;
+
+      if (exceededHours > 0) {
+        showLoading(false);
+
+        const confirmed = window.confirm(
+          `ATENÇÃO: JORNADA DIÁRIA EXCEDIDA\n\n` +
+          `Jornada prevista: ${fmt(dailyHours)} h\n` +
+          `Horas já apontadas: ${fmt(registeredHours)} h\n` +
+          `Novo lançamento: ${fmt(hoursToAdd)} h\n` +
+          `Total após salvar: ${fmt(projectedHours)} h\n` +
+          `Excedente: ${fmt(exceededHours)} h\n\n` +
+          `Deseja salvar mesmo assim?`
+        );
+
+        if (!confirmed) {
+          await updateDayTotal();
+          return;
+        }
+
+        showLoading(true);
+      }
+
+      const payload = {
+        user_id: userId,
+        entry_date: entryDate,
+        project_id: $("entryProject").value,
+        activity_id: $("entryActivity").value,
+        ...entryFlowPayload("entry"),
+        hours: hoursToAdd,
+        details: $("entryDetails").value.trim(),
+        status: "rascunho"
+      };
+
+      const {error} = await sb.from("time_entries").insert(payload);
+      if (error) throw error;
+
+      $("entryHours").value = "";
+      $("entryDetails").value = "";
+
+      if (exceededHours > 0) {
+        toast(`Apontamento salvo. Jornada excedida em ${fmt(exceededHours)} h.`, true);
+      } else {
+        toast("Apontamento salvo.");
+      }
+
+      await Promise.all([renderEntries(), renderDashboard(), updateDayTotal()]);
+    } catch (error) {
+      handleError(error);
+    } finally {
+      showLoading(false);
+    }
+  };
+
+  async function renderEntries() {
+    try {
+      const user = isManager() ? $("filterEntryUser").value : me.id;
+      const rows = await selectEntries(
+        $("filterEntryStart").value || firstDay(),
+        $("filterEntryEnd").value || lastDay(),
+        user
+      );
+
+      visibleEditableEntryIds=rows
+        .filter(x=>isManager()||(x.user_id===me.id&&["rascunho","devolvido"].includes(x.status)))
+        .map(x=>x.id);
+
+      const visibleIds=new Set(rows.map(x=>x.id));
+      Array.from(selectedEntryIds).forEach(id=>{
+        if(!visibleIds.has(id)||!visibleEditableEntryIds.includes(id)){
+          selectedEntryIds.delete(id);
+        }
+      });
+
+      $("entriesTable").innerHTML = rows.map(x => {
+        const editable=isManager()||(x.user_id===me.id&&["rascunho","devolvido"].includes(x.status));
+        return `<tr>
+          <td>
+            ${editable
+              ?`<input class="entry-row-selector" type="checkbox" data-select-entry="${x.id}" ${selectedEntryIds.has(x.id)?"checked":""} aria-label="Selecionar apontamento de ${dateBR(x.entry_date)}">`
+              :'<span title="Apontamento bloqueado">—</span>'}
+          </td>
+          <td>${dateBR(x.entry_date)}</td>
+          <td>${esc(profileName(x.user_id))}</td>
+          <td>${esc(projectName(x.project_id))}</td>
+          <td>${esc(areaName(x.area_code))}</td>
+          <td>${esc(entryReferenceName(x))}</td>
+          <td>${esc(activityName(x.activity_id))}</td>
+          <td>${fmt(x.hours)}</td>
+          <td><span class="badge status-${x.status}">${statusLabel(x.status)}</span></td>
+          <td>
+            ${editable
+              ?`<div class="table-actions">
+                  <button class="btn secondary small" data-edit-entry="${x.id}">Editar</button>
+                  <button class="btn danger small" data-delete-entry="${x.id}">Excluir</button>
+                </div>`
+              :"—"}
+          </td>
+        </tr>`;
+      }).join("") || '<tr><td colspan="10" class="empty">Nenhum apontamento encontrado</td></tr>';
+
+      updateEntryBulkActions();
+      await updateDayTotal();
+    } catch (e) {
+      handleError(e);
+    }
+  }
+
+  $("filterEntriesBtn").onclick = async ()=>{
+    clearEntrySelection();
+    await renderEntries();
+  };
+
+  $("entriesTable").onclick = async (e) => {
+    const selector=e.target.closest("[data-select-entry]");
+    if(selector){
+      const id=selector.dataset.selectEntry;
+      if(selector.checked)selectedEntryIds.add(id);
+      else selectedEntryIds.delete(id);
+      updateEntryBulkActions();
+      return;
+    }
+
+    const editId = e.target.dataset.editEntry;
+    const deleteId = e.target.dataset.deleteEntry;
+    if (editId) {
+      const {data, error} = await sb.from("time_entries").select("*").eq("id", editId).single();
+      if (error) return handleError(error);
+      $("editEntryId").value = data.id;
+      $("editEntryDate").value = data.entry_date;
+      $("editEntryHours").value = data.hours;
+      $("editEntryProject").value=data.project_id;
+      let areaCode=data.area_code;
+      if(!areaCode) areaCode=activityAreas(data.activity_id)[0]||"ADM";
+      $("editEntryArea").value=areaCode;
+      refreshEntryFlow("editEntry",data);
+      $("editEntryActivity").value=data.activity_id;
+      $("editEntryDetails").value=data.details;
+      updateActivityHelp("editEntry");
+      $("editEntryDialog").showModal();
+    }
+    if (deleteId && confirm("Excluir este apontamento?")) {
+      showLoading(true);
+      try {
+        await deleteTimeEntryById(deleteId);
+        selectedEntryIds.delete(deleteId);
+        toast("Apontamento excluído.");
+        await Promise.all([renderEntries(), renderDashboard()]);
+      } catch(error) {
+        handleError(error, "Não foi possível excluir. Períodos enviados ou aprovados precisam ser reabertos.");
+      } finally { showLoading(false); }
+    }
+  };
+
+  $("selectAllVisibleEntries").onchange=e=>{
+    visibleEditableEntryIds.forEach(id=>{
+      if(e.target.checked)selectedEntryIds.add(id);
+      else selectedEntryIds.delete(id);
+    });
+
+    document.querySelectorAll("[data-select-entry]").forEach(input=>{
+      input.checked=e.target.checked;
+    });
+
+    updateEntryBulkActions();
+  };
+
+  $("clearSelectedEntriesBtn").onclick=clearEntrySelection;
+
+  $("deleteSelectedEntriesBtn").onclick=async ()=>{
+    const ids=Array.from(selectedEntryIds);
+    if(!ids.length)return;
+
+    const confirmed=window.confirm(
+      `Excluir ${ids.length} apontamento${ids.length===1?"":"s"} selecionado${ids.length===1?"":"s"}?\n\n`+
+      "Apontamentos aprovados, enviados ou pertencentes a períodos fechados podem ser bloqueados."
+    );
+    if(!confirmed)return;
+
+    showLoading(true);
+    let deleted=0;
+    const blocked=[];
+
+    try{
+      for(const id of ids){
+        try{
+          await deleteTimeEntryById(id);
+          deleted+=1;
+          selectedEntryIds.delete(id);
+        }catch(error){
+          blocked.push({
+            id,
+            message:error?.message||"Exclusão bloqueada."
+          });
+        }
+      }
+
+      await Promise.all([renderEntries(),renderDashboard(),updateDayTotal()]);
+
+      if(blocked.length){
+        const message=[
+          `${deleted} apontamento${deleted===1?"":"s"} excluído${deleted===1?"":"s"}.`,
+          `${blocked.length} não ${blocked.length===1?"pôde":"puderam"} ser excluído${blocked.length===1?"":"s"} por bloqueio de aprovação ou fechamento.`
+        ].join(" ");
+        toast(message,true);
+        console.warn("Apontamentos não excluídos",blocked);
+      }else{
+        toast(`${deleted} apontamento${deleted===1?"":"s"} excluído${deleted===1?"":"s"}.`);
+      }
+    }finally{
+      showLoading(false);
+      updateEntryBulkActions();
+    }
+  };
+
+  $("saveEditEntryBtn").onclick = async (e) => {
+    e.preventDefault();
+
+    if (!validateEntryFlow("editEntry")) return;
+
+    const editedDate = $("editEntryDate").value;
+    if (!validateNotFutureDate(editedDate, "uma data")) {
+      $("editEntryDate").focus();
+      return;
+    }
+
+    showLoading(true);
+    try {
+      const {error} = await sb.from("time_entries").update({
+        entry_date:editedDate, hours:Number($("editEntryHours").value),
+        project_id:$("editEntryProject").value, activity_id:$("editEntryActivity").value,
+        ...entryFlowPayload("editEntry"),
+        details:$("editEntryDetails").value.trim(), status:"rascunho"
+      }).eq("id",$("editEntryId").value);
+      if (error) throw error;
+      $("editEntryDialog").close(); toast("Apontamento atualizado.");
+      await Promise.all([renderEntries(),renderDashboard()]);
+    } catch(e2){handleError(e2)} finally{showLoading(false)}
+  };
+
+  $("copyPreviousBtn").onclick = async () => {
+    const userId = isManager() ? $("entryUser").value : me.id;
+    const target = $("entryDate").value;
+    if (!userId || !target) return;
+
+    if (!validateNotFutureDate(target, "uma data")) {
+      $("entryDate").value = today();
+      await updateDayTotal();
+      return;
+    }
+
+    showLoading(true);
+    try {
+      const {data:previous,error} = await sb.from("time_entries").select("*")
+        .eq("user_id",userId).lt("entry_date",target).order("entry_date",{ascending:false}).limit(1);
+      if (error) throw error;
+      if (!previous?.length) return toast("Não há dia anterior para copiar.", true);
+      const sourceDate = previous[0].entry_date;
+      const {data:source,error:sourceError} = await sb.from("time_entries").select("*").eq("user_id",userId).eq("entry_date",sourceDate);
+      if (sourceError) throw sourceError;
+      const copies=source.map(x=>({user_id:userId,entry_date:target,project_id:x.project_id,activity_id:x.activity_id,area_code:x.area_code,sector_id:x.sector_id,module_id:x.module_id,room_id:x.room_id,panel_type_id:x.panel_type_id,project_room_instance_id:x.project_room_instance_id,project_room_instance_module_id:x.project_room_instance_module_id,module_part:x.module_part,hours:x.hours,details:x.details,status:"rascunho"}));
+      const {error:insertError} = await sb.from("time_entries").insert(copies);
+      if (insertError) throw insertError;
+      toast(`${copies.length} apontamento(s) copiado(s) de ${dateBR(sourceDate)}.`);
+      await Promise.all([renderEntries(),renderDashboard()]);
+    } catch(e){handleError(e)} finally{showLoading(false)}
+  };
+
+  function resetAbsenceForm() {
+    $("absenceId").value = "";
+    $("absenceFormTitle").textContent = "Novo período";
+    $("saveAbsenceBtn").textContent = "Salvar período";
+    $("cancelAbsenceEditBtn").hidden = true;
+    $("absenceType").value = "Férias";
+    $("absenceStart").value = today();
+    $("absenceEnd").value = today();
+    $("absenceNotes").value = "";
+  }
+
+  $("cancelAbsenceEditBtn").onclick = resetAbsenceForm;
+
+  $("absenceForm").onsubmit = async (e) => {
+    e.preventDefault();
+    if ($("absenceEnd").value < $("absenceStart").value) return toast("A data final não pode ser menor que a inicial.", true);
+    showLoading(true);
+    try {
+      const {error} = await sb.rpc("aponta_upsert_absence_v28", {
+        p_id: $("absenceId").value || null,
+        p_user_id: isManager() ? $("absenceUser").value : me.id,
+        p_absence_type: $("absenceType").value,
+        p_start_date: $("absenceStart").value,
+        p_end_date: $("absenceEnd").value,
+        p_notes: $("absenceNotes").value.trim()
+      });
+      if (error) throw error;
+      const edited = Boolean($("absenceId").value);
+      resetAbsenceForm();
+      toast(edited ? "Período atualizado." : (isManager() ? "Período cadastrado como pendente de aprovação." : "Período enviado para aprovação do gestor."));
+      await renderAbsences();
+    } catch(error){
+      handleError(error, "Não foi possível salvar. Execute o SQL da versão 2.8 no Supabase.");
+    } finally { showLoading(false); }
+  };
+
+  function renderAbsenceRows() {
+    const userFilter = isManager() ? $("absenceFilterUser").value : me.id;
+    const typeFilter = $("absenceFilterType").value;
+    const statusFilter = $("absenceFilterStatus").value;
+    const approvalFilter = $("absenceFilterApproval").value;
+    const normalizedFilter = typeFilter.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+    const rows = absences.filter(x => {
+      const normalizedType = absenceTypeLabel(x.absence_type).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      return (!userFilter || x.user_id === userFilter) &&
+        (!normalizedFilter || normalizedType.includes(normalizedFilter)) &&
+        (!statusFilter || absenceStatus(x) === statusFilter) &&
+        (!approvalFilter || absenceApprovalStatus(x) === approvalFilter);
+    });
+
+    $("absencesTable").innerHTML = rows.map(x => {
+      const status = absenceStatus(x);
+      const approval = absenceApprovalStatus(x);
+      const userCanModify = isManager() || approval !== "aprovado";
+      const approvalAction = isManager() && approval === "pendente"
+        ? `<button class="btn success small" data-approve-absence="${x.id}">Aprovar</button>`
+        : "";
+      const editActions = userCanModify
+        ? `<button class="btn secondary small" data-edit-absence="${x.id}">Editar</button><button class="btn danger small" data-delete-absence="${x.id}">Excluir</button>`
+        : '<span class="badge approval-locked">Bloqueado</span>';
+      return `<tr>
+        <td>${esc(profileName(x.user_id))}</td>
+        <td>${dateBR(x.start_date)} a ${dateBR(x.end_date)}</td>
+        <td>${absenceDays(x)}</td>
+        <td>${esc(absenceTypeLabel(x.absence_type))}</td>
+        <td><span class="badge absence-${status}">${absenceStatusLabel(status)}</span></td>
+        <td><span class="badge approval-${approval}">${absenceApprovalLabel(approval)}</span></td>
+        <td>${esc(x.notes || "—")}</td>
+        <td><div class="table-actions">${approvalAction}${editActions}</div></td>
+      </tr>`;
+    }).join("") || '<tr><td colspan="8" class="empty">Nenhum período encontrado</td></tr>';
+  }
+
+  async function renderAbsences() {
+    try {
+      let q = sb.from("absences").select("*").order("start_date", {ascending:false});
+      if (!isManager()) q = q.eq("user_id", me.id);
+      const {data,error} = await q;
+      if (error) throw error;
+      absences = data || [];
+      renderAbsenceRows();
+    } catch(error) { handleError(error); }
+  }
+
+  $("absenceFilterUser").onchange = renderAbsenceRows;
+  $("absenceFilterType").onchange = renderAbsenceRows;
+  $("absenceFilterStatus").onchange = renderAbsenceRows;
+  $("absenceFilterApproval").onchange = renderAbsenceRows;
+
+  $("absencesTable").onclick = async (e) => {
+    const editId = e.target.dataset.editAbsence;
+    const deleteId = e.target.dataset.deleteAbsence;
+    const approveId = e.target.dataset.approveAbsence;
+
+    if (approveId) {
+      if (!isManager()) return toast("Somente Gestor ou Administrador pode aprovar.", true);
+      if (!confirm("Aprovar este período? Após a aprovação, o colaborador não poderá editar nem excluir.")) return;
+      showLoading(true);
+      try {
+        const {error} = await sb.rpc("aponta_approve_absence_v210", {p_id: approveId});
+        if (error) throw error;
+        toast("Férias/afastamento aprovado. O registro foi bloqueado para o colaborador.");
+        await renderAbsences();
+      } catch(error) {
+        handleError(error, "Não foi possível aprovar. Execute o SQL da versão 2.10 no Supabase.");
+      } finally { showLoading(false); }
+      return;
+    }
+
+    if (editId) {
+      const row = absences.find(x => x.id === editId);
+      if (!row) return;
+      if (!isManager() && absenceApprovalStatus(row) === "aprovado") {
+        return toast("Este período já foi aprovado. Somente Gestor ou Administrador pode alterá-lo.", true);
+      }
+      $("absenceId").value = row.id;
+      if (isManager()) $("absenceUser").value = row.user_id;
+      $("absenceStart").value = row.start_date;
+      $("absenceEnd").value = row.end_date;
+      const label = absenceTypeLabel(row.absence_type);
+      const validOption = [...$("absenceType").options].some(option => option.value === label);
+      $("absenceType").value = validOption ? label : "Outro afastamento";
+      $("absenceNotes").value = row.notes || "";
+      $("absenceFormTitle").textContent = "Editar período";
+      $("saveAbsenceBtn").textContent = "Salvar alteração";
+      $("cancelAbsenceEditBtn").hidden = false;
+      $("absenceForm").scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    if (deleteId) {
+      const row = absences.find(x => x.id === deleteId);
+      if (row && !isManager() && absenceApprovalStatus(row) === "aprovado") {
+        return toast("Este período já foi aprovado. Somente Gestor ou Administrador pode excluí-lo.", true);
+      }
+    }
+
+    if (deleteId && confirm("Excluir este período de férias/afastamento?")) {
+      showLoading(true);
+      try {
+        const {error} = await sb.rpc("aponta_delete_absence_v28", {p_id: deleteId});
+        if (error) throw error;
+        if ($("absenceId").value === deleteId) resetAbsenceForm();
+        toast("Período excluído.");
+        await renderAbsences();
+      } catch(error) {
+        handleError(error, "Não foi possível excluir. Execute o SQL da versão 2.8 no Supabase.");
+      } finally { showLoading(false); }
+    }
+  };
+
+  async function loadClosing() {
+    try {
+      const userId=isManager()?$("closingUser").value:me.id, month=$("closingMonth").value||monthNow();
+      if(!userId)return;
+      const rows=await selectEntries(firstDay(month),lastDay(month),userId);
+      $("closingHours").textContent=fmt(rows.reduce((s,x)=>s+Number(x.hours),0));
+      const {data,error}=await sb.from("monthly_closings").select("*").eq("user_id",userId).eq("month_ref",firstDay(month)).maybeSingle();
+      if(error)throw error;
+      currentClosing=data;
+      $("closingStatus").textContent=statusLabel(data?.status||"aberto");
+      $("closingNote").value=data?.review_note||"";
+      $("submitClosingBtn").disabled=!!data&&["enviado","aprovado"].includes(data.status);
+      $("approveClosingBtn").disabled=!data||data.status!=="enviado";
+      $("rejectClosingBtn").disabled=!data||data.status!=="enviado";
+
+      const approvedForAdministrativeReturn=isAdmin()&&data?.status==="aprovado";
+      const adminReturnPanel=$("adminApprovedReturnPanel");
+      const adminReturnReason=$("adminApprovedReturnReason");
+      const returnToCollaboratorBtn=$("returnClosingToCollaboratorBtn");
+      const returnToManagerBtn=$("returnClosingToManagerBtn");
+      const adminReturnStatus=$("adminApprovedReturnStatus");
+      const adminReturnHelp=$("adminApprovedReturnHelp");
+
+      if(adminReturnPanel)adminReturnPanel.hidden=!isAdmin();
+      if(adminReturnReason)adminReturnReason.disabled=!approvedForAdministrativeReturn;
+      if(returnToCollaboratorBtn)returnToCollaboratorBtn.disabled=!approvedForAdministrativeReturn;
+      if(returnToManagerBtn)returnToManagerBtn.disabled=!approvedForAdministrativeReturn;
+
+      if(adminReturnStatus){
+        adminReturnStatus.textContent=approvedForAdministrativeReturn
+          ?"Período aprovado selecionado"
+          :"Disponível somente após aprovação";
+        adminReturnStatus.classList.toggle("ready",approvedForAdministrativeReturn);
+      }
+
+      if(adminReturnHelp){
+        adminReturnHelp.textContent=approvedForAdministrativeReturn
+          ?"Escolha o destino da devolução e informe obrigatoriamente o motivo."
+          :"Selecione um fechamento com situação Aprovado para utilizar esta ação.";
+      }
+
+      if(!approvedForAdministrativeReturn&&adminReturnReason){
+        adminReturnReason.value="";
+      }
+    }catch(e){handleError(e)}
+  }
+  $("loadClosingBtn").onclick=loadClosing;$("closingUser").onchange=loadClosing;$("closingMonth").onchange=loadClosing;
+
+  function switchClosingView(view, shouldRender=true){
+    const selected=view==="history"?"history":"current";
+
+    document.querySelectorAll("[data-closing-view]").forEach(button=>{
+      const active=button.dataset.closingView===selected;
+      button.classList.toggle("active",active);
+      button.setAttribute("aria-selected",String(active));
+    });
+
+    if($("currentClosingPanel")) $("currentClosingPanel").hidden=selected!=="current";
+    if($("closingHistoryPanel")) $("closingHistoryPanel").hidden=selected!=="history";
+
+    try{sessionStorage.setItem("aponta-horas-closing-view",selected)}catch(_){}
+
+    if(!shouldRender)return;
+    if(selected==="history") renderClosingHistory();
+    else loadClosing();
+  }
+
+  async function renderActiveClosingView(){
+    const active=document.querySelector("[data-closing-view].active")?.dataset.closingView||"current";
+    if(active==="history") await renderClosingHistory();
+    else await loadClosing();
+  }
+
+  function closingHistoryKey(userId,monthRef){
+    return `${userId}|${String(monthRef||"").slice(0,7)}`;
+  }
+
+  function updateClosingHistoryBulkActions(){
+    const count=selectedClosingHistoryIds.size;
+    const countElement=$("selectedClosingsCount");
+    const clearButton=$("clearSelectedClosingsBtn");
+    const approveButton=$("approveSelectedClosingsBtn");
+    const returnButton=$("returnSelectedClosingsBtn");
+    const selectAll=$("selectAllVisibleClosings");
+
+    if(countElement){
+      countElement.textContent=`${count} selecionado${count===1?"":"s"}`;
+    }
+
+    if(clearButton)clearButton.disabled=count===0;
+    if(approveButton)approveButton.disabled=count===0;
+    if(returnButton)returnButton.disabled=count===0;
+
+    if(selectAll){
+      const selectedVisible=visibleReviewableClosingIds.filter(
+        id=>selectedClosingHistoryIds.has(id)
+      ).length;
+
+      selectAll.checked=
+        visibleReviewableClosingIds.length>0&&
+        selectedVisible===visibleReviewableClosingIds.length;
+      selectAll.indeterminate=
+        selectedVisible>0&&
+        selectedVisible<visibleReviewableClosingIds.length;
+      selectAll.disabled=visibleReviewableClosingIds.length===0;
+    }
+  }
+
+  function clearClosingHistorySelection(){
+    selectedClosingHistoryIds.clear();
+    document.querySelectorAll("[data-select-closing]").forEach(input=>{
+      input.checked=false;
+    });
+    updateClosingHistoryBulkActions();
+  }
+
+  function updateClosingHistorySummary(rows){
+    const totalHours=rows.reduce((sum,row)=>sum+Number(row.total_hours||0),0);
+    const pending=rows.filter(row=>row.status==="enviado").length;
+    const approved=rows.filter(row=>row.status==="aprovado").length;
+
+    if($("closingHistoryTotal")) $("closingHistoryTotal").textContent=String(rows.length);
+    if($("closingHistoryHours")) $("closingHistoryHours").textContent=fmt(totalHours);
+    if($("closingHistoryPending")) $("closingHistoryPending").textContent=String(pending);
+    if($("closingHistoryApproved")) $("closingHistoryApproved").textContent=String(approved);
+    if($("closingHistoryCountBadge")){
+      $("closingHistoryCountBadge").textContent=`${rows.length} registro${rows.length===1?"":"s"}`;
+    }
+  }
+
+  async function renderClosingHistory(){
+    const table=$("closingHistoryTable");
+    if(!table)return;
+
+    const startMonth=$("closingHistoryStartMonth")?.value||`${monthNow().slice(0,4)}-01`;
+    const endMonth=$("closingHistoryEndMonth")?.value||monthNow();
+    const selectedUser=isManager()?($("closingHistoryUser")?.value||""):me.id;
+    const selectedStatus=$("closingHistoryStatus")?.value||"";
+    const selectedProject=$("closingHistoryProject")?.value||"";
+    const search=normalizeText($("closingHistorySearch")?.value||"");
+
+    if(endMonth<startMonth){
+      toast("O mês final não pode ser anterior ao mês inicial.",true);
+      return;
+    }
+
+    table.innerHTML=`<tr><td colspan="${isManager()?10:9}" class="empty">Carregando fechamentos...</td></tr>`;
+
+    try{
+      let query=sb.from("monthly_closings")
+        .select("*")
+        .gte("month_ref",firstDay(startMonth))
+        .lte("month_ref",firstDay(endMonth))
+        .in("status",["enviado","aprovado","devolvido"])
+        .order("month_ref",{ascending:false})
+        .order("submitted_at",{ascending:false});
+
+      if(selectedUser) query=query.eq("user_id",selectedUser);
+      if(selectedStatus) query=query.eq("status",selectedStatus);
+      if(!isManager()) query=query.eq("user_id",me.id);
+
+      const {data:closings,error}=await query;
+      if(error)throw error;
+
+      const entries=await selectEntries(
+        firstDay(startMonth),
+        lastDay(endMonth),
+        selectedUser||"",
+        ""
+      );
+
+      const aggregate=new Map();
+      entries.forEach(entry=>{
+        const key=closingHistoryKey(entry.user_id,entry.entry_date);
+        if(!aggregate.has(key)){
+          aggregate.set(key,{hours:0,projectIds:new Set()});
+        }
+        const item=aggregate.get(key);
+        item.hours+=Number(entry.hours||0);
+        if(entry.project_id)item.projectIds.add(entry.project_id);
+      });
+
+      let rows=(closings||[]).map(closing=>{
+        const item=aggregate.get(closingHistoryKey(closing.user_id,closing.month_ref))||{hours:0,projectIds:new Set()};
+        const projectIds=[...item.projectIds];
+        return {
+          ...closing,
+          total_hours:item.hours,
+          project_ids:projectIds,
+          project_names:projectIds.map(projectName).filter(name=>name&&name!=="—")
+        };
+      });
+
+      if(selectedProject){
+        rows=rows.filter(row=>row.project_ids.includes(selectedProject));
+      }
+
+      if(search){
+        rows=rows.filter(row=>normalizeText([
+          profileName(row.user_id),
+          row.project_names.join(" "),
+          statusLabel(row.status),
+          profileName(row.reviewed_by),
+          row.review_note
+        ].join(" ")).includes(search));
+      }
+
+      closingHistoryRows=rows;
+      visibleReviewableClosingIds=isManager()
+        ?rows.filter(row=>row.status==="enviado").map(row=>row.id)
+        :[];
+
+      const visibleReviewableSet=new Set(visibleReviewableClosingIds);
+      Array.from(selectedClosingHistoryIds).forEach(id=>{
+        if(!visibleReviewableSet.has(id))selectedClosingHistoryIds.delete(id);
+      });
+
+      updateClosingHistorySummary(rows);
+      updateClosingHistoryBulkActions();
+
+      table.innerHTML=rows.map(row=>{
+        const projectsText=row.project_names.length?row.project_names.join(", "):"Sem projeto identificado";
+        const canReview=isManager()&&row.status==="enviado";
+        const selectorCell=isManager()
+          ?`<td data-label="Selecionar">${
+              canReview
+                ?`<input class="closing-history-row-selector" type="checkbox" data-select-closing="${row.id}" ${selectedClosingHistoryIds.has(row.id)?"checked":""} aria-label="Selecionar fechamento de ${esc(profileName(row.user_id))}, ${esc(monthLabel(row.month_ref))}">`
+                :`<span class="closing-history-not-reviewable" title="Somente fechamentos enviados podem ser analisados em lote">—</span>`
+            }</td>`
+          :"";
+
+        return `<tr>
+          ${selectorCell}
+          <td data-label="Colaborador">${esc(profileName(row.user_id))}</td>
+          <td data-label="Mês"><strong>${esc(monthLabel(row.month_ref))}</strong></td>
+          <td data-label="Horas">${fmt(row.total_hours)}</td>
+          <td data-label="Projetos"><span class="closing-projects" title="${esc(projectsText)}">${esc(projectsText)}</span></td>
+          <td data-label="Enviado em">${dateTimeBR(row.submitted_at)}</td>
+          <td data-label="Situação"><span class="badge status-${esc(row.status)}">${esc(statusLabel(row.status))}</span></td>
+          <td data-label="Revisado por">${row.reviewed_by?esc(profileName(row.reviewed_by)):"—"}</td>
+          <td data-label="Observação">${esc(row.review_note||"—")}</td>
+          <td data-label="Ações">
+            <div class="table-actions">
+              <button class="btn secondary small" type="button" data-open-closing="${row.id}">Abrir</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join("")||`<tr><td colspan="${isManager()?10:9}" class="empty">Nenhum fechamento enviado encontrado com os filtros selecionados.</td></tr>`;
+    }catch(error){
+      closingHistoryRows=[];
+      visibleReviewableClosingIds=[];
+      clearClosingHistorySelection();
+      updateClosingHistorySummary([]);
+      table.innerHTML=`<tr><td colspan="${isManager()?10:9}" class="empty">Não foi possível carregar os fechamentos.</td></tr>`;
+      handleError(error,"Não foi possível consultar os fechamentos enviados.");
+    }
+  }
+
+  document.querySelectorAll("[data-closing-view]").forEach(button=>{
+    button.addEventListener("click",()=>switchClosingView(button.dataset.closingView));
+  });
+
+  try{
+    switchClosingView(sessionStorage.getItem("aponta-horas-closing-view")||"current",false);
+  }catch(_){
+    switchClosingView("current",false);
+  }
+
+  if($("filterClosingHistoryBtn")) $("filterClosingHistoryBtn").onclick=()=>{
+    clearClosingHistorySelection();
+    renderClosingHistory();
+  };
+  if($("closingHistorySearch")){
+    $("closingHistorySearch").addEventListener("keydown",event=>{
+      if(event.key==="Enter"){
+        clearClosingHistorySelection();
+        renderClosingHistory();
+      }
+    });
+  }
+
+  if($("clearClosingHistoryFiltersBtn")){
+    $("clearClosingHistoryFiltersBtn").onclick=()=>{
+      $("closingHistorySearch").value="";
+      if(isManager()) $("closingHistoryUser").value="";
+      $("closingHistoryStartMonth").value=`${monthNow().slice(0,4)}-01`;
+      $("closingHistoryEndMonth").value=monthNow();
+      $("closingHistoryStatus").value="";
+      $("closingHistoryProject").value="";
+      clearClosingHistorySelection();
+      renderClosingHistory();
+    };
+  }
+
+  if($("exportClosingHistoryBtn")){
+    $("exportClosingHistoryBtn").onclick=()=>{
+      if(!closingHistoryRows.length){
+        toast("Não há fechamentos filtrados para exportar.",true);
+        return;
+      }
+
+      downloadCsv(
+        `fechamentos_enviados_${today()}.csv`,
+        [
+          ["Colaborador","Mês","Horas","Projetos","Enviado em","Situação","Revisado por","Revisado em","Observação"],
+          ...closingHistoryRows.map(row=>[
+            profileName(row.user_id),
+            monthLabel(row.month_ref),
+            fmt(row.total_hours),
+            row.project_names.join(", "),
+            dateTimeBR(row.submitted_at),
+            statusLabel(row.status),
+            row.reviewed_by?profileName(row.reviewed_by):"",
+            dateTimeBR(row.reviewed_at),
+            row.review_note||""
+          ])
+        ]
+      );
+    };
+  }
+
+  if($("selectAllVisibleClosings")){
+    $("selectAllVisibleClosings").onchange=event=>{
+      visibleReviewableClosingIds.forEach(id=>{
+        if(event.target.checked)selectedClosingHistoryIds.add(id);
+        else selectedClosingHistoryIds.delete(id);
+      });
+
+      document.querySelectorAll("[data-select-closing]").forEach(input=>{
+        input.checked=event.target.checked;
+      });
+
+      updateClosingHistoryBulkActions();
+    };
+  }
+
+  if($("clearSelectedClosingsBtn")){
+    $("clearSelectedClosingsBtn").onclick=clearClosingHistorySelection;
+  }
+
+  async function reviewSelectedClosings(status){
+    if(!isManager()){
+      toast("Somente Gestor ou Administrador pode analisar fechamentos.",true);
+      return;
+    }
+
+    const ids=Array.from(selectedClosingHistoryIds);
+    if(!ids.length){
+      toast("Selecione pelo menos um fechamento enviado.",true);
+      return;
+    }
+
+    const note=$("closingHistoryBulkNote")?.value.trim()||"";
+    if(status==="devolvido"&&!note){
+      toast("Informe o motivo da devolução em lote.",true);
+      $("closingHistoryBulkNote")?.focus();
+      return;
+    }
+
+    const actionLabel=status==="aprovado"?"aprovar":"devolver";
+    const confirmed=window.confirm(
+      `${actionLabel.charAt(0).toUpperCase()+actionLabel.slice(1)} `+
+      `${ids.length} fechamento${ids.length===1?"":"s"} selecionado${ids.length===1?"":"s"}?
+
+`+
+      (status==="aprovado"
+        ?"Os apontamentos dos períodos serão marcados como Aprovados."
+        :"Os apontamentos dos períodos serão devolvidos aos colaboradores para correção.")
+    );
+
+    if(!confirmed)return;
+
+    showLoading(true);
+    try{
+      const {data,error}=await sb.rpc(
+        "aponta_review_monthly_closings_bulk_v2190",
+        {
+          p_closing_ids:ids,
+          p_status:status,
+          p_review_note:note
+        }
+      );
+
+      if(error)throw error;
+
+      const processed=Number(data?.closings_processed||0);
+      const entries=Number(data?.entries_updated||0);
+      const skipped=Number(data?.closings_skipped||0);
+
+      clearClosingHistorySelection();
+      if($("closingHistoryBulkNote"))$("closingHistoryBulkNote").value="";
+
+      await Promise.all([
+        renderClosingHistory(),
+        loadClosing(),
+        renderEntries(),
+        renderDashboard()
+      ]);
+
+      const actionDone=status==="aprovado"?"aprovado":"devolvido";
+      toast(
+        `${processed} fechamento${processed===1?"":"s"} ${actionDone}${processed===1?"":"s"}. `+
+        `${entries} apontamento${entries===1?"":"s"} atualizado${entries===1?"":"s"}.`+
+        (skipped?` ${skipped} item${skipped===1?"":"s"} ignorado${skipped===1?"":"s"} por não estar enviado.`:"")
+      );
+    }catch(error){
+      handleError(
+        error,
+        "Não foi possível analisar os fechamentos selecionados. Execute o SQL obrigatório da versão 2.19.0 no Supabase."
+      );
+    }finally{
+      showLoading(false);
+    }
+  }
+
+  if($("approveSelectedClosingsBtn")){
+    $("approveSelectedClosingsBtn").onclick=()=>reviewSelectedClosings("aprovado");
+  }
+
+  if($("returnSelectedClosingsBtn")){
+    $("returnSelectedClosingsBtn").onclick=()=>reviewSelectedClosings("devolvido");
+  }
+
+  if($("closingHistoryTable")){
+    $("closingHistoryTable").onchange=event=>{
+      const selector=event.target.closest("[data-select-closing]");
+      if(!selector)return;
+
+      const id=selector.dataset.selectClosing;
+      if(selector.checked)selectedClosingHistoryIds.add(id);
+      else selectedClosingHistoryIds.delete(id);
+      updateClosingHistoryBulkActions();
+    };
+
+    $("closingHistoryTable").onclick=async event=>{
+      const button=event.target.closest("[data-open-closing]");
+      if(!button)return;
+      const row=closingHistoryRows.find(item=>item.id===button.dataset.openClosing);
+      if(!row)return;
+
+      if(isManager()) $("closingUser").value=row.user_id;
+      $("closingMonth").value=String(row.month_ref).slice(0,7);
+      switchClosingView("current",false);
+      await loadClosing();
+      $("currentClosingPanel")?.scrollIntoView({behavior:"smooth",block:"start"});
+    };
+  }
+
+  async function readFunctionError(error) {
+    let message = error?.message || "Falha ao chamar a função de e-mail.";
+    let code = "";
+
+    try {
+      const response = error?.context;
+      if (response && typeof response.clone === "function") {
+        const payload = await response.clone().json();
+        if (payload?.error) message = payload.error;
+        if (payload?.code) code = payload.code;
+      }
+    } catch (_) {}
+
+    if (/Failed to send a request|not found|404/i.test(message)) {
+      message =
+        "A função enviar-aprovacao não foi encontrada ou não está publicada no Supabase.";
+      code = "FUNCTION_NOT_DEPLOYED";
+    }
+
+    const detailedError = new Error(message);
+    detailedError.code = code;
+    return detailedError;
+  }
+
+  async function sendApprovalEmail(userId, month) {
+    const {data, error} = await sb.functions.invoke("enviar-aprovacao", {
+      body: {userId, month}
+    });
+
+    if (error) {
+      throw await readFunctionError(error);
+    }
+
+    if (!data?.sent) {
+      const detailedError = new Error(
+        data?.error || "O serviço não confirmou o envio do e-mail."
+      );
+      detailedError.code = data?.code || "";
+      throw detailedError;
+    }
+
+    return data;
+  }
+
+  $("submitClosingBtn").onclick=async()=>{
+    const userId=isManager()?$("closingUser").value:me.id;
+    const targetProfile=profiles.find(profile=>profile.id===userId);
+    if(!canMakeEntries(targetProfile)){
+      toast("Este colaborador ainda não está aprovado para realizar apontamentos.",true);
+      return;
+    }
+    const monthValue=$("closingMonth").value;
+    const month=firstDay(monthValue);
+    let emailResult=null;
+    let emailError=null;
+
+    showLoading(true);
+
+    try{
+      const{error}=await sb.from("monthly_closings").upsert({
+        user_id:userId,
+        month_ref:month,
+        status:"enviado",
+        submitted_at:new Date().toISOString(),
+        review_note:""
+      },{onConflict:"user_id,month_ref"});
+
+      if(error)throw error;
+
+      const{error:e2}=await sb.from("time_entries")
+        .update({status:"enviado"})
+        .eq("user_id",userId)
+        .gte("entry_date",month)
+        .lt("entry_date",nextMonthFirst(monthValue))
+        .in("status",["rascunho","devolvido"]);
+
+      if(e2)throw e2;
+
+      try {
+        emailResult = await sendApprovalEmail(userId, month);
+      } catch (mailError) {
+        emailError = mailError;
+        console.error("Falha ao enviar e-mail de aprovação:", mailError);
+      }
+
+      await Promise.all([loadClosing(),renderEntries(),renderDashboard(),renderClosingHistory()]);
+
+      if (emailError) {
+        toast(
+          `Mês enviado para aprovação. O e-mail não foi enviado: ${emailError.message}`,
+          true
+        );
+      } else {
+        const count = Number(emailResult?.recipients || 0);
+        toast(
+          `Mês enviado para aprovação. E-mail enviado para ${count} ${count === 1 ? "aprovador" : "aprovadores"}.`
+        );
+      }
+    }catch(e){
+      handleError(e);
+    }finally{
+      showLoading(false);
+    }
+  };
+
+  async function reviewClosing(status){
+    if(!isManager()||!currentClosing)return;
+    showLoading(true);
+    try{
+      const userId=$("closingUser").value, month=$("closingMonth").value;
+      const{error}=await sb.from("monthly_closings").update({status,reviewed_by:me.id,reviewed_at:new Date().toISOString(),review_note:$("closingNote").value.trim()}).eq("id",currentClosing.id);
+      if(error)throw error;
+      const entryStatus=status==="aprovado"?"aprovado":"devolvido";
+      const{error:e2}=await sb.from("time_entries").update({status:entryStatus}).eq("user_id",userId).gte("entry_date",firstDay(month)).lt("entry_date",nextMonthFirst(month)).eq("status","enviado");
+      if(e2)throw e2;
+      toast(status==="aprovado"?"Fechamento aprovado.":"Fechamento devolvido.");
+      await Promise.all([loadClosing(),renderEntries(),renderDashboard(),renderClosingHistory()]);
+    }catch(e){handleError(e)}finally{showLoading(false)}
+  }
+  $("approveClosingBtn").onclick=()=>reviewClosing("aprovado");
+  $("rejectClosingBtn").onclick=()=>reviewClosing("devolvido");
+
+  async function returnApprovedClosing(destination){
+    if(!isAdmin()){
+      toast("Somente o Administrador pode devolver um período depois da aprovação.",true);
+      return;
+    }
+
+    if(!currentClosing||currentClosing.status!=="aprovado"){
+      toast("Selecione um fechamento aprovado.",true);
+      return;
+    }
+
+    const reason=$("adminApprovedReturnReason").value.trim();
+    if(!reason){
+      toast("Informe o motivo da devolução.",true);
+      $("adminApprovedReturnReason").focus();
+      return;
+    }
+
+    const toCollaborator=destination==="colaborador";
+    const destinationLabel=toCollaborator
+      ?"ao colaborador para correção"
+      :"à fila de aprovação do gestor";
+
+    const confirmed=window.confirm(
+      `Devolver este período ${destinationLabel}?\n\n`+
+      (toCollaborator
+        ?"Os apontamentos serão liberados para edição e exclusão."
+        :"Os apontamentos continuarão bloqueados para o colaborador.")
+    );
+
+    if(!confirmed)return;
+
+    showLoading(true);
+
+    try{
+      const {data,error}=await sb.rpc(
+        "aponta_admin_return_approved_closing_v2176",
+        {
+          p_closing_id:currentClosing.id,
+          p_destination:destination,
+          p_reason:reason
+        }
+      );
+
+      if(error)throw error;
+
+      $("adminApprovedReturnReason").value="";
+
+      await Promise.all([
+        loadClosing(),
+        renderEntries(),
+        renderDashboard(),
+        renderClosingHistory()
+      ]);
+
+      if(toCollaborator){
+        toast(
+          `${data?.entries_updated??0} apontamento${Number(data?.entries_updated||0)===1?"":"s"} `+
+          "devolvido(s) ao colaborador para correção."
+        );
+      }else{
+        toast(
+          "O fechamento voltou para a fila de aprovação do gestor."
+        );
+      }
+    }catch(error){
+      handleError(
+        error,
+        "Não foi possível devolver o período. Execute o SQL obrigatório da versão 2.17.6 no Supabase."
+      );
+    }finally{
+      showLoading(false);
+    }
+  }
+
+  $("returnClosingToCollaboratorBtn").onclick=()=>returnApprovedClosing("colaborador");
+  $("returnClosingToManagerBtn").onclick=()=>returnApprovedClosing("gestor");
+
+  function downloadCsv(filename, lines) {
+    const csv="\uFEFF"+lines.map(row=>row.map(value=>`"${String(value??"").replaceAll('"','""')}"`).join(";")).join("\n");
+    const link=document.createElement("a");
+    link.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+    link.download=filename;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  async function renderReport(){
+    try{
+      const user=isManager()?$("reportUser").value:me.id;
+      lastReportRows=await selectEntries($("reportStart").value||firstDay(),$("reportEnd").value||lastDay(),user,$("reportProject").value);
+      const reportHours=lastReportRows.reduce(
+        (sum,row)=>sum+Number(row.hours||0),
+        0
+      );
+      const reportPeople=new Set(
+        lastReportRows.map(row=>row.user_id).filter(Boolean)
+      ).size;
+
+      $("reportTotal").textContent=
+        `${fmt(reportHours)} horas · `+
+        `${lastReportRows.length} apontamento${lastReportRows.length===1?"":"s"} · `+
+        `${reportPeople} colaborador${reportPeople===1?"":"es"}`;
+      $("reportTable").innerHTML=lastReportRows.map(x=>`<tr><td>${dateBR(x.entry_date)}</td><td>${esc(profileName(x.user_id))}</td><td>${esc(projectName(x.project_id))}</td><td>${esc(areaName(x.area_code))}</td><td>${esc(entryReferenceName(x))}</td><td>${esc(activityName(x.activity_id))}</td><td>${fmt(x.hours)}</td><td>${esc(x.details)}</td><td><span class="badge status-${x.status}">${statusLabel(x.status)}</span></td></tr>`).join("")||'<tr><td colspan="9" class="empty">Sem dados</td></tr>';
+    }catch(e){handleError(e)}
+  }
+
+  async function renderPeopleReport(){
+    try{
+      const start=$("peopleReportStart").value||firstDay();
+      const end=$("peopleReportEnd").value||lastDay();
+      if(end<start) return toast("A data final do relatório não pode ser menor que a inicial.",true);
+
+      const user=isManager()?$("peopleReportUser").value:me.id;
+      const typeFilter=$("peopleReportType").value;
+      const [entries,absenceRows]=await Promise.all([
+        selectEntries(start,end,user),
+        selectAbsencesForReport(start,end,user,typeFilter)
+      ]);
+
+      lastPeopleAbsenceRows=absenceRows.map(row=>({...row,days_in_filter:overlapDays(row,start,end)}));
+
+      const relevantIds=new Set();
+      if(user) relevantIds.add(user);
+      entries.forEach(row=>relevantIds.add(row.user_id));
+      lastPeopleAbsenceRows.forEach(row=>relevantIds.add(row.user_id));
+      if(!user&&isManager()) profiles.filter(profile=>profile.active).forEach(profile=>relevantIds.add(profile.id));
+      if(!isManager()) relevantIds.add(me.id);
+
+      lastPeopleReportRows=[...relevantIds].map(userId=>{
+        const userEntries=entries.filter(row=>row.user_id===userId);
+        const userAbsences=lastPeopleAbsenceRows.filter(row=>row.user_id===userId);
+        const summary={
+          user_id:userId,
+          hours:userEntries.reduce((sum,row)=>sum+Number(row.hours),0),
+          vacation:0,
+          medical:0,
+          away:0,
+          dayoff:0,
+          other:0,
+          occurrence_types:[...new Set(userAbsences.map(row=>absenceTypeLabel(row.absence_type)))]
+        };
+        userAbsences.forEach(row=>summary[absenceCategory(row.absence_type)]+=Number(row.days_in_filter||0));
+        summary.total_days=summary.vacation+summary.medical+summary.away+summary.dayoff+summary.other;
+        return summary;
+      }).sort((a,b)=>profileName(a.user_id).localeCompare(profileName(b.user_id),"pt-BR"));
+
+      const totalHours=lastPeopleReportRows.reduce((sum,row)=>sum+row.hours,0);
+      const vacationDays=lastPeopleReportRows.reduce((sum,row)=>sum+row.vacation,0);
+      const awayDays=lastPeopleReportRows.reduce((sum,row)=>sum+row.medical+row.away+row.dayoff+row.other,0);
+      const usersWithAbsence=lastPeopleReportRows.filter(row=>row.total_days>0).length;
+
+      $("peopleReportHours").textContent=fmt(totalHours);
+      $("peopleReportVacationDays").textContent=vacationDays;
+      $("peopleReportAwayDays").textContent=awayDays;
+      $("peopleReportUsersWithAbsence").textContent=usersWithAbsence;
+
+      $("peopleReportTable").innerHTML=lastPeopleReportRows.map(row=>`<tr>
+        <td>${esc(profileName(row.user_id))}</td>
+        <td>${fmt(row.hours)}</td>
+        <td>${row.vacation}</td>
+        <td>${row.medical}</td>
+        <td>${row.away}</td>
+        <td>${row.dayoff}</td>
+        <td>${row.other}</td>
+        <td><strong>${row.total_days}</strong></td>
+        <td>${esc(row.occurrence_types.join(", ")||"Sem ausência no período")}</td>
+      </tr>`).join("")||'<tr><td colspan="9" class="empty">Sem dados no período</td></tr>';
+
+      $("peopleAbsenceReportTable").innerHTML=lastPeopleAbsenceRows.map(row=>{
+        const status=absenceStatus(row);
+        return `<tr>
+          <td>${esc(profileName(row.user_id))}</td>
+          <td>${esc(absenceTypeLabel(row.absence_type))}</td>
+          <td>${dateBR(row.start_date)}</td>
+          <td>${dateBR(row.end_date)}</td>
+          <td>${row.days_in_filter}</td>
+          <td><span class="badge absence-${status}">${absenceStatusLabel(status)}</span></td>
+          <td><span class="badge approval-${absenceApprovalStatus(row)}">${absenceApprovalLabel(absenceApprovalStatus(row))}</span></td>
+          <td>${esc(row.notes||"—")}</td>
+        </tr>`;
+      }).join("")||'<tr><td colspan="8" class="empty">Nenhuma férias ou afastamento no período</td></tr>';
+    }catch(e){handleError(e,"Não foi possível gerar o relatório de férias e afastamentos.")}
+  }
+
+
+  function switchCatalogView(view){
+    const allowed=new Set(["general","references","projects","holidays"]);
+    const selectedView=allowed.has(view)?view:"general";
+    const previousView=document.querySelector("[data-catalog-view].active")?.dataset.catalogView||"";
+    if(previousView==="projects"&&selectedView!=="projects"){
+      resetProjectStructureSelection();
+    }
+
+    document.querySelectorAll("[data-catalog-view]").forEach(button=>{
+      const isActive=button.dataset.catalogView===selectedView;
+      button.classList.toggle("active",isActive);
+      button.setAttribute("aria-selected",String(isActive));
+    });
+
+    const panelMap={
+      general:"generalCatalogPanel",
+      references:"referenceCatalogPanel",
+      projects:"projectStructureCatalogPanel",
+      holidays:"holidayCatalogPanel"
+    };
+
+    Object.entries(panelMap).forEach(([key,id])=>{
+      const panel=$(id);
+      if (panel) panel.hidden=key!==selectedView;
+    });
+
+    try{
+      sessionStorage.setItem("aponta-p3-catalog-view",selectedView);
+    }catch(_){}
+  }
+
+  document.querySelectorAll("[data-catalog-view]").forEach(button=>{
+    button.addEventListener("click",()=>{
+      switchCatalogView(button.dataset.catalogView);
+    });
+  });
+
+  try{
+    switchCatalogView(
+      sessionStorage.getItem("aponta-p3-catalog-view")||"general"
+    );
+  }catch(_){
+    switchCatalogView("general");
+  }
+
+  async function renderActiveReport(){
+    const active=document.querySelector("[data-report-view].active")?.dataset.reportView||"projects";
+    if(active==="people") await renderPeopleReport();
+    else await renderReport();
+  }
+
+  function switchReportView(view){
+    const selected=view==="people"?"people":"projects";
+    document.querySelectorAll("[data-report-view]").forEach(button=>{
+      const active=button.dataset.reportView===selected;
+      button.classList.toggle("active",active);
+      button.setAttribute("aria-selected",String(active));
+    });
+    $("projectReportPanel").hidden=selected!=="projects";
+    $("peopleReportPanel").hidden=selected!=="people";
+    try{sessionStorage.setItem("aponta-p3-report-view",selected)}catch(_){}
+    if(selected==="people") renderPeopleReport();
+    else renderReport();
+  }
+
+  document.querySelectorAll("[data-report-view]").forEach(button=>{
+    button.addEventListener("click",()=>switchReportView(button.dataset.reportView));
+  });
+
+  try{switchReportView(sessionStorage.getItem("aponta-p3-report-view")||"projects")}catch(_){switchReportView("projects")}
+
+  $("selectAllActivityAreasBtn").onclick=()=>setAllActivityAreas("activityAreasCheckboxes",true);
+  $("clearActivityAreasBtn").onclick=()=>setAllActivityAreas("activityAreasCheckboxes",false);
+  $("selectAllEditActivityAreasBtn").onclick=()=>setAllActivityAreas("editActivityAreasCheckboxes",true);
+  $("clearEditActivityAreasBtn").onclick=()=>setAllActivityAreas("editActivityAreasCheckboxes",false);
+
+  $("generateReportBtn").onclick=renderReport;
+  $("generatePeopleReportBtn").onclick=renderPeopleReport;
+
+  $("exportReportBtn").onclick=()=>{
+    const lines=[["Data","Colaborador","Projeto","Área","Referência","Atividade","Horas","Observação","Status"],...lastReportRows.map(x=>[x.entry_date,profileName(x.user_id),projectName(x.project_id),areaName(x.area_code),entryReferenceName(x),activityName(x.activity_id),String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
+    downloadCsv(`apontamentos_${today()}.csv`,lines);
+  };
+
+  $("exportPeopleReportBtn").onclick=()=>{
+    const lines=[["Colaborador","Horas apontadas","Dias de férias","Dias de atestado","Dias de afastamentos/licenças","Dias de folga","Outros dias","Total de dias de ausência","Ocorrências no período"],...lastPeopleReportRows.map(row=>[
+      profileName(row.user_id),String(row.hours).replace(".",","),row.vacation,row.medical,row.away,row.dayoff,row.other,row.total_days,row.occurrence_types.join(", ")||"Sem ausência no período"
+    ])];
+    downloadCsv(`resumo_equipe_horas_ausencias_${today()}.csv`,lines);
+  };
+
+  $("exportPeopleAbsencesBtn").onclick=()=>{
+    const lines=[["Colaborador","Tipo","Data inicial","Data final","Dias no período filtrado","Situação","Aprovação","Observação"],...lastPeopleAbsenceRows.map(row=>[
+      profileName(row.user_id),absenceTypeLabel(row.absence_type),row.start_date,row.end_date,row.days_in_filter,absenceStatusLabel(absenceStatus(row)),absenceApprovalLabel(absenceApprovalStatus(row)),row.notes||""
+    ])];
+    downloadCsv(`detalhes_ferias_afastamentos_${today()}.csv`,lines);
+  };
+
+  $("projectForm").onsubmit=async e=>{e.preventDefault();const{error}=await sb.from("projects").insert({code:$("projectCode").value.trim()||null,client_name:$("projectClient").value.trim(),name:$("projectName").value.trim(),description:$("projectDescription").value.trim(),created_by:me.id});if(error)handleError(error);else{$("projectForm").reset();toast("Projeto adicionado.");await reloadCatalogs()}};
+  $("activityForm").onsubmit=async e=>{
+    e.preventDefault();
+    const areas=checkedAreaCodes("activityAreasCheckboxes");
+    if(!areas.length)return toast("Selecione pelo menos uma área para a atividade.",true);
+
+    showLoading(true);
+    try{
+      const {data,error}=await sb.rpc(
+        "aponta_save_activity_v2180",
+        {
+          p_activity_id:null,
+          p_code:normalizeActivityCode($("activityCode").value)||null,
+          p_name:$("activityName").value.trim(),
+          p_discipline_name:$("activityDiscipline").value.trim(),
+          p_nature:$("activityNature").value.trim(),
+          p_usage_description:$("activityUsageDescription").value.trim(),
+          p_observation_requirement:normalizeObservationRequirement(
+            $("activityObservationRequirement").value
+          ),
+          p_active:true,
+          p_areas:areas
+        }
+      );
+
+      if(error)throw error;
+      if(!data?.id)throw new Error("O banco não confirmou a atividade criada.");
+
+      const confirmedAreas=applyConfirmedActivityAreas(
+        data.id,
+        Array.isArray(data.areas)?data.areas:areas
+      );
+
+      $("activityForm").reset();
+      $("activityObservationRequirement").value="Opcional";
+      renderActivityAreaCheckboxes("activityAreasCheckboxes");
+
+      await reloadCatalogs();
+
+      // A resposta da RPC é a confirmação transacional do banco.
+      // Reaplica localmente para evitar leitura antiga imediatamente após o insert.
+      applyConfirmedActivityAreas(data.id,confirmedAreas);
+      renderActivitiesCatalog();
+
+      toast(
+        `Atividade adicionada com ${confirmedAreas.length} `+
+        `área${confirmedAreas.length===1?"":"s"}.`
+      );
+    }catch(error){
+      handleError(
+        error,
+        "Não foi possível salvar a atividade. Execute o SQL obrigatório da versão 2.18.3."
+      );
+    }finally{
+      showLoading(false);
+    }
+  };
+  $("holidayForm").onsubmit=async e=>{e.preventDefault();const{error}=await sb.from("holidays").insert({holiday_date:$("holidayDate").value,name:$("holidayName").value.trim()});if(error)handleError(error);else{$("holidayForm").reset();toast("Feriado adicionado.");await reloadCatalogs()}};
+
+  async function reloadCatalogs(){await loadBaseData();await renderCatalogs()}
+
+  function renderProfile() {
+    $("profileName").value = me?.full_name || "";
+    $("profileEmail").value = me?.email || session?.user?.email || "";
+    $("profileDailyHours").value = me?.daily_hours || 8;
+    $("profileRole").value = roleLabel(me?.role);
+  }
+
+  $("profileForm").onsubmit = async (e) => {
+    e.preventDefault();
+    showLoading(true);
+    try {
+      const {error} = await sb.rpc("update_my_profile", {
+        p_full_name: $("profileName").value.trim(),
+        p_daily_hours: Number($("profileDailyHours").value)
+      });
+      if (error) throw error;
+      await loadBaseData();
+      renderProfile();
+      toast("Perfil atualizado.");
+    } catch (error) {
+      handleError(error, "Não foi possível atualizar o perfil. Execute o arquivo ATUALIZAR_BANCO_v2.1.sql no Supabase.");
+    } finally {
+      showLoading(false);
+    }
+  };
+
+  function safeStructureCode(value,fallback="ITEM"){
+    const normalized=String(value||fallback).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/[^A-Z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+    return normalized||fallback;
+  }
+
+  function compactCatalogKey(value){return normalizeText(value).replace(/[^a-z0-9]/g,"");}
+  function standardRoomDefinitionFor(room){if(!room)return null;const code=compactCatalogKey(room.code),name=compactCatalogKey(room.name);return STANDARD_PROJECT_ROOMS.find(def=>def.aliases.includes(code)||def.aliases.includes(name))||null;}
+  function instanceModuleCount(instanceId){return projectRoomInstanceModules.filter(row=>row.room_instance_id===instanceId&&row.active).length;}
+  function roomCatalogName(roomId){return rooms.find(row=>row.id===roomId)?.name||"Sala";}
+  function roomCatalogCode(roomId){return rooms.find(row=>row.id===roomId)?.code||"SALA";}
+
+  async function syncRoomInstanceModuleQuantity(instanceId,desiredValue){
+    const desired=Number(desiredValue);if(!Number.isInteger(desired)||desired<1)throw new Error("A quantidade de módulos deve ser um número inteiro maior que zero.");
+    const instance=projectRoomInstances.find(row=>row.id===instanceId);if(!instance)throw new Error("Sala específica não encontrada.");
+    const def=standardRoomDefinitionFor(rooms.find(row=>row.id===instance.room_id));if(def?.monoblock&&desired>MAX_MONOBLOCK_MODULES)throw new Error(`O MONOBLOCO permite no máximo ${MAX_MONOBLOCK_MODULES} módulos.`);
+    let rows=projectRoomInstanceModules.filter(row=>row.room_instance_id===instanceId).sort((a,b)=>(a.module_number||0)-(b.module_number||0));
+    const active=rows.filter(row=>row.active),inactive=rows.filter(row=>!row.active);
+    while(active.length<desired&&inactive.length){const row=inactive.shift();const changes={active:true,updated_at:new Date().toISOString()};if(def?.monoblock){changes.has_lower_part=false;changes.has_upper_part=false;}const{error}=await sb.from("project_room_instance_modules").update(changes).eq("id",row.id);if(error)throw error;row.active=true;if(def?.monoblock){row.has_lower_part=false;row.has_upper_part=false;}active.push(row);}
+    let next=Math.max(0,...rows.map(row=>Number(row.module_number||0)))+1;
+    while(active.length<desired){const number=next++;const code=`${safeStructureCode(instance.code||instance.display_name,"SALA")}-M${String(number).padStart(2,"0")}`;const display=`Módulo ${String(number).padStart(2,"0")}`;const hasParts=!def?.monoblock;const{data,error}=await sb.from("project_room_instance_modules").insert({room_instance_id:instanceId,module_number:number,code,display_name:display,order_index:number,has_lower_part:hasParts,has_upper_part:hasParts,active:true}).select("*").single();if(error)throw error;projectRoomInstanceModules.push(data);active.push(data);}
+    if(active.length>desired){for(const row of active.slice(desired)){const{error}=await sb.from("project_room_instance_modules").update({active:false,updated_at:new Date().toISOString()}).eq("id",row.id);if(error)throw error;row.active=false;}}
+  }
+
+
+  function resetProjectStructureSelection(){
+    const composition=$("projectCompositionProject");
+    const moduleProject=$("projectRoomModuleProject");
+    const moduleRoom=$("projectRoomModuleRoom");
+    const roomCatalog=$("projectRoomInstanceRoom");
+
+    if(composition)composition.value="";
+    if(moduleProject)moduleProject.value="";
+    if(roomCatalog)roomCatalog.value="";
+
+    if(moduleRoom){
+      moduleRoom.innerHTML='<option value="">Selecione primeiro o projeto</option>';
+      moduleRoom.value="";
+      moduleRoom.disabled=true;
+    }
+
+    if($("projectRoomInstanceCount"))$("projectRoomInstanceCount").value="1";
+    if($("projectRoomInstanceModuleCount"))$("projectRoomInstanceModuleCount").value="1";
+    if($("projectRoomInstanceNamePrefix"))$("projectRoomInstanceNamePrefix").value="";
+
+    selectedProjectRoomIds.clear();
+    renderProjectComposition();
+    renderProjectStructureTables();
+  }
+
+  function renderProjectComposition(){
+    const projectId=$("projectCompositionProject")?.value;const status=$("projectCompositionStatus");
+    const count=projectRoomInstances.filter(row=>row.project_id===projectId&&row.active).length;
+    if(status)status.innerHTML=projectId?`<strong>${esc(projectName(projectId))}</strong><span>${count} sala${count===1?"":"s"} cadastrada${count===1?"":"s"}</span>`:"Selecione um projeto para configurar.";
+  }
+
+  const selectedProjectRoomIds=new Set();
+
+  function visibleProjectRoomIds(){
+    return Array.from(document.querySelectorAll('#projectRoomsTable [data-select-room-instance]')).map(input=>input.dataset.selectRoomInstance);
+  }
+
+  function updateProjectRoomBulkActions(){
+    const visible=visibleProjectRoomIds();
+    const selectedVisible=visible.filter(id=>selectedProjectRoomIds.has(id));
+    const count=$('selectedProjectRoomsCount');
+    if(count)count.textContent=`${selectedProjectRoomIds.size} selecionada${selectedProjectRoomIds.size===1?'':'s'}`;
+    const all=$('selectAllProjectRooms');
+    if(all){
+      all.checked=visible.length>0&&selectedVisible.length===visible.length;
+      all.indeterminate=selectedVisible.length>0&&selectedVisible.length<visible.length;
+    }
+    ['clearSelectedProjectRoomsBtn','inactivateSelectedProjectRoomsBtn','deleteSelectedProjectRoomsBtn'].forEach(id=>{
+      const button=$(id);if(button)button.disabled=selectedProjectRoomIds.size===0;
+    });
+  }
+
+  function renderProjectStructureTables(){
+    const projectId=$("projectCompositionProject")?.value||"";
+
+    // A tabela de salas é um cadastro geral e mostra todos os projetos,
+    // independentemente do projeto selecionado no formulário superior.
+    const allRoomRows=[...projectRoomInstances].sort((a,b)=>{
+      const projectComparison=projectName(a.project_id).localeCompare(projectName(b.project_id),"pt-BR");
+      if(projectComparison)return projectComparison;
+
+      const roomComparison=roomCatalogCode(a.room_id).localeCompare(roomCatalogCode(b.room_id),"pt-BR");
+      if(roomComparison)return roomComparison;
+
+      return (a.order_index||0)-(b.order_index||0)
+        ||(a.instance_number||0)-(b.instance_number||0);
+    });
+
+    const projectFilter=$("projectRoomsProjectFilter");
+    const typeFilter=$("projectRoomsTypeFilter");
+
+    if(projectFilter){
+      const previousProject=projectFilter.value;
+      const projectIds=[...new Set(
+        allRoomRows.map(row=>row.project_id).filter(Boolean)
+      )].sort((a,b)=>projectName(a).localeCompare(projectName(b),"pt-BR"));
+
+      projectFilter.innerHTML=
+        '<option value="">Todos os projetos</option>'+
+        projectIds.map(id=>`<option value="${id}">${esc(projectName(id))}</option>`).join("");
+
+      if(projectIds.includes(previousProject)){
+        projectFilter.value=previousProject;
+      }
+    }
+
+    if(typeFilter){
+      const previousType=typeFilter.value;
+      const roomIds=[...new Set(
+        allRoomRows.map(row=>row.room_id).filter(Boolean)
+      )].sort((a,b)=>{
+        const codeComparison=roomCatalogCode(a).localeCompare(roomCatalogCode(b),"pt-BR");
+        return codeComparison||roomCatalogName(a).localeCompare(roomCatalogName(b),"pt-BR");
+      });
+
+      typeFilter.innerHTML=
+        '<option value="">Todos os tipos</option>'+
+        roomIds.map(id=>`<option value="${id}">${esc(roomCatalogCode(id))} — ${esc(roomCatalogName(id))}</option>`).join("");
+
+      if(roomIds.includes(previousType)){
+        typeFilter.value=previousType;
+      }
+    }
+
+    const searchText=normalizeText($("projectRoomsSearch")?.value||"");
+    const selectedProject=$("projectRoomsProjectFilter")?.value||"";
+    const selectedType=$("projectRoomsTypeFilter")?.value||"";
+    const selectedStatus=$("projectRoomsStatusFilter")?.value||"";
+
+    const roomRows=allRoomRows.filter(row=>{
+      if(selectedProject&&row.project_id!==selectedProject)return false;
+      if(selectedType&&row.room_id!==selectedType)return false;
+      if(selectedStatus==="active"&&!row.active)return false;
+      if(selectedStatus==="inactive"&&row.active)return false;
+
+      if(searchText){
+        const searchable=normalizeText([
+          projectName(row.project_id),
+          roomCatalogCode(row.room_id),
+          roomCatalogName(row.room_id),
+          row.display_name,
+          row.instance_number,
+          instanceModuleCount(row.id)
+        ].join(" "));
+
+        if(!searchable.includes(searchText))return false;
+      }
+
+      return true;
+    });
+
+    // A área avançada de módulos continua vinculada ao projeto selecionado,
+    // para evitar misturar módulos de projetos diferentes.
+    const moduleRows=projectId
+      ? projectRoomInstanceModules.filter(row=>{
+          const instance=projectRoomInstances.find(item=>item.id===row.room_instance_id);
+          return instance&&instance.project_id===projectId;
+        }).sort((a,b)=>{
+          const instanceA=projectRoomInstances.find(item=>item.id===a.room_instance_id);
+          const instanceB=projectRoomInstances.find(item=>item.id===b.room_instance_id);
+          const roomComparison=roomInstanceName(instanceA?.id).localeCompare(roomInstanceName(instanceB?.id),"pt-BR");
+          return roomComparison||(a.order_index||0)-(b.order_index||0);
+        })
+      : [];
+
+    const activeRoomCount=allRoomRows.filter(row=>row.active).length;
+    if($("projectRoomsCount")){
+      $("projectRoomsCount").textContent=`${activeRoomCount} sala${activeRoomCount===1?"":"s"}`;
+    }
+
+    if($("projectRoomsFilterCount")){
+      const total=allRoomRows.length;
+      const visible=roomRows.length;
+      $("projectRoomsFilterCount").textContent=
+        visible===total
+          ?`${total} resultado${total===1?"":"s"}`
+          :`${visible} de ${total} salas`;
+    }
+
+    const existingRoomIds=new Set(projectRoomInstances.map(row=>row.id));
+    Array.from(selectedProjectRoomIds).forEach(id=>{
+      if(!existingRoomIds.has(id))selectedProjectRoomIds.delete(id);
+    });
+
+    $("projectRoomsTable").innerHTML=roomRows.map(row=>`<tr>
+      <td><input class="room-instance-selector" type="checkbox" data-select-room-instance="${row.id}" ${selectedProjectRoomIds.has(row.id)?"checked":""} aria-label="Selecionar ${esc(row.display_name||roomCatalogName(row.room_id))}"></td>
+      <td>${esc(projectName(row.project_id))}</td>
+      <td>${esc(roomCatalogCode(row.room_id))}</td>
+      <td>${esc(row.display_name||roomCatalogName(row.room_id))}</td>
+      <td>${row.instance_number}</td>
+      <td><strong>${instanceModuleCount(row.id)}</strong></td>
+      <td><span class="badge">${row.active?"Ativa":"Inativa"}</span></td>
+      <td><div class="table-actions">
+        <button class="btn primary small" data-edit-room-instance="${row.id}">Editar</button>
+        <button class="btn secondary small" data-toggle-room-instance="${row.id}" data-active="${row.active}">${row.active?"Inativar":"Ativar"}</button>
+        <button class="btn danger small" data-delete-room-instance="${row.id}">Excluir</button>
+      </div></td>
+    </tr>`).join("")||(
+      allRoomRows.length
+        ?'<tr><td colspan="8" class="empty">Nenhuma sala encontrada com os filtros selecionados.</td></tr>'
+        :'<tr><td colspan="8" class="empty">Nenhuma sala cadastrada.</td></tr>'
+    );
+
+    updateProjectRoomBulkActions();
+
+    if($("projectRoomModulesCount")){
+      const activeModuleCount=moduleRows.filter(row=>row.active).length;
+      $("projectRoomModulesCount").textContent=`${activeModuleCount} módulo${activeModuleCount===1?"":"s"}`;
+    }
+
+    $("projectRoomModulesTable").innerHTML=moduleRows.map(row=>{
+      const instance=projectRoomInstances.find(item=>item.id===row.room_instance_id);
+      const monoblock=isMonoblockRoomInstance(instance?.id);
+      const parts=monoblock
+        ?"Não se aplica"
+        :([row.has_lower_part?"Inferior":"",row.has_upper_part?"Superior":""].filter(Boolean).join(" + ")||"Nenhuma");
+
+      return `<tr>
+        <td>${esc(projectName(instance?.project_id))}</td>
+        <td>${esc(roomInstanceName(row.room_instance_id))}</td>
+        <td>${esc(row.code)}</td>
+        <td>${esc(row.display_name)}</td>
+        <td>${esc(parts)}</td>
+        <td><span class="badge">${row.active?"Ativo":"Inativo"}</span></td>
+        <td><div class="table-actions">
+          <button class="btn primary small" data-edit-instance-module="${row.id}">Editar</button>
+          <button class="btn secondary small" data-toggle-instance-module="${row.id}" data-active="${row.active}">${row.active?"Inativar":"Ativar"}</button>
+          <button class="btn danger small" data-delete-instance-module="${row.id}">Excluir</button>
+        </div></td>
+      </tr>`;
+    }).join("")||(
+      projectId
+        ?'<tr><td colspan="7" class="empty">Nenhum módulo cadastrado para este projeto</td></tr>'
+        :'<tr><td colspan="7" class="empty">Selecione um projeto para visualizar os módulos avançados</td></tr>'
+    );
+  }
+
+  async function deleteRoomInstance(id){const{error}=await sb.from("project_room_instances").delete().eq("id",id);if(error)throw error;}
+  async function deleteRoomInstanceModule(id){const{error}=await sb.from("project_room_instance_modules").delete().eq("id",id);if(error)throw error;}
+
+
+  function setActivityWorkbookStatus(message,error=false){
+    const element=$("activityWorkbookStatus");
+    if(!element)return;
+    element.textContent=message;
+    element.classList.toggle("error",error);
+  }
+
+  function updateActivityBulkActions(){
+    const count=selectedActivityIds.size;
+    const countElement=$("selectedActivitiesCount");
+    const selectAll=$("selectAllVisibleActivities");
+    const clearButton=$("clearSelectedActivitiesBtn");
+    const inactivateButton=$("inactivateSelectedActivitiesBtn");
+    const deleteButton=$("deleteSelectedActivitiesBtn");
+
+    if(countElement){
+      countElement.textContent=`${count} selecionada${count===1?"":"s"}`;
+    }
+
+    [clearButton,inactivateButton,deleteButton].forEach(button=>{
+      if(button)button.disabled=count===0;
+    });
+
+    if(selectAll){
+      const selectedVisible=visibleActivityIds.filter(id=>selectedActivityIds.has(id)).length;
+      selectAll.disabled=!isAdmin()||visibleActivityIds.length===0;
+      selectAll.checked=visibleActivityIds.length>0&&selectedVisible===visibleActivityIds.length;
+      selectAll.indeterminate=selectedVisible>0&&selectedVisible<visibleActivityIds.length;
+    }
+  }
+
+  function clearActivitySelection(){
+    selectedActivityIds.clear();
+    document.querySelectorAll("[data-select-activity]").forEach(input=>{
+      input.checked=false;
+    });
+    updateActivityBulkActions();
+  }
+
+  function normalizeActivityWorkbookHeader(value){
+    return normalizeText(value)
+      .replace(/[^a-z0-9]+/g,"_")
+      .replace(/^_+|_+$/g,"");
+  }
+
+  function activityWorkbookRowMap(row){
+    const mapped={};
+    Object.entries(row||{}).forEach(([key,value])=>{
+      mapped[normalizeActivityWorkbookHeader(key)]=value;
+    });
+    return mapped;
+  }
+
+  function workbookValue(row,aliases){
+    for(const alias of aliases){
+      const key=normalizeActivityWorkbookHeader(alias);
+      if(Object.prototype.hasOwnProperty.call(row,key))return row[key];
+    }
+    return "";
+  }
+
+  function truthySpreadsheetValue(value){
+    const normalized=normalizeText(value);
+    return ["sim","s","x","1","true","verdadeiro","ativo","ativa"].includes(normalized);
+  }
+
+  function parseSpreadsheetObservationRequirement(value,currentValue="Opcional"){
+    const normalized=normalizeText(value);
+    if(!normalized)return normalizeObservationRequirement(currentValue);
+
+    if([
+      "obrigatoria",
+      "obrigatorio",
+      "sim",
+      "s"
+    ].includes(normalized)){
+      return "Obrigatória";
+    }
+
+    if([
+      "opcional",
+      "nao",
+      "n",
+      "recomendado",
+      "recomendada"
+    ].includes(normalized)){
+      return "Opcional";
+    }
+
+    throw new Error(
+      `Observação inválida: "${value}". Use Opcional ou Obrigatória.`
+    );
+  }
+
+  function parseSpreadsheetActive(value,currentValue=true){
+    const normalized=normalizeText(value);
+    if(!normalized)return currentValue;
+    if(["inativo","inativa","nao","não","n","0","false","falso"].includes(normalized))return false;
+    if(["ativo","ativa","sim","s","1","true","verdadeiro"].includes(normalized))return true;
+    throw new Error(`Status inválido: "${value}". Use Ativa ou Inativa.`);
+  }
+
+  function parseSpreadsheetAreas(row){
+    const combined=String(workbookValue(row,[
+      "Áreas aplicáveis (códigos)",
+      "Areas aplicaveis codigos",
+      "Áreas aplicáveis",
+      "Areas",
+      "Area"
+    ])||"").trim();
+
+    const resolved=[];
+    const invalid=[];
+
+    const addAreaToken=token=>{
+      const clean=String(token||"").trim();
+      if(!clean)return;
+
+      const normalized=normalizeText(clean);
+      const area=workAreas.find(item=>
+        normalizeText(item.code)===normalized||
+        normalizeText(item.name)===normalized
+      );
+
+      if(area){
+        if(!resolved.includes(area.code))resolved.push(area.code);
+      }else{
+        invalid.push(clean);
+      }
+    };
+
+    if(combined){
+      combined.split(/[;,|\n]+/).forEach(addAreaToken);
+    }
+
+    if(!combined){
+      workAreas.forEach(area=>{
+        const keys=[
+          area.code,
+          area.name,
+          `Área ${area.code}`,
+          `Area ${area.code}`
+        ];
+
+        const marked=keys.some(key=>
+          truthySpreadsheetValue(workbookValue(row,[key]))
+        );
+
+        if(marked&&!resolved.includes(area.code))resolved.push(area.code);
+      });
+    }
+
+    return {codes:resolved,invalid};
+  }
+
+  function activityWorkbookRows(){
+    return [...activities]
+      .sort((a,b)=>
+        String(a.code||"").localeCompare(String(b.code||""),"pt-BR")||
+        a.name.localeCompare(b.name,"pt-BR")
+      )
+      .map(activity=>({
+        "ID":activity.id,
+        "Código":normalizeActivityCode(activity.code),
+        "Atividade":activity.name,
+        "Disciplina":activity.discipline_name||"",
+        "Natureza":activity.nature||"",
+        "Áreas aplicáveis (códigos)":activityAreas(activity.id).join("; "),
+        "Orientação de uso":activity.usage_description||"",
+        "Observação":normalizeObservationRequirement(activity.observation_requirement),
+        "Status":activity.active?"Ativa":"Inativa"
+      }));
+  }
+
+  function downloadActivitiesWorkbook(){
+    if(!isAdmin()){
+      toast("Somente o Administrador pode baixar a lista de atividades.",true);
+      return;
+    }
+
+    if(!window.XLSX){
+      toast("Biblioteca de Excel não carregada. Atualize a página e tente novamente.",true);
+      return;
+    }
+
+    const workbook=XLSX.utils.book_new();
+    const rows=activityWorkbookRows();
+    const activitySheet=XLSX.utils.json_to_sheet(rows,{
+      header:[
+        "ID",
+        "Código",
+        "Atividade",
+        "Disciplina",
+        "Natureza",
+        "Áreas aplicáveis (códigos)",
+        "Orientação de uso",
+        "Observação",
+        "Status"
+      ]
+    });
+
+    activitySheet["!cols"]=[
+      {wch:38},
+      {wch:16},
+      {wch:48},
+      {wch:28},
+      {wch:22},
+      {wch:30},
+      {wch:58},
+      {wch:14},
+      {wch:12}
+    ];
+    activitySheet["!autofilter"]={ref:`A1:I${Math.max(rows.length+1,2)}`};
+
+    const instructionRows=[
+      ["IMPORTAÇÃO DE ATIVIDADES — APONTA P3"],
+      [""],
+      ["Regra","Orientação"],
+      ["ID","Não altere o ID das atividades existentes. Para criar uma nova atividade, deixe o ID vazio."],
+      ["Código","Use códigos sem o prefixo EM-. Exemplo: SST-020."],
+      ["Atividade","Campo obrigatório e único."],
+      ["Áreas aplicáveis (códigos)","Informe um ou mais códigos separados por ponto e vírgula. Exemplo: FAB; MES; MFI."],
+      ["Observação","Use Opcional ou Obrigatória."],
+      ["Status","Use Ativa ou Inativa."],
+      ["Exclusão","Apagar uma linha do Excel não exclui a atividade do sistema. Use a seleção em massa no aplicativo."],
+      ["Histórico","Atividades que possuem apontamentos podem ser atualizadas ou inativadas, mas não excluídas."]
+    ];
+    const instructionSheet=XLSX.utils.aoa_to_sheet(instructionRows);
+    instructionSheet["!cols"]=[{wch:32},{wch:100}];
+
+    const areaRows=[
+      ["Código","Área","Ativa"],
+      ...workAreas.map(area=>[area.code,area.name,area.active?"Sim":"Não"])
+    ];
+    const areaSheet=XLSX.utils.aoa_to_sheet(areaRows);
+    areaSheet["!cols"]=[{wch:14},{wch:34},{wch:10}];
+    areaSheet["!autofilter"]={ref:`A1:C${Math.max(areaRows.length,2)}`};
+
+    XLSX.utils.book_append_sheet(workbook,activitySheet,"Atividades");
+    XLSX.utils.book_append_sheet(workbook,instructionSheet,"Instruções");
+    XLSX.utils.book_append_sheet(workbook,areaSheet,"Áreas");
+
+    XLSX.writeFile(workbook,`Lista_Atividades_Aponta_P3_${today()}.xlsx`);
+    setActivityWorkbookStatus(`${rows.length} atividades exportadas para Excel.`);
+  }
+
+  async function parseActivitiesWorkbook(file){
+    if(!window.XLSX)throw new Error("Biblioteca de Excel não carregada.");
+    if(!file)throw new Error("Selecione o arquivo de atividades.");
+    if(file.size>10*1024*1024)throw new Error("O arquivo deve ter no máximo 10 MB.");
+
+    const arrayBuffer=await file.arrayBuffer();
+    const workbook=XLSX.read(arrayBuffer,{type:"array",cellDates:false});
+
+    const sheetName=workbook.SheetNames.find(name=>
+      normalizeText(name)==="atividades"
+    )||workbook.SheetNames[0];
+
+    if(!sheetName)throw new Error("O arquivo não possui nenhuma planilha.");
+
+    const rawRows=XLSX.utils.sheet_to_json(workbook.Sheets[sheetName],{
+      defval:"",
+      raw:false
+    });
+
+    const rows=[];
+    const duplicateCodes=new Set();
+    const duplicateNames=new Set();
+    const seenCodes=new Set();
+    const seenNames=new Set();
+
+    rawRows.forEach((rawRow,index)=>{
+      const row=activityWorkbookRowMap(rawRow);
+      const id=String(workbookValue(row,["ID","atividade_id"])||"").trim();
+      const code=normalizeActivityCode(workbookValue(row,["Código","Codigo","code"]));
+      const name=String(workbookValue(row,["Atividade","Nome","activity","name"])||"").trim();
+      const disciplineName=String(workbookValue(row,["Disciplina","discipline_name"])||"").trim();
+      const nature=String(workbookValue(row,["Natureza","nature"])||"").trim();
+      const usageDescription=String(workbookValue(row,[
+        "Orientação de uso",
+        "Orientacao de uso",
+        "usage_description"
+      ])||"").trim();
+
+      if(!id&&!code&&!name)return;
+      if(!name)throw new Error(`Linha ${index+2}: informe o nome da atividade.`);
+
+      const current=
+        activities.find(activity=>activity.id===id)||
+        (code?activities.find(activity=>normalizeActivityCode(activity.code)===code):null)||
+        activities.find(activity=>normalizeText(activity.name)===normalizeText(name));
+
+      const observationRequirement=parseSpreadsheetObservationRequirement(
+        workbookValue(row,[
+          "Observação",
+          "Observacao",
+          "Observação obrigatória",
+          "Observacao obrigatoria",
+          "observation_requirement"
+        ]),
+        current?.observation_requirement||"Opcional"
+      );
+
+      const active=parseSpreadsheetActive(
+        workbookValue(row,["Status","Ativo","Active"]),
+        current?.active??true
+      );
+
+      const areaResult=parseSpreadsheetAreas(row);
+      if(areaResult.invalid.length){
+        throw new Error(
+          `Linha ${index+2}: área(s) inválida(s): ${areaResult.invalid.join(", ")}.`
+        );
+      }
+      if(!areaResult.codes.length){
+        throw new Error(`Linha ${index+2}: informe pelo menos uma área aplicável.`);
+      }
+
+      if(code){
+        if(seenCodes.has(code))duplicateCodes.add(code);
+        seenCodes.add(code);
+      }
+
+      const normalizedName=normalizeText(name);
+      if(seenNames.has(normalizedName))duplicateNames.add(name);
+      seenNames.add(normalizedName);
+
+      rows.push({
+        row_number:index+2,
+        id:id||null,
+        code:code||null,
+        name,
+        discipline_name:disciplineName,
+        nature,
+        usage_description:usageDescription,
+        observation_requirement:observationRequirement,
+        active,
+        areas:areaResult.codes
+      });
+    });
+
+    if(!rows.length)throw new Error("Nenhuma atividade válida foi encontrada no arquivo.");
+    if(duplicateCodes.size){
+      throw new Error(`Códigos repetidos no arquivo: ${[...duplicateCodes].join(", ")}.`);
+    }
+    if(duplicateNames.size){
+      throw new Error(`Atividades repetidas no arquivo: ${[...duplicateNames].join(", ")}.`);
+    }
+
+    return rows;
+  }
+
+  async function uploadActivitiesWorkbook(file){
+    if(!isAdmin()){
+      toast("Somente o Administrador pode enviar a lista de atividades.",true);
+      return;
+    }
+
+    showLoading(true);
+    setActivityWorkbookStatus("Lendo e validando o arquivo...");
+
+    try{
+      const rows=await parseActivitiesWorkbook(file);
+      let predictedCreated=0;
+      let predictedUpdated=0;
+
+      rows.forEach(row=>{
+        const existing=
+          (row.id&&activities.some(activity=>activity.id===row.id))||
+          (row.code&&activities.some(activity=>normalizeActivityCode(activity.code)===row.code))||
+          activities.some(activity=>normalizeText(activity.name)===normalizeText(row.name));
+
+        if(existing)predictedUpdated+=1;
+        else predictedCreated+=1;
+      });
+
+      const confirmed=window.confirm(
+        `Importar ${rows.length} atividade${rows.length===1?"":"s"}?\n\n`+
+        `${predictedUpdated} serão atualizadas e ${predictedCreated} serão criadas.\n\n`+
+        "As linhas ausentes no Excel não serão excluídas."
+      );
+      if(!confirmed){
+        setActivityWorkbookStatus("Importação cancelada.");
+        return;
+      }
+
+      setActivityWorkbookStatus(`Importando ${rows.length} atividades...`);
+
+      const {data,error}=await sb.rpc(
+        "aponta_import_activities_v2180",
+        {p_rows:rows}
+      );
+
+      if(error)throw error;
+
+      clearActivitySelection();
+      await reloadCatalogs();
+
+      const created=Number(data?.created||0);
+      const updated=Number(data?.updated||0);
+      setActivityWorkbookStatus(
+        `Importação concluída: ${created} criada${created===1?"":"s"} e `+
+        `${updated} atualizada${updated===1?"":"s"}.`
+      );
+      toast("Lista de atividades atualizada.");
+    }catch(error){
+      console.error(error);
+      setActivityWorkbookStatus(
+        error?.message||
+        "Não foi possível importar a lista de atividades.",
+        true
+      );
+      toast(
+        error?.message||
+        "Não foi possível importar a lista de atividades.",
+        true
+      );
+    }finally{
+      showLoading(false);
+      const input=$("activitiesWorkbookFile");
+      if(input)input.value="";
+    }
+  }
+
+)
+        );
+        if(!match)return;
+
+        const number=Number(match[1]);
+        if(number>greatest){
+          greatest=number;
+          greatestDigits=Math.max(3,match[1].length);
+          latest=code;
+        }
+      });
+
+    const nextNumber=greatest+1;
+    const next=`${prefix}-${String(nextNumber).padStart(greatestDigits,"0")}`;
+
+    return {
+      discipline,
+      prefix,
+      latest,
+      next
+    };
+  }
+
+  function updateActivityCodeSequence(mode="create",autoFill=false){
+    const isEdit=mode==="edit";
+    const discipline=$(isEdit?"editActivityDiscipline":"activityDiscipline");
+    const code=$(isEdit?"editActivityCode":"activityCode");
+    const hint=$(isEdit?"editActivityCodeSequenceHint":"activityCodeSequenceHint");
+
+    if(!discipline||!code||!hint)return;
+
+    const sequence=activityCodeSequence(discipline.value);
+
+    if(!sequence){
+      hint.textContent=
+        "Selecione a disciplina para consultar o último código cadastrado.";
+      if(!isEdit)code.placeholder="Selecione primeiro a disciplina";
+      return;
+    }
+
+    if(!sequence.prefix){
+      hint.textContent=
+        "Nenhum prefixo foi encontrado para esta disciplina. Informe o código manualmente.";
+      code.placeholder="Informe o código";
+      return;
+    }
+
+    if(sequence.latest){
+      hint.textContent=
+        `Último código cadastrado: ${sequence.latest} • `+
+        `Próximo sugerido: ${sequence.next}`;
+    }else{
+      hint.textContent=
+        `Nenhum código cadastrado nesta disciplina • `+
+        `Primeiro sugerido: ${sequence.next}`;
+    }
+
+    code.placeholder=sequence.next;
+
+    if(
+      autoFill&&
+      !isEdit&&
+      (!code.value.trim()||code.dataset.sequenceSuggested==="true")
+    ){
+      code.value=sequence.next;
+      code.dataset.sequenceSuggested="true";
+    }
+  }
+
+  const activityDisciplineSelect=$("activityDiscipline");
+  if(activityDisciplineSelect){
+    activityDisciplineSelect.addEventListener("change",()=>{
+      updateActivityCodeSequence("create",true);
+    });
+  }
+
+  const editActivityDisciplineSelect=$("editActivityDiscipline");
+  if(editActivityDisciplineSelect){
+    editActivityDisciplineSelect.addEventListener("change",()=>{
+      updateActivityCodeSequence("edit",false);
+    });
+  }
+
+  const activityCodeInput=$("activityCode");
+  if(activityCodeInput){
+    activityCodeInput.addEventListener("input",()=>{
+      activityCodeInput.dataset.sequenceSuggested="false";
+    });
+  }
   function populateActivityFilterOptions(){
     const areaSelect=$("activityFilterArea");
     const disciplineSelect=$("activityFilterDiscipline");
@@ -3893,6 +7987,7 @@
   }
 
   function renderActivitiesCatalog(){
+    populateActivityFormOptions();
     populateActivityFilterOptions();
     const rows=filteredCatalogActivities();
     const total=activities.length;
@@ -4119,6 +8214,7 @@
     const deleteId=e.target.dataset.deleteActivity;
     if(editId){
       const x=activities.find(a=>a.id===editId);
+      populateActivityFormOptions(x.discipline_name||"",x.nature||"");
       $("editActivityId").value=x.id;
       $("editActivityCode").value=normalizeActivityCode(x.code);
       $("editActivityName").value=x.name;
