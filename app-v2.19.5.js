@@ -1039,7 +1039,7 @@
     setEntryStepNumbers(prefix,areaCode);
   }
 
-  function filteredActivities(areaCode) {
+  function filteredEntryActivities(areaCode) {
     if (!areaCode) return [];
     const ids=new Set(activityAreaLinks.filter(link=>link.area_code===areaCode).map(link=>link.activity_id));
     return activities.filter(activity=>activity.active && ids.has(activity.id));
@@ -1047,7 +1047,7 @@
 
   function setActivityOptions(prefix, selectedActivityId = "") {
     const areaCode=$(prefix+"Area").value;
-    const rows=filteredActivities(areaCode);
+    const rows=filteredEntryActivities(areaCode);
     const select=$(prefix+"Activity");
     select.innerHTML=optionsWithPlaceholder(rows,row=>`${row.code?row.code+" — ":""}${row.name}`,row=>row.id,areaCode?"Selecione a atividade":"Selecione primeiro a área");
     select.disabled=!areaCode;
@@ -1162,8 +1162,25 @@
       $(prefix+"Room").focus();
       return false;
     }
-    if (!$(prefix+"Activity").value) {
+    const selectedActivityId=$(prefix+"Activity").value;
+    if (!selectedActivityId) {
       toast("Selecione a atividade.",true);
+      $(prefix+"Activity").focus();
+      return false;
+    }
+
+    const activityBelongsToSelectedArea=activityAreaLinks.some(link=>
+      String(link.activity_id||"")===String(selectedActivityId||"")&&
+      String(link.area_code||"").trim().toUpperCase()===
+        String(area||"").trim().toUpperCase()
+    );
+
+    if(!activityBelongsToSelectedArea){
+      toast(
+        "A atividade selecionada não pertence à área informada. "+
+        "Escolha uma atividade exibida para esta área.",
+        true
+      );
       $(prefix+"Activity").focus();
       return false;
     }
@@ -3846,7 +3863,7 @@
     }
   }
 
-  function filteredActivities(){
+  function filteredCatalogActivities(){
     const search=normalizeText($("activityFilterSearch")?.value);
     const area=$("activityFilterArea")?.value||"";
     const discipline=$("activityFilterDiscipline")?.value||"";
@@ -3877,7 +3894,7 @@
 
   function renderActivitiesCatalog(){
     populateActivityFilterOptions();
-    const rows=filteredActivities();
+    const rows=filteredCatalogActivities();
     const total=activities.length;
     const filtered=rows.length!==total||Boolean(
       $("activityFilterSearch")?.value||
@@ -5804,7 +5821,7 @@
 
   if("serviceWorker" in navigator && location.protocol.startsWith("http")){
     navigator.serviceWorker
-      .register("sw.js?v=2.19.5", {updateViaCache:"none"})
+      .register("sw.js?v=2.19.8", {updateViaCache:"none"})
       .then(async registration=>{
         await registration.update();
         if(registration.waiting){
@@ -6323,5 +6340,5 @@
     }, 350);
   });
 
-  window.APONTA_P3_VERSION = "2.19.5";
+  window.APONTA_P3_VERSION = "2.19.8";
 })();
