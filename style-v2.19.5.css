@@ -3643,209 +3643,126 @@ main,
   }
 }
 
-/* Aponta Horas v2.19.17 — ajustar distribuição das colunas de Apontamentos */
+/* Aponta Horas v2.19.18 — somente larguras das colunas de Apontamentos */
 
-/* Mais espaço para o histórico, sem juntar nenhuma informação. */
-#entries > .grid{
-  display:grid;
-  grid-template-columns:minmax(390px,3fr) minmax(0,9fr);
-  gap:10px;
-  align-items:start;
-}
+/*
+  Este bloco não altera:
+  - formulário;
+  - proporção entre os cards;
+  - filtros;
+  - botões;
+  - conteúdo;
+  - quantidade de colunas.
+*/
 
-#entries > .grid > .card{
-  min-width:0;
-}
-
-#entries > .grid > .card.span-4,
-#entries > .grid > .card.span-8{
-  grid-column:auto;
-}
-
-/* Filtros do histórico mais próximos e alinhados. */
-#entries .card.span-8 .filters{
-  display:grid;
-  grid-template-columns:minmax(170px,1fr) 132px 132px auto;
-  gap:6px;
-  align-items:end;
-}
-
-#entries .card.span-8 .filters label{
-  min-width:0;
-}
-
-#entries .card.span-8 .filters .btn{
-  min-height:40px;
-  padding-left:14px;
-  padding-right:14px;
-  white-space:nowrap;
-}
-
-/* Mantém todas as dez colunas separadas. */
-#entries .table-wrap{
+#entries .card.span-8 .table-wrap{
   overflow:auto;
   max-height:610px;
 }
 
-#entries .table-wrap table{
+#entries .card.span-8 .table-wrap table{
   width:100%;
-  min-width:1080px;
+  min-width:1040px;
   table-layout:fixed;
-  font-size:12.5px;
 }
 
-#entries .table-wrap th,
-#entries .table-wrap td{
-  padding:7px 6px;
+#entries .card.span-8 .table-wrap th,
+#entries .card.span-8 .table-wrap td{
+  padding-left:5px;
+  padding-right:5px;
   vertical-align:middle;
-  line-height:1.3;
-}
-
-#entries .table-wrap th{
-  font-size:11.5px;
-  white-space:normal;
+  line-height:1.28;
 }
 
 /* Selecionar */
-#entries .table-wrap th:nth-child(1),
-#entries .table-wrap td:nth-child(1){
-  width:42px;
-  min-width:42px;
+#entries .card.span-8 .table-wrap th:nth-child(1),
+#entries .card.span-8 .table-wrap td:nth-child(1){
+  width:4%;
   text-align:center;
 }
 
 /* Data */
-#entries .table-wrap th:nth-child(2),
-#entries .table-wrap td:nth-child(2){
-  width:72px;
-  min-width:72px;
+#entries .card.span-8 .table-wrap th:nth-child(2),
+#entries .card.span-8 .table-wrap td:nth-child(2){
+  width:7%;
+  white-space:nowrap;
 }
 
 /* Colaborador */
-#entries .table-wrap th:nth-child(3),
-#entries .table-wrap td:nth-child(3){
-  width:140px;
-  min-width:140px;
+#entries .card.span-8 .table-wrap th:nth-child(3),
+#entries .card.span-8 .table-wrap td:nth-child(3){
+  width:12%;
 }
 
 /* Projeto */
-#entries .table-wrap th:nth-child(4),
-#entries .table-wrap td:nth-child(4){
-  width:162px;
-  min-width:162px;
+#entries .card.span-8 .table-wrap th:nth-child(4),
+#entries .card.span-8 .table-wrap td:nth-child(4){
+  width:14%;
 }
 
 /* Área */
-#entries .table-wrap th:nth-child(5),
-#entries .table-wrap td:nth-child(5){
-  width:120px;
-  min-width:120px;
+#entries .card.span-8 .table-wrap th:nth-child(5),
+#entries .card.span-8 .table-wrap td:nth-child(5){
+  width:11%;
 }
 
 /* Referência */
-#entries .table-wrap th:nth-child(6),
-#entries .table-wrap td:nth-child(6){
-  width:145px;
-  min-width:145px;
+#entries .card.span-8 .table-wrap th:nth-child(6),
+#entries .card.span-8 .table-wrap td:nth-child(6){
+  width:12%;
 }
 
-/* Atividade — recebe a maior parte do espaço liberado. */
-#entries .table-wrap th:nth-child(7),
-#entries .table-wrap td:nth-child(7){
-  width:auto;
-  min-width:245px;
+/* Atividade */
+#entries .card.span-8 .table-wrap th:nth-child(7),
+#entries .card.span-8 .table-wrap td:nth-child(7){
+  width:20%;
 }
 
 /* Horas */
-#entries .table-wrap th:nth-child(8),
-#entries .table-wrap td:nth-child(8){
-  width:58px;
-  min-width:58px;
+#entries .card.span-8 .table-wrap th:nth-child(8),
+#entries .card.span-8 .table-wrap td:nth-child(8){
+  width:5%;
   text-align:center;
+  white-space:nowrap;
 }
 
 /* Status */
-#entries .table-wrap th:nth-child(9),
-#entries .table-wrap td:nth-child(9){
-  width:78px;
-  min-width:78px;
+#entries .card.span-8 .table-wrap th:nth-child(9),
+#entries .card.span-8 .table-wrap td:nth-child(9){
+  width:6%;
   text-align:center;
+  white-space:nowrap;
 }
 
 /* Ações */
-#entries .table-wrap th:nth-child(10),
-#entries .table-wrap td:nth-child(10){
-  width:96px;
-  min-width:96px;
+#entries .card.span-8 .table-wrap th:nth-child(10),
+#entries .card.span-8 .table-wrap td:nth-child(10){
+  width:9%;
   text-align:center;
+  white-space:nowrap;
 }
 
-#entries .table-wrap td:nth-child(3),
-#entries .table-wrap td:nth-child(4),
-#entries .table-wrap td:nth-child(5),
-#entries .table-wrap td:nth-child(6),
-#entries .table-wrap td:nth-child(7){
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:normal;
+#entries .card.span-8 .table-wrap td:nth-child(3),
+#entries .card.span-8 .table-wrap td:nth-child(4),
+#entries .card.span-8 .table-wrap td:nth-child(5),
+#entries .card.span-8 .table-wrap td:nth-child(6),
+#entries .card.span-8 .table-wrap td:nth-child(7){
   overflow-wrap:anywhere;
 }
 
-#entries .table-wrap td:nth-child(10) .table-actions,
-#entries .table-wrap td:nth-child(10){
-  gap:4px;
-}
-
-#entries .table-wrap td:nth-child(10) .btn{
-  padding:6px 7px;
+#entries .card.span-8 .table-wrap td:nth-child(10) .btn{
+  padding:5px 6px;
   font-size:11px;
 }
 
-/* Telas muito largas: aproveita o espaço, sem esticar excessivamente
-   Data, Horas, Status e Ações. */
 @media(min-width:1500px){
-  #entries > .grid{
-    grid-template-columns:minmax(420px,3fr) minmax(0,9.5fr);
-  }
-
-  #entries .table-wrap table{
+  #entries .card.span-8 .table-wrap table{
     min-width:0;
   }
-
-  #entries .table-wrap th:nth-child(7),
-  #entries .table-wrap td:nth-child(7){
-    min-width:280px;
-  }
 }
 
-/* Notebook: mantém as dez colunas e permite rolagem horizontal. */
-@media(max-width:1180px){
-  #entries > .grid{
-    grid-template-columns:1fr;
-  }
-
-  #entries .card.span-8 .filters{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-
-  #entries .card.span-8 .filters .btn{
-    width:100%;
-  }
-}
-
-/* Celular: preserva as regras responsivas já existentes do aplicativo. */
 @media(max-width:760px){
-  #entries .card.span-8 .filters{
-    grid-template-columns:1fr 1fr;
-  }
-
-  #entries .table-wrap table{
+  #entries .card.span-8 .table-wrap table{
     min-width:980px;
-  }
-}
-
-@media(max-width:520px){
-  #entries .card.span-8 .filters{
-    grid-template-columns:1fr;
   }
 }

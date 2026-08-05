@@ -22,12 +22,12 @@
 <body>
   <main class="card">
     <h1>Aponta Horas</h1>
-    <p>Atualizando somente a distribuição das colunas de Apontamentos.</p>
+    <p>Atualizando somente as larguras das colunas de Apontamentos.</p>
     <div class="spinner"></div>
     <div id="status" class="status">Removendo a versão anterior...</div>
   </main>
   <script>
-    const BUILD="2207";
+    const BUILD="2208";
     const statusBox=document.getElementById("status");
 
     async function clearApontaCache(){
@@ -36,7 +36,6 @@
           const registrations=await navigator.serviceWorker.getRegistrations();
           await Promise.all(registrations.map(item=>item.unregister()));
         }
-
         if("caches" in window){
           const names=await caches.keys();
           await Promise.all(names.map(name=>caches.delete(name)));
@@ -51,7 +50,7 @@
         setTimeout(()=>window.location.replace(destination.toString()),1200);
       }catch(error){
         console.error(error);
-        statusBox.textContent="Feche as outras abas e atualize esta página.";
+        statusBox.textContent="Feche as outras abas do Aponta P3 e atualize esta página.";
       }
     }
 
