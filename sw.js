@@ -1,12 +1,12 @@
-const CACHE = "aponta-horas-v2.19.16-fechamento-ampliado";
+const CACHE = "aponta-horas-v2.19.17-colunas-apontamentos";
 const ASSETS = [
   "./",
   "./index.html",
-  "./app-v2.19.5.js?build=2206",
-  "./style-v2.19.5.css?build=2206",
+  "./app-v2.19.5.js?build=2207",
+  "./style-v2.19.5.css?build=2207",
   "./redefinir-senha.html",
-  "./auth-recovery-v2.19.5.js?build=2206",
-  "./manifest.webmanifest?v=2.19.16",
+  "./auth-recovery-v2.19.5.js?build=2207",
+  "./manifest.webmanifest?v=2.19.17",
   "./modular-app-icon-192-v2116.png",
   "./modular-app-icon-512-v2116.png"
 ];
