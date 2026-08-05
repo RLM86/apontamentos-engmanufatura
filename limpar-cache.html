@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#052630">
-  <title>Aponta Horas | Atualizar fechamento</title>
+  <title>Aponta Horas | Atualizar leitura</title>
   <style>
     *{box-sizing:border-box}
     body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;
       font-family:Arial,Helvetica,sans-serif;background:#f2f6f4;color:#052630}
-    .card{width:min(480px,100%);padding:28px;background:#fff;border:1px solid #d7e3dc;
+    .card{width:min(500px,100%);padding:28px;background:#fff;border:1px solid #d7e3dc;
       border-top:6px solid #71ad3e;border-radius:18px;box-shadow:0 18px 45px rgba(5,38,48,.12)}
     h1{margin:0 0 8px;font-size:25px}
     p{line-height:1.5}
@@ -22,33 +22,39 @@
 <body>
   <main class="card">
     <h1>Aponta Horas</h1>
-    <p>Limpando somente o cache do Aponta P3 e abrindo o fechamento atualizado.</p>
+    <p>Atualizando o tamanho e a leitura da tela de fechamentos enviados.</p>
     <div class="spinner"></div>
     <div id="status" class="status">Removendo a versão anterior...</div>
   </main>
   <script>
-    const BUILD="2205";
+    const BUILD="2206";
     const statusBox=document.getElementById("status");
+
     async function clearApontaCache(){
       try{
         if("serviceWorker" in navigator){
           const registrations=await navigator.serviceWorker.getRegistrations();
-          await Promise.all(registrations.map(registration=>registration.unregister()));
+          await Promise.all(registrations.map(item=>item.unregister()));
         }
+
         if("caches" in window){
           const names=await caches.keys();
           await Promise.all(names.map(name=>caches.delete(name)));
         }
-        statusBox.textContent="Cache limpo. Abrindo o fechamento atualizado...";
+
+        statusBox.textContent="Cache limpo. Abrindo a tela ampliada...";
+
         const destination=new URL("./",window.location.href);
         destination.searchParams.set("build",BUILD);
         destination.searchParams.set("refresh",String(Date.now()));
+
         setTimeout(()=>window.location.replace(destination.toString()),1200);
       }catch(error){
         console.error(error);
         statusBox.textContent="Feche as outras abas do Aponta P3 e atualize esta página.";
       }
     }
+
     clearApontaCache();
   </script>
 </body>

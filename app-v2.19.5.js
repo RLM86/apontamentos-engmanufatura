@@ -7116,5 +7116,5 @@
     }, 350);
   });
 
-  window.APONTA_P3_VERSION = "2.19.15";
+  window.APONTA_P3_VERSION = "2.19.16";
 })();
