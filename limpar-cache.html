@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#052630">
-  <title>Aponta Horas | Atualizar colunas</title>
+  <title>Aponta Horas | Atualizar tabela</title>
   <style>
     *{box-sizing:border-box}
     body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;
@@ -22,12 +22,12 @@
 <body>
   <main class="card">
     <h1>Aponta Horas</h1>
-    <p>Atualizando somente as larguras das colunas de Apontamentos.</p>
+    <p>Atualizando somente a distribuição e a leitura das colunas.</p>
     <div class="spinner"></div>
     <div id="status" class="status">Removendo a versão anterior...</div>
   </main>
   <script>
-    const BUILD="2208";
+    const BUILD="2209";
     const statusBox=document.getElementById("status");
 
     async function clearApontaCache(){
@@ -36,6 +36,7 @@
           const registrations=await navigator.serviceWorker.getRegistrations();
           await Promise.all(registrations.map(item=>item.unregister()));
         }
+
         if("caches" in window){
           const names=await caches.keys();
           await Promise.all(names.map(name=>caches.delete(name)));
