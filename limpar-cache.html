@@ -22,19 +22,21 @@
 <body>
   <main class="card">
     <h1>Aponta Horas</h1>
-    <p>Atualizando somente os arquivos e o cache do Aponta P3.</p>
+    <p>Atualizando somente o cache e os arquivos do Aponta P3.</p>
     <div class="spinner"></div>
     <div id="status" class="status">Removendo a versão anterior...</div>
   </main>
   <script>
-    const BUILD="2201";
+    const BUILD="2202";
     const statusBox=document.getElementById("status");
 
     async function clearApontaCache(){
       try{
         if("serviceWorker" in navigator){
           const registrations=await navigator.serviceWorker.getRegistrations();
-          await Promise.all(registrations.map(registration=>registration.unregister()));
+          await Promise.all(
+            registrations.map(registration=>registration.unregister())
+          );
         }
 
         if("caches" in window){
@@ -42,19 +44,21 @@
           await Promise.all(names.map(name=>caches.delete(name)));
         }
 
-        sessionStorage.clear();
-
-        statusBox.textContent="Cache do Aponta P3 limpo. Abrindo a versão atualizada...";
+        statusBox.textContent=
+          "Cache do Aponta P3 limpo. Abrindo o build atualizado...";
 
         const destination=new URL("./",window.location.href);
         destination.searchParams.set("build",BUILD);
         destination.searchParams.set("refresh",String(Date.now()));
 
-        setTimeout(()=>window.location.replace(destination.toString()),1200);
+        setTimeout(
+          ()=>window.location.replace(destination.toString()),
+          1200
+        );
       }catch(error){
         console.error(error);
         statusBox.textContent=
-          "Não foi possível concluir automaticamente. Feche as outras abas do Aponta P3 e atualize esta página.";
+          "Feche as outras abas do Aponta P3 e atualize esta página.";
       }
     }
 

@@ -2223,20 +2223,63 @@
 
   async function loadClosing() {
     try {
-      const userId=isManager()?$("closingUser").value:me.id, month=$("closingMonth").value||monthNow();
+      const userId=isManager()?$("closingUser").value:me.id;
+      const month=$("closingMonth").value||monthNow();
       if(!userId)return;
-      const rows=await selectEntries(firstDay(month),lastDay(month),userId);
-      $("closingHours").textContent=fmt(rows.reduce((s,x)=>s+Number(x.hours),0));
-      const {data,error}=await sb.from("monthly_closings").select("*").eq("user_id",userId).eq("month_ref",firstDay(month)).maybeSingle();
+
+      const startDate=firstDay(month);
+      const endDate=lastDay(month);
+
+      const [rows,approvedAbsences]=await Promise.all([
+        selectEntries(startDate,endDate,userId),
+        loadApprovedAbsencesForPeriod(startDate,endDate,userId)
+      ]);
+
+      const pointedHours=rows.reduce(
+        (sum,row)=>sum+Number(row.hours||0),
+        0
+      );
+      const planned=plannedHoursSummary(
+        userId,
+        month,
+        approvedAbsences
+      );
+      const balance=closingBalance(
+        pointedHours,
+        planned.planned_hours
+      );
+      const conference=closingConference(balance);
+
+      $("closingPlannedHours").textContent=fmt(planned.planned_hours);
+      $("closingHours").textContent=fmt(pointedHours);
+      $("closingBalance").textContent=signedHours(balance);
+      $("closingBalance").className=`closing-balance-${conference.key}`;
+
+      if($("closingPlanDetails")){
+        $("closingPlanDetails").textContent=
+          `${plannedHoursDetail(planned)}. ${conference.detail}.`;
+      }
+
+      const {data,error}=await sb
+        .from("monthly_closings")
+        .select("*")
+        .eq("user_id",userId)
+        .eq("month_ref",startDate)
+        .maybeSingle();
+
       if(error)throw error;
       currentClosing=data;
       $("closingStatus").textContent=statusLabel(data?.status||"aberto");
       $("closingNote").value=data?.review_note||"";
-      $("submitClosingBtn").disabled=!!data&&["enviado","aprovado"].includes(data.status);
-      $("approveClosingBtn").disabled=!data||data.status!=="enviado";
-      $("rejectClosingBtn").disabled=!data||data.status!=="enviado";
+      $("submitClosingBtn").disabled=
+        !!data&&["enviado","aprovado"].includes(data.status);
+      $("approveClosingBtn").disabled=
+        !data||data.status!=="enviado";
+      $("rejectClosingBtn").disabled=
+        !data||data.status!=="enviado";
 
-      const approvedForAdministrativeReturn=isAdmin()&&data?.status==="aprovado";
+      const approvedForAdministrativeReturn=
+        isAdmin()&&data?.status==="aprovado";
       const adminReturnPanel=$("adminApprovedReturnPanel");
       const adminReturnReason=$("adminApprovedReturnReason");
       const returnToCollaboratorBtn=$("returnClosingToCollaboratorBtn");
@@ -2245,29 +2288,42 @@
       const adminReturnHelp=$("adminApprovedReturnHelp");
 
       if(adminReturnPanel)adminReturnPanel.hidden=!isAdmin();
-      if(adminReturnReason)adminReturnReason.disabled=!approvedForAdministrativeReturn;
-      if(returnToCollaboratorBtn)returnToCollaboratorBtn.disabled=!approvedForAdministrativeReturn;
-      if(returnToManagerBtn)returnToManagerBtn.disabled=!approvedForAdministrativeReturn;
-
+      if(adminReturnReason){
+        adminReturnReason.disabled=!approvedForAdministrativeReturn;
+      }
+      if(returnToCollaboratorBtn){
+        returnToCollaboratorBtn.disabled=!approvedForAdministrativeReturn;
+      }
+      if(returnToManagerBtn){
+        returnToManagerBtn.disabled=!approvedForAdministrativeReturn;
+      }
       if(adminReturnStatus){
         adminReturnStatus.textContent=approvedForAdministrativeReturn
           ?"Período aprovado selecionado"
           :"Disponível somente após aprovação";
-        adminReturnStatus.classList.toggle("ready",approvedForAdministrativeReturn);
+        adminReturnStatus.classList.toggle(
+          "ready",
+          approvedForAdministrativeReturn
+        );
       }
-
       if(adminReturnHelp){
         adminReturnHelp.textContent=approvedForAdministrativeReturn
           ?"Escolha o destino da devolução e informe obrigatoriamente o motivo."
           :"Selecione um fechamento com situação Aprovado para utilizar esta ação.";
       }
-
       if(!approvedForAdministrativeReturn&&adminReturnReason){
         adminReturnReason.value="";
       }
-    }catch(e){handleError(e)}
+    }catch(error){
+      handleError(
+        error,
+        "Não foi possível calcular o planejado do fechamento."
+      );
+    }
   }
-  $("loadClosingBtn").onclick=loadClosing;$("closingUser").onchange=loadClosing;$("closingMonth").onchange=loadClosing;
+  $("loadClosingBtn").onclick=loadClosing;
+  $("closingUser").onchange=loadClosing;
+  $("closingMonth").onchange=loadClosing;
 
   function switchClosingView(view, shouldRender=true){
     const selected=view==="history"?"history":"current";
@@ -2297,6 +2353,129 @@
   function closingHistoryKey(userId,monthRef){
     return `${userId}|${String(monthRef||"").slice(0,7)}`;
   }
+  /* APONTA P3 v2.19.12 — planejado x apontado no fechamento */
+  function profileDailyHours(userId){
+    const value=Number(
+      profiles.find(profile=>profile.id===userId)?.daily_hours||8
+    );
+    return Number.isFinite(value)&&value>0?value:8;
+  }
+
+  async function loadApprovedAbsencesForPeriod(startDate,endDate,userId=""){
+    let query=sb
+      .from("absences")
+      .select("user_id,start_date,end_date,absence_type,approval_status")
+      .lte("start_date",endDate)
+      .gte("end_date",startDate)
+      .eq("approval_status","aprovado");
+
+    if(userId)query=query.eq("user_id",userId);
+
+    const {data,error}=await query;
+    if(error)throw error;
+    return data||[];
+  }
+
+  function plannedHoursSummary(userId,monthRef,approvedAbsences=[]){
+    const month=String(monthRef||"").slice(0,7);
+    const start=firstDay(month);
+    const end=lastDay(month);
+    const dailyHours=profileDailyHours(userId);
+    const holidayDates=new Set(
+      holidays.map(row=>String(row.holiday_date||"").slice(0,10))
+    );
+    const userAbsences=approvedAbsences.filter(row=>
+      row.user_id===userId&&
+      row.start_date<=end&&
+      row.end_date>=start
+    );
+
+    let grossWorkDays=0;
+    let holidayWorkDays=0;
+    let absenceWorkDays=0;
+    let plannedWorkDays=0;
+
+    const cursor=new Date(`${start}T12:00:00Z`);
+    const finalDate=new Date(`${end}T12:00:00Z`);
+
+    while(cursor<=finalDate){
+      const date=cursor.toISOString().slice(0,10);
+      const dayOfWeek=cursor.getUTCDay();
+
+      if(dayOfWeek!==0&&dayOfWeek!==6){
+        grossWorkDays+=1;
+
+        if(holidayDates.has(date)){
+          holidayWorkDays+=1;
+        }else if(userAbsences.some(row=>
+          row.start_date<=date&&row.end_date>=date
+        )){
+          absenceWorkDays+=1;
+        }else{
+          plannedWorkDays+=1;
+        }
+      }
+
+      cursor.setUTCDate(cursor.getUTCDate()+1);
+    }
+
+    return {
+      daily_hours:dailyHours,
+      gross_work_days:grossWorkDays,
+      holiday_work_days:holidayWorkDays,
+      absence_work_days:absenceWorkDays,
+      planned_work_days:plannedWorkDays,
+      planned_hours:plannedWorkDays*dailyHours
+    };
+  }
+
+  function closingBalance(pointedHours,plannedHours){
+    return Number(pointedHours||0)-Number(plannedHours||0);
+  }
+
+  function signedHours(value){
+    const number=Number(value||0);
+    if(Math.abs(number)<0.005)return "0,00";
+    return `${number>0?"+":""}${fmt(number)}`;
+  }
+
+  function closingConference(balance){
+    const difference=Number(balance||0);
+
+    if(Math.abs(difference)<0.01){
+      return {
+        key:"complete",
+        label:"Completo",
+        detail:"Apontado igual ao planejado"
+      };
+    }
+
+    if(difference<0){
+      return {
+        key:"missing",
+        label:`Faltam ${fmt(Math.abs(difference))} h`,
+        detail:"Apontamento abaixo do planejado"
+      };
+    }
+
+    return {
+      key:"excess",
+      label:`Excedente ${fmt(difference)} h`,
+      detail:"Apontamento acima do planejado"
+    };
+  }
+
+  function plannedHoursDetail(summary){
+    return (
+      `${summary.gross_work_days} dia${summary.gross_work_days===1?"":"s"} útil${summary.gross_work_days===1?"":"eis"} bruto${summary.gross_work_days===1?"":"s"} `+
+      `− ${summary.holiday_work_days} feriado${summary.holiday_work_days===1?"":"s"} `+
+      `− ${summary.absence_work_days} dia${summary.absence_work_days===1?"":"s"} de ausência aprovada `+
+      `= ${summary.planned_work_days} dia${summary.planned_work_days===1?"":"s"} planejado${summary.planned_work_days===1?"":"s"} `+
+      `× ${fmt(summary.daily_hours)} h/dia`
+    );
+  }
+
+
 
   function updateClosingHistoryBulkActions(){
     const count=selectedClosingHistoryIds.size;
@@ -2338,39 +2517,74 @@
   }
 
   function updateClosingHistorySummary(rows){
-    const totalHours=rows.reduce((sum,row)=>sum+Number(row.total_hours||0),0);
+    const totalPlanned=rows.reduce(
+      (sum,row)=>sum+Number(row.planned_hours||0),
+      0
+    );
+    const totalPointed=rows.reduce(
+      (sum,row)=>sum+Number(row.total_hours||0),
+      0
+    );
     const pending=rows.filter(row=>row.status==="enviado").length;
     const approved=rows.filter(row=>row.status==="aprovado").length;
 
-    if($("closingHistoryTotal")) $("closingHistoryTotal").textContent=String(rows.length);
-    if($("closingHistoryHours")) $("closingHistoryHours").textContent=fmt(totalHours);
-    if($("closingHistoryPending")) $("closingHistoryPending").textContent=String(pending);
-    if($("closingHistoryApproved")) $("closingHistoryApproved").textContent=String(approved);
+    if($("closingHistoryTotal")){
+      $("closingHistoryTotal").textContent=String(rows.length);
+    }
+    if($("closingHistoryPlannedHours")){
+      $("closingHistoryPlannedHours").textContent=fmt(totalPlanned);
+    }
+    if($("closingHistoryHours")){
+      $("closingHistoryHours").textContent=fmt(totalPointed);
+    }
+    if($("closingHistoryPending")){
+      $("closingHistoryPending").textContent=String(pending);
+    }
+    if($("closingHistoryApproved")){
+      $("closingHistoryApproved").textContent=String(approved);
+    }
     if($("closingHistoryCountBadge")){
-      $("closingHistoryCountBadge").textContent=`${rows.length} registro${rows.length===1?"":"s"}`;
+      $("closingHistoryCountBadge").textContent=
+        `${rows.length} registro${rows.length===1?"":"s"}`;
     }
   }
-
   async function renderClosingHistory(){
     const table=$("closingHistoryTable");
     if(!table)return;
 
-    const startMonth=$("closingHistoryStartMonth")?.value||`${monthNow().slice(0,4)}-01`;
-    const endMonth=$("closingHistoryEndMonth")?.value||monthNow();
-    const selectedUser=isManager()?($("closingHistoryUser")?.value||""):me.id;
-    const selectedStatus=$("closingHistoryStatus")?.value||"";
-    const selectedProject=$("closingHistoryProject")?.value||"";
-    const search=normalizeText($("closingHistorySearch")?.value||"");
+    const startMonth=
+      $("closingHistoryStartMonth")?.value||
+      `${monthNow().slice(0,4)}-01`;
+    const endMonth=
+      $("closingHistoryEndMonth")?.value||
+      monthNow();
+    const selectedUser=
+      isManager()
+        ?($("closingHistoryUser")?.value||"")
+        :me.id;
+    const selectedStatus=
+      $("closingHistoryStatus")?.value||"";
+    const selectedProject=
+      $("closingHistoryProject")?.value||"";
+    const search=
+      normalizeText($("closingHistorySearch")?.value||"");
 
     if(endMonth<startMonth){
-      toast("O mês final não pode ser anterior ao mês inicial.",true);
+      toast(
+        "O mês final não pode ser anterior ao mês inicial.",
+        true
+      );
       return;
     }
 
-    table.innerHTML=`<tr><td colspan="${isManager()?10:9}" class="empty">Carregando fechamentos...</td></tr>`;
+    const columnCount=isManager()?13:12;
+    table.innerHTML=
+      `<tr><td colspan="${columnCount}" class="empty">`+
+      `Carregando fechamentos e horas planejadas...</td></tr>`;
 
     try{
-      let query=sb.from("monthly_closings")
+      let query=sb
+        .from("monthly_closings")
         .select("*")
         .gte("month_ref",firstDay(startMonth))
         .lte("month_ref",firstDay(endMonth))
@@ -2378,107 +2592,235 @@
         .order("month_ref",{ascending:false})
         .order("submitted_at",{ascending:false});
 
-      if(selectedUser) query=query.eq("user_id",selectedUser);
-      if(selectedStatus) query=query.eq("status",selectedStatus);
-      if(!isManager()) query=query.eq("user_id",me.id);
+      if(selectedUser)query=query.eq("user_id",selectedUser);
+      if(selectedStatus)query=query.eq("status",selectedStatus);
+      if(!isManager())query=query.eq("user_id",me.id);
 
-      const {data:closings,error}=await query;
+      const [{data:closings,error},entries,approvedAbsences]=
+        await Promise.all([
+          query,
+          selectEntries(
+            firstDay(startMonth),
+            lastDay(endMonth),
+            selectedUser||"",
+            ""
+          ),
+          loadApprovedAbsencesForPeriod(
+            firstDay(startMonth),
+            lastDay(endMonth),
+            selectedUser||""
+          )
+        ]);
+
       if(error)throw error;
 
-      const entries=await selectEntries(
-        firstDay(startMonth),
-        lastDay(endMonth),
-        selectedUser||"",
-        ""
-      );
-
       const aggregate=new Map();
+
       entries.forEach(entry=>{
-        const key=closingHistoryKey(entry.user_id,entry.entry_date);
+        const key=closingHistoryKey(
+          entry.user_id,
+          entry.entry_date
+        );
+
         if(!aggregate.has(key)){
-          aggregate.set(key,{hours:0,projectIds:new Set()});
+          aggregate.set(
+            key,
+            {hours:0,projectIds:new Set()}
+          );
         }
+
         const item=aggregate.get(key);
         item.hours+=Number(entry.hours||0);
-        if(entry.project_id)item.projectIds.add(entry.project_id);
+
+        if(entry.project_id){
+          item.projectIds.add(entry.project_id);
+        }
       });
 
       let rows=(closings||[]).map(closing=>{
-        const item=aggregate.get(closingHistoryKey(closing.user_id,closing.month_ref))||{hours:0,projectIds:new Set()};
+        const item=
+          aggregate.get(
+            closingHistoryKey(
+              closing.user_id,
+              closing.month_ref
+            )
+          )||
+          {hours:0,projectIds:new Set()};
+
         const projectIds=[...item.projectIds];
+        const planned=plannedHoursSummary(
+          closing.user_id,
+          closing.month_ref,
+          approvedAbsences
+        );
+        const balance=closingBalance(
+          item.hours,
+          planned.planned_hours
+        );
+        const conference=closingConference(balance);
+
         return {
           ...closing,
           total_hours:item.hours,
+          ...planned,
+          balance_hours:balance,
+          conference_key:conference.key,
+          conference_label:conference.label,
+          conference_detail:conference.detail,
+          planned_detail:plannedHoursDetail(planned),
           project_ids:projectIds,
-          project_names:projectIds.map(projectName).filter(name=>name&&name!=="—")
+          project_names:projectIds
+            .map(projectName)
+            .filter(name=>name&&name!=="—")
         };
       });
 
       if(selectedProject){
-        rows=rows.filter(row=>row.project_ids.includes(selectedProject));
+        rows=rows.filter(
+          row=>row.project_ids.includes(selectedProject)
+        );
       }
 
       if(search){
-        rows=rows.filter(row=>normalizeText([
-          profileName(row.user_id),
-          row.project_names.join(" "),
-          statusLabel(row.status),
-          profileName(row.reviewed_by),
-          row.review_note
-        ].join(" ")).includes(search));
+        rows=rows.filter(row=>
+          normalizeText([
+            profileName(row.user_id),
+            row.project_names.join(" "),
+            statusLabel(row.status),
+            profileName(row.reviewed_by),
+            row.review_note,
+            row.conference_label,
+            row.planned_detail
+          ].join(" ")).includes(search)
+        );
       }
 
       closingHistoryRows=rows;
-      visibleReviewableClosingIds=isManager()
-        ?rows.filter(row=>row.status==="enviado").map(row=>row.id)
-        :[];
+      visibleReviewableClosingIds=
+        isManager()
+          ?rows
+            .filter(row=>row.status==="enviado")
+            .map(row=>row.id)
+          :[];
 
-      const visibleReviewableSet=new Set(visibleReviewableClosingIds);
+      const visibleReviewableSet=
+        new Set(visibleReviewableClosingIds);
+
       Array.from(selectedClosingHistoryIds).forEach(id=>{
-        if(!visibleReviewableSet.has(id))selectedClosingHistoryIds.delete(id);
+        if(!visibleReviewableSet.has(id)){
+          selectedClosingHistoryIds.delete(id);
+        }
       });
 
       updateClosingHistorySummary(rows);
       updateClosingHistoryBulkActions();
 
       table.innerHTML=rows.map(row=>{
-        const projectsText=row.project_names.length?row.project_names.join(", "):"Sem projeto identificado";
-        const canReview=isManager()&&row.status==="enviado";
+        const projectsText=row.project_names.length
+          ?row.project_names.join(", ")
+          :"Sem projeto identificado";
+        const canReview=
+          isManager()&&row.status==="enviado";
+
         const selectorCell=isManager()
           ?`<td data-label="Selecionar">${
               canReview
-                ?`<input class="closing-history-row-selector" type="checkbox" data-select-closing="${row.id}" ${selectedClosingHistoryIds.has(row.id)?"checked":""} aria-label="Selecionar fechamento de ${esc(profileName(row.user_id))}, ${esc(monthLabel(row.month_ref))}">`
-                :`<span class="closing-history-not-reviewable" title="Somente fechamentos enviados podem ser analisados em lote">—</span>`
+                ?`<input class="closing-history-row-selector" `+
+                  `type="checkbox" data-select-closing="${row.id}" `+
+                  `${selectedClosingHistoryIds.has(row.id)?"checked":""} `+
+                  `aria-label="Selecionar fechamento de `+
+                  `${esc(profileName(row.user_id))}, `+
+                  `${esc(monthLabel(row.month_ref))}">`
+                :`<span class="closing-history-not-reviewable" `+
+                  `title="Somente fechamentos enviados podem ser analisados em lote">—</span>`
             }</td>`
           :"";
 
-        return `<tr>
+        return `<tr class="closing-workload-row closing-${row.conference_key}">
           ${selectorCell}
-          <td data-label="Colaborador">${esc(profileName(row.user_id))}</td>
-          <td data-label="Mês"><strong>${esc(monthLabel(row.month_ref))}</strong></td>
-          <td data-label="Horas">${fmt(row.total_hours)}</td>
-          <td data-label="Projetos"><span class="closing-projects" title="${esc(projectsText)}">${esc(projectsText)}</span></td>
-          <td data-label="Enviado em">${dateTimeBR(row.submitted_at)}</td>
-          <td data-label="Situação"><span class="badge status-${esc(row.status)}">${esc(statusLabel(row.status))}</span></td>
-          <td data-label="Revisado por">${row.reviewed_by?esc(profileName(row.reviewed_by)):"—"}</td>
-          <td data-label="Observação">${esc(row.review_note||"—")}</td>
+          <td data-label="Colaborador">
+            <strong>${esc(profileName(row.user_id))}</strong>
+            <small class="closing-daily-hours">
+              Jornada: ${fmt(row.daily_hours)} h/dia
+            </small>
+          </td>
+          <td data-label="Mês">
+            <strong>${esc(monthLabel(row.month_ref))}</strong>
+          </td>
+          <td data-label="Planejado" title="${esc(row.planned_detail)}">
+            <strong>${fmt(row.planned_hours)}</strong>
+            <small>${row.planned_work_days} dias</small>
+          </td>
+          <td data-label="Apontado">
+            <strong>${fmt(row.total_hours)}</strong>
+          </td>
+          <td data-label="Saldo">
+            <strong class="closing-balance-${row.conference_key}">
+              ${signedHours(row.balance_hours)}
+            </strong>
+          </td>
+          <td data-label="Conferência">
+            <span
+              class="badge closing-conference closing-conference-${row.conference_key}"
+              title="${esc(row.conference_detail)}">
+              ${esc(row.conference_label)}
+            </span>
+          </td>
+          <td data-label="Projetos">
+            <span
+              class="closing-projects"
+              title="${esc(projectsText)}">
+              ${esc(projectsText)}
+            </span>
+          </td>
+          <td data-label="Enviado em">
+            ${dateTimeBR(row.submitted_at)}
+          </td>
+          <td data-label="Situação">
+            <span class="badge status-${esc(row.status)}">
+              ${esc(statusLabel(row.status))}
+            </span>
+          </td>
+          <td data-label="Revisado por">
+            ${row.reviewed_by
+              ?esc(profileName(row.reviewed_by))
+              :"—"}
+          </td>
+          <td data-label="Observação">
+            ${esc(row.review_note||"—")}
+          </td>
           <td data-label="Ações">
             <div class="table-actions">
-              <button class="btn secondary small" type="button" data-open-closing="${row.id}">Abrir</button>
+              <button
+                class="btn secondary small"
+                type="button"
+                data-open-closing="${row.id}">
+                Abrir
+              </button>
             </div>
           </td>
         </tr>`;
-      }).join("")||`<tr><td colspan="${isManager()?10:9}" class="empty">Nenhum fechamento enviado encontrado com os filtros selecionados.</td></tr>`;
+      }).join("")||
+        `<tr><td colspan="${columnCount}" class="empty">`+
+        `Nenhum fechamento enviado encontrado com os filtros selecionados.`+
+        `</td></tr>`;
     }catch(error){
       closingHistoryRows=[];
       visibleReviewableClosingIds=[];
       clearClosingHistorySelection();
       updateClosingHistorySummary([]);
-      table.innerHTML=`<tr><td colspan="${isManager()?10:9}" class="empty">Não foi possível carregar os fechamentos.</td></tr>`;
-      handleError(error,"Não foi possível consultar os fechamentos enviados.");
+
+      table.innerHTML=
+        `<tr><td colspan="${columnCount}" class="empty">`+
+        `Não foi possível carregar os fechamentos e o planejado.`+
+        `</td></tr>`;
+
+      handleError(
+        error,
+        "Não foi possível consultar o planejado. Confira se férias e afastamentos estão instalados no banco."
+      );
     }
   }
-
   document.querySelectorAll("[data-closing-view]").forEach(button=>{
     button.addEventListener("click",()=>switchClosingView(button.dataset.closingView));
   });
@@ -2518,22 +2860,53 @@
   if($("exportClosingHistoryBtn")){
     $("exportClosingHistoryBtn").onclick=()=>{
       if(!closingHistoryRows.length){
-        toast("Não há fechamentos filtrados para exportar.",true);
+        toast(
+          "Não há fechamentos filtrados para exportar.",
+          true
+        );
         return;
       }
 
       downloadCsv(
         `fechamentos_enviados_${today()}.csv`,
         [
-          ["Colaborador","Mês","Horas","Projetos","Enviado em","Situação","Revisado por","Revisado em","Observação"],
+          [
+            "Colaborador",
+            "Mês",
+            "Jornada diária",
+            "Dias úteis brutos",
+            "Feriados úteis descontados",
+            "Dias de ausência aprovados descontados",
+            "Dias planejados",
+            "Horas planejadas",
+            "Horas apontadas",
+            "Saldo",
+            "Conferência",
+            "Projetos",
+            "Enviado em",
+            "Situação",
+            "Revisado por",
+            "Revisado em",
+            "Observação"
+          ],
           ...closingHistoryRows.map(row=>[
             profileName(row.user_id),
             monthLabel(row.month_ref),
+            fmt(row.daily_hours),
+            row.gross_work_days,
+            row.holiday_work_days,
+            row.absence_work_days,
+            row.planned_work_days,
+            fmt(row.planned_hours),
             fmt(row.total_hours),
+            signedHours(row.balance_hours),
+            row.conference_label,
             row.project_names.join(", "),
             dateTimeBR(row.submitted_at),
             statusLabel(row.status),
-            row.reviewed_by?profileName(row.reviewed_by):"",
+            row.reviewed_by
+              ?profileName(row.reviewed_by)
+              :"",
             dateTimeBR(row.reviewed_at),
             row.review_note||""
           ])
@@ -2541,7 +2914,6 @@
       );
     };
   }
-
   if($("selectAllVisibleClosings")){
     $("selectAllVisibleClosings").onchange=event=>{
       visibleReviewableClosingIds.forEach(id=>{
@@ -6085,7 +6457,7 @@
 
   if("serviceWorker" in navigator && location.protocol.startsWith("http")){
     navigator.serviceWorker
-      .register("sw.js?v=2.19.8", {updateViaCache:"none"})
+      .register("sw.js?v=2.19.12", {updateViaCache:"none"})
       .then(async registration=>{
         await registration.update();
         if(registration.waiting){
@@ -6604,5 +6976,5 @@
     }, 350);
   });
 
-  window.APONTA_P3_VERSION = "2.19.11";
+  window.APONTA_P3_VERSION = "2.19.12";
 })();
