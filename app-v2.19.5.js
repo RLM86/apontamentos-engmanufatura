@@ -3831,6 +3831,267 @@
     }
   }
 
+  /* APONTA P3 v2.19.11 — disciplina, natureza e sequência de códigos */
+  const ACTIVITY_NATURE_DEFAULTS = [
+    "Rotina / Demanda",
+    "Planejada / Demanda",
+    "Demanda / Emergencial",
+    "Demanda / Validação",
+    "Validação / Demanda",
+    "Rotina / Planejada",
+    "Planejada / Rotina",
+    "Melhoria"
+  ];
+
+  function activityCodeParts(value){
+    const normalized=normalizeActivityCode(value);
+    const match=normalized.match(/^([A-Z0-9]+)-(\d+)$/);
+    if(!match)return null;
+    return {
+      prefix:match[1],
+      number:Number(match[2]),
+      digits:match[2].length,
+      code:normalized
+    };
+  }
+
+  function inferActivityDisciplinePrefix(disciplineName){
+    const normalizedDiscipline=normalizeText(disciplineName);
+    if(!normalizedDiscipline)return "";
+
+    const counts=new Map();
+    activities
+      .filter(activity=>
+        normalizeText(activity.discipline_name)===normalizedDiscipline
+      )
+      .forEach(activity=>{
+        const parts=activityCodeParts(activity.code);
+        if(!parts)return;
+        counts.set(parts.prefix,(counts.get(parts.prefix)||0)+1);
+      });
+
+    return [...counts.entries()]
+      .sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"pt-BR"))[0]?.[0]||"";
+  }
+
+  function activityDisciplineOptions(){
+    const rows=new Map();
+
+    activities.forEach(activity=>{
+      const name=String(activity.discipline_name||"").trim();
+      if(!name)return;
+
+      const key=normalizeText(name);
+      if(!rows.has(key)){
+        rows.set(key,{
+          name,
+          prefix:inferActivityDisciplinePrefix(name)
+        });
+      }
+    });
+
+    return [...rows.values()].sort((a,b)=>
+      String(a.prefix||"").localeCompare(
+        String(b.prefix||""),
+        "pt-BR",
+        {numeric:true,sensitivity:"base"}
+      )||
+      a.name.localeCompare(b.name,"pt-BR",{sensitivity:"base"})
+    );
+  }
+
+  function activityNatureOptions(){
+    const values=[];
+    const seen=new Set();
+
+    [...ACTIVITY_NATURE_DEFAULTS,
+      ...activities.map(activity=>String(activity.nature||"").trim())
+    ].forEach(value=>{
+      const clean=String(value||"").trim();
+      const key=normalizeText(clean);
+      if(!clean||seen.has(key))return;
+      seen.add(key);
+      values.push(clean);
+    });
+
+    return values;
+  }
+
+  function fillActivityFormSelect(
+    selectId,
+    rows,
+    placeholder,
+    labelFn,
+    valueFn,
+    preferredValue=""
+  ){
+    const select=$(selectId);
+    if(!select)return;
+
+    const selectedValue=preferredValue||select.value||"";
+    select.innerHTML=
+      `<option value="">${esc(placeholder)}</option>`+
+      rows.map(row=>
+        `<option value="${esc(valueFn(row))}">${esc(labelFn(row))}</option>`
+      ).join("");
+
+    if(
+      selectedValue&&
+      [...select.options].some(option=>option.value===selectedValue)
+    ){
+      select.value=selectedValue;
+    }else{
+      select.value="";
+    }
+  }
+
+  function populateActivityFormOptions(
+    preferredDiscipline="",
+    preferredNature=""
+  ){
+    const disciplines=activityDisciplineOptions();
+    const natures=activityNatureOptions();
+
+    fillActivityFormSelect(
+      "activityDiscipline",
+      disciplines,
+      "Selecione a disciplina",
+      row=>row.prefix?`${row.prefix} — ${row.name}`:row.name,
+      row=>row.name
+    );
+
+    fillActivityFormSelect(
+      "activityNature",
+      natures,
+      "Selecione a natureza",
+      value=>value,
+      value=>value
+    );
+
+    fillActivityFormSelect(
+      "editActivityDiscipline",
+      disciplines,
+      "Selecione a disciplina",
+      row=>row.prefix?`${row.prefix} — ${row.name}`:row.name,
+      row=>row.name,
+      preferredDiscipline
+    );
+
+    fillActivityFormSelect(
+      "editActivityNature",
+      natures,
+      "Selecione a natureza",
+      value=>value,
+      value=>value,
+      preferredNature
+    );
+
+    updateActivityCodeSequence("create",false);
+    updateActivityCodeSequence("edit",false);
+  }
+
+  function activityCodeSequence(disciplineName){
+    const discipline=String(disciplineName||"").trim();
+    if(!discipline)return null;
+
+    const prefix=inferActivityDisciplinePrefix(discipline);
+    if(!prefix){
+      return {
+        discipline,
+        prefix:"",
+        latest:"",
+        next:""
+      };
+    }
+
+    let greatest=0;
+    let greatestDigits=3;
+    let latest="";
+
+    activities
+      .filter(activity=>
+        normalizeText(activity.discipline_name)===normalizeText(discipline)
+      )
+      .forEach(activity=>{
+        const parts=activityCodeParts(activity.code);
+        if(!parts||parts.prefix!==prefix)return;
+
+        if(parts.number>greatest){
+          greatest=parts.number;
+          greatestDigits=Math.max(3,parts.digits);
+          latest=parts.code;
+        }
+      });
+
+    const nextNumber=greatest+1;
+    const next=`${prefix}-${String(nextNumber).padStart(greatestDigits,"0")}`;
+
+    return {
+      discipline,
+      prefix,
+      latest,
+      next
+    };
+  }
+
+  function updateActivityCodeSequence(mode="create",autoFill=false){
+    const editing=mode==="edit";
+    const discipline=$(editing?"editActivityDiscipline":"activityDiscipline");
+    const code=$(editing?"editActivityCode":"activityCode");
+    const hint=$(editing?"editActivityCodeSequenceHint":"activityCodeSequenceHint");
+
+    if(!discipline||!code||!hint)return;
+
+    const sequence=activityCodeSequence(discipline.value);
+
+    if(!sequence){
+      hint.textContent=
+        "Selecione a disciplina para consultar o último código cadastrado.";
+      if(!editing)code.placeholder="Selecione primeiro a disciplina";
+      return;
+    }
+
+    if(!sequence.prefix){
+      hint.textContent=
+        "Nenhum prefixo foi encontrado para esta disciplina. Informe o código manualmente.";
+      code.placeholder="Informe o código";
+      return;
+    }
+
+    if(sequence.latest){
+      hint.textContent=
+        `Último código cadastrado: ${sequence.latest} • `+
+        `Próximo sugerido: ${sequence.next}`;
+    }else{
+      hint.textContent=
+        `Nenhum código cadastrado nesta disciplina • `+
+        `Primeiro sugerido: ${sequence.next}`;
+    }
+
+    code.placeholder=sequence.next;
+
+    if(
+      autoFill&&
+      !editing&&
+      (!code.value.trim()||code.dataset.sequenceSuggested==="true")
+    ){
+      code.value=sequence.next;
+      code.dataset.sequenceSuggested="true";
+    }
+  }
+
+  $("activityDiscipline")?.addEventListener("change",()=>{
+    updateActivityCodeSequence("create",true);
+  });
+
+  $("editActivityDiscipline")?.addEventListener("change",()=>{
+    updateActivityCodeSequence("edit",false);
+  });
+
+  $("activityCode")?.addEventListener("input",()=>{
+    $("activityCode").dataset.sequenceSuggested="false";
+  });
+
   function populateActivityFilterOptions(){
     const areaSelect=$("activityFilterArea");
     const disciplineSelect=$("activityFilterDiscipline");
@@ -3893,6 +4154,7 @@
   }
 
   function renderActivitiesCatalog(){
+    populateActivityFormOptions();
     populateActivityFilterOptions();
     const rows=filteredCatalogActivities();
     const total=activities.length;
@@ -4119,11 +4381,13 @@
     const deleteId=e.target.dataset.deleteActivity;
     if(editId){
       const x=activities.find(a=>a.id===editId);
+      populateActivityFormOptions(x.discipline_name||"",x.nature||"");
       $("editActivityId").value=x.id;
       $("editActivityCode").value=normalizeActivityCode(x.code);
       $("editActivityName").value=x.name;
       $("editActivityDiscipline").value=x.discipline_name||"";
       $("editActivityNature").value=x.nature||"";
+      updateActivityCodeSequence("edit",false);
       $("editActivityObservationRequirement").value=normalizeObservationRequirement(
         x.observation_requirement
       );
@@ -6340,5 +6604,5 @@
     }, 350);
   });
 
-  window.APONTA_P3_VERSION = "2.19.8";
+  window.APONTA_P3_VERSION = "2.19.11";
 })();

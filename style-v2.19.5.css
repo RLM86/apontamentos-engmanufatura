@@ -3139,3 +3139,35 @@ main,
 #authMessage.error{
   font-size:.92rem;
 }
+
+/* Aponta Horas v2.19.11 — cadastro de atividades padronizado */
+.activity-code-field{
+  gap:6px;
+}
+
+.activity-code-sequence-hint{
+  display:block;
+  min-height:18px;
+  margin-top:2px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+  line-height:1.4;
+}
+
+.activity-code-field input:focus + .activity-code-sequence-hint{
+  color:var(--primary);
+}
+
+#activityDiscipline,
+#activityNature,
+#editActivityDiscipline,
+#editActivityNature{
+  cursor:pointer;
+}
+
+@media(max-width:620px){
+  .activity-code-sequence-hint{
+    font-size:11px;
+  }
+}
