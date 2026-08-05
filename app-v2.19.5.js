@@ -6457,7 +6457,7 @@
 
   if("serviceWorker" in navigator && location.protocol.startsWith("http")){
     navigator.serviceWorker
-      .register("sw.js?v=2.19.12", {updateViaCache:"none"})
+      .register("sw.js?v=2.19.14", {updateViaCache:"none"})
       .then(async registration=>{
         await registration.update();
         if(registration.waiting){
@@ -6976,5 +6976,5 @@
     }, 350);
   });
 
-  window.APONTA_P3_VERSION = "2.19.12";
+  window.APONTA_P3_VERSION = "2.19.14";
 })();
