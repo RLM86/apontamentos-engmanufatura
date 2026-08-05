@@ -2577,7 +2577,7 @@
       return;
     }
 
-    const columnCount=isManager()?13:12;
+    const columnCount=isManager()?8:7;
     table.innerHTML=
       `<tr><td colspan="${columnCount}" class="empty">`+
       `Carregando fechamentos e horas planejadas...</td></tr>`;
@@ -2719,11 +2719,26 @@
         const projectsText=row.project_names.length
           ?row.project_names.join(", ")
           :"Sem projeto identificado";
+        const projectsSummary=row.project_names.length
+          ?(
+              row.project_names.length===1
+                ?row.project_names[0]
+                :`${row.project_names[0]} +${row.project_names.length-1}`
+            )
+          :"Sem projeto";
         const canReview=
           isManager()&&row.status==="enviado";
+        const detailsId=`closing-history-details-${row.id}`;
+        const completion=
+          Number(row.planned_hours||0)>0
+            ?Math.round(
+                (Number(row.total_hours||0)/
+                 Number(row.planned_hours||0))*100
+              )
+            :0;
 
         const selectorCell=isManager()
-          ?`<td data-label="Selecionar">${
+          ?`<td data-label="Selecionar" class="closing-compact-select">${
               canReview
                 ?`<input class="closing-history-row-selector" `+
                   `type="checkbox" data-select-closing="${row.id}" `+
@@ -2736,70 +2751,162 @@
             }</td>`
           :"";
 
-        return `<tr class="closing-workload-row closing-${row.conference_key}">
-          ${selectorCell}
-          <td data-label="Colaborador">
-            <strong>${esc(profileName(row.user_id))}</strong>
-            <small class="closing-daily-hours">
-              Jornada: ${fmt(row.daily_hours)} h/dia
-            </small>
-          </td>
-          <td data-label="Mês">
-            <strong>${esc(monthLabel(row.month_ref))}</strong>
-          </td>
-          <td data-label="Planejado" title="${esc(row.planned_detail)}">
-            <strong>${fmt(row.planned_hours)}</strong>
-            <small>${row.planned_work_days} dias</small>
-          </td>
-          <td data-label="Apontado">
-            <strong>${fmt(row.total_hours)}</strong>
-          </td>
-          <td data-label="Saldo">
-            <strong class="closing-balance-${row.conference_key}">
-              ${signedHours(row.balance_hours)}
-            </strong>
-          </td>
-          <td data-label="Conferência">
-            <span
-              class="badge closing-conference closing-conference-${row.conference_key}"
-              title="${esc(row.conference_detail)}">
-              ${esc(row.conference_label)}
-            </span>
-          </td>
-          <td data-label="Projetos">
-            <span
-              class="closing-projects"
-              title="${esc(projectsText)}">
-              ${esc(projectsText)}
-            </span>
-          </td>
-          <td data-label="Enviado em">
-            ${dateTimeBR(row.submitted_at)}
-          </td>
-          <td data-label="Situação">
-            <span class="badge status-${esc(row.status)}">
-              ${esc(statusLabel(row.status))}
-            </span>
-          </td>
-          <td data-label="Revisado por">
-            ${row.reviewed_by
-              ?esc(profileName(row.reviewed_by))
-              :"—"}
-          </td>
-          <td data-label="Observação">
-            ${esc(row.review_note||"—")}
-          </td>
-          <td data-label="Ações">
-            <div class="table-actions">
+        const summaryRow=
+          `<tr class="closing-workload-row closing-compact-summary closing-${row.conference_key}">
+            ${selectorCell}
+
+            <td data-label="Colaborador / Mês" class="closing-compact-person">
+              <strong>${esc(profileName(row.user_id))}</strong>
+              <small>
+                ${esc(monthLabel(row.month_ref))} ·
+                ${fmt(row.daily_hours)} h/dia
+              </small>
+            </td>
+
+            <td data-label="Planejado" title="${esc(row.planned_detail)}">
+              <strong>${fmt(row.planned_hours)} h</strong>
+              <small>${row.planned_work_days} dias planejados</small>
+            </td>
+
+            <td data-label="Apontado">
+              <strong>${fmt(row.total_hours)} h</strong>
+              <small>${completion}% do planejado</small>
+            </td>
+
+            <td data-label="Saldo / Conferência" class="closing-compact-balance">
+              <strong class="closing-balance-${row.conference_key}">
+                ${signedHours(row.balance_hours)} h
+              </strong>
+              <span
+                class="badge closing-conference closing-conference-${row.conference_key}"
+                title="${esc(row.conference_detail)}">
+                ${esc(row.conference_label)}
+              </span>
+            </td>
+
+            <td data-label="Situação" class="closing-compact-status">
+              <span class="badge status-${esc(row.status)}">
+                ${esc(statusLabel(row.status))}
+              </span>
+              <small>Enviado: ${dateTimeBR(row.submitted_at)}</small>
+            </td>
+
+            <td data-label="Projetos" class="closing-compact-projects">
+              <strong title="${esc(projectsText)}">
+                ${esc(projectsSummary)}
+              </strong>
+              <small>
+                ${row.project_names.length}
+                projeto${row.project_names.length===1?"":"s"}
+              </small>
+            </td>
+
+            <td data-label="Conferir" class="closing-compact-action">
               <button
-                class="btn secondary small"
+                class="btn secondary small closing-details-toggle"
                 type="button"
-                data-open-closing="${row.id}">
-                Abrir
+                data-toggle-closing-details="${row.id}"
+                data-closed-label="Conferir"
+                data-open-label="Fechar"
+                aria-expanded="false"
+                aria-controls="${detailsId}">
+                Conferir
               </button>
-            </div>
-          </td>
-        </tr>`;
+            </td>
+          </tr>`;
+
+        const detailsRow=
+          `<tr
+            id="${detailsId}"
+            class="closing-compact-details-row"
+            data-closing-details-row="${row.id}"
+            hidden>
+            <td colspan="${columnCount}">
+              <section class="closing-compact-details-panel">
+                <div class="closing-compact-details-grid">
+                  <article>
+                    <span>Jornada diária</span>
+                    <strong>${fmt(row.daily_hours)} h</strong>
+                  </article>
+                  <article>
+                    <span>Dias úteis brutos</span>
+                    <strong>${row.gross_work_days}</strong>
+                  </article>
+                  <article>
+                    <span>Feriados descontados</span>
+                    <strong>${row.holiday_work_days}</strong>
+                  </article>
+                  <article>
+                    <span>Ausências aprovadas</span>
+                    <strong>${row.absence_work_days} dias</strong>
+                  </article>
+                  <article>
+                    <span>Dias planejados</span>
+                    <strong>${row.planned_work_days}</strong>
+                  </article>
+                  <article>
+                    <span>Horas planejadas</span>
+                    <strong>${fmt(row.planned_hours)} h</strong>
+                  </article>
+                  <article>
+                    <span>Horas apontadas</span>
+                    <strong>${fmt(row.total_hours)} h</strong>
+                  </article>
+                  <article>
+                    <span>Saldo</span>
+                    <strong class="closing-balance-${row.conference_key}">
+                      ${signedHours(row.balance_hours)} h
+                    </strong>
+                  </article>
+
+                  <article class="closing-detail-wide">
+                    <span>Composição do planejado</span>
+                    <strong>${esc(row.planned_detail)}</strong>
+                  </article>
+
+                  <article class="closing-detail-wide">
+                    <span>Projetos</span>
+                    <strong>${esc(projectsText)}</strong>
+                  </article>
+
+                  <article>
+                    <span>Enviado em</span>
+                    <strong>${dateTimeBR(row.submitted_at)}</strong>
+                  </article>
+
+                  <article>
+                    <span>Revisado por</span>
+                    <strong>
+                      ${row.reviewed_by
+                        ?esc(profileName(row.reviewed_by))
+                        :"Ainda não revisado"}
+                    </strong>
+                  </article>
+
+                  <article>
+                    <span>Revisado em</span>
+                    <strong>${dateTimeBR(row.reviewed_at)}</strong>
+                  </article>
+
+                  <article class="closing-detail-wide">
+                    <span>Observação da análise</span>
+                    <strong>${esc(row.review_note||"Sem observação")}</strong>
+                  </article>
+                </div>
+
+                <div class="closing-compact-details-actions">
+                  <button
+                    class="btn primary small"
+                    type="button"
+                    data-open-closing="${row.id}">
+                    Abrir fechamento
+                  </button>
+                </div>
+              </section>
+            </td>
+          </tr>`;
+
+        return summaryRow+detailsRow;
       }).join("")||
         `<tr><td colspan="${columnCount}" class="empty">`+
         `Nenhum fechamento enviado encontrado com os filtros selecionados.`+
@@ -3020,7 +3127,6 @@
     $("closingHistoryTable").onchange=event=>{
       const selector=event.target.closest("[data-select-closing]");
       if(!selector)return;
-
       const id=selector.dataset.selectClosing;
       if(selector.checked)selectedClosingHistoryIds.add(id);
       else selectedClosingHistoryIds.delete(id);
@@ -3028,16 +3134,50 @@
     };
 
     $("closingHistoryTable").onclick=async event=>{
+      const detailsButton=event.target.closest(
+        "[data-toggle-closing-details]"
+      );
+
+      if(detailsButton){
+        const id=detailsButton.dataset.toggleClosingDetails;
+        const detailsRow=document.getElementById(
+          `closing-history-details-${id}`
+        );
+
+        if(!detailsRow)return;
+
+        const willOpen=detailsRow.hidden;
+        detailsRow.hidden=!willOpen;
+        detailsButton.setAttribute(
+          "aria-expanded",
+          String(willOpen)
+        );
+        detailsButton.textContent=willOpen
+          ?detailsButton.dataset.openLabel
+          :detailsButton.dataset.closedLabel;
+        detailsButton.classList.toggle(
+          "closing-details-toggle-open",
+          willOpen
+        );
+        return;
+      }
+
       const button=event.target.closest("[data-open-closing]");
       if(!button)return;
-      const row=closingHistoryRows.find(item=>item.id===button.dataset.openClosing);
+
+      const row=closingHistoryRows.find(
+        item=>item.id===button.dataset.openClosing
+      );
       if(!row)return;
 
       if(isManager()) $("closingUser").value=row.user_id;
       $("closingMonth").value=String(row.month_ref).slice(0,7);
       switchClosingView("current",false);
       await loadClosing();
-      $("currentClosingPanel")?.scrollIntoView({behavior:"smooth",block:"start"});
+      $("currentClosingPanel")?.scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+      });
     };
   }
 
@@ -6976,5 +7116,5 @@
     }, 350);
   });
 
-  window.APONTA_P3_VERSION = "2.19.14";
+  window.APONTA_P3_VERSION = "2.19.15";
 })();
