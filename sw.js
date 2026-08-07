@@ -1,12 +1,12 @@
-const CACHE = "aponta-horas-v2.19.19-colunas-legiveis";
+const CACHE = "aponta-horas-v2.19.20-prevalidacao-importacao";
 const ASSETS = [
   "./",
   "./index.html",
-  "./app-v2.19.5.js?build=2209",
-  "./style-v2.19.5.css?build=2209",
+  "./app-v2.19.20.js?build=2210",
+  "./style-v2.19.20.css?build=2210",
   "./redefinir-senha.html",
   "./auth-recovery-v2.19.5.js?build=2209",
-  "./manifest.webmanifest?v=2.19.19",
+  "./manifest.webmanifest?v=2.19.20",
   "./modular-app-icon-192-v2116.png",
   "./modular-app-icon-512-v2116.png"
 ];
