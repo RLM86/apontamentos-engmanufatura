@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#052630">
   <meta name="description" content="Aponta Horas — Gestão de Apontamentos da Modular Data Centers">
-  <link rel="manifest" href="manifest.webmanifest?v=2.19.21">
+  <link rel="manifest" href="manifest.webmanifest?v=2.19.22">
   <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
   <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
-  <link rel="stylesheet" href="style-v2.19.21.css?build=2211">
+  <link rel="stylesheet" href="style-v2.19.22.css?build=2212">
   <title>Modular | Aponta Horas</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,8 +16,8 @@
 
   <script>
     (function () {
-      const BUILD = "2.19.21";
-      const ASSET_BUILD = "2211";
+      const BUILD = "2.19.22";
+      const ASSET_BUILD = "2212";
       const resetKey = "aponta-p3-cache-reset-" + BUILD;
 
       async function removeOldApplicationCache() {
@@ -351,6 +351,20 @@
           <p id="closingPlanDetails" class="closing-plan-details">
             O planejado considera a jornada diária, os dias úteis, os feriados e as ausências aprovadas.
           </p>
+
+          <section id="currentClosingDailyReview" class="closing-daily-audit closing-daily-audit-ok">
+            <div class="closing-daily-audit-heading">
+              <div>
+                <span>Conferência antes do fechamento</span>
+                <strong id="currentClosingDailyReviewTitle">Jornada diária</strong>
+                <small id="currentClosingDailyReviewHelp">
+                  Consulte o mês para conferir dias com horas acima da jornada.
+                </small>
+              </div>
+              <span id="currentClosingDailyReviewBadge" class="badge closing-daily-badge-ok">OK</span>
+            </div>
+            <div id="currentClosingDailyReviewList" class="closing-excess-days-list"></div>
+          </section>
           <div class="actions">
             <button id="submitClosingBtn" class="btn primary">Enviar para aprovação</button>
             <button id="approveClosingBtn" class="btn success" data-manager-only>Aprovar</button>
@@ -1407,7 +1421,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="config.js"></script>
-  <script src="app-v2.19.21.js?build=2211"></script>
+  <script src="app-v2.19.22.js?build=2212"></script>
 
   <div id="installAppOverlay" class="install-app-overlay" hidden>
     <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
@@ -1456,7 +1470,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=2.19.21", { updateViaCache: "none" })
+        navigator.serviceWorker.register("./sw.js?v=2.19.22", { updateViaCache: "none" })
           .then(registration => registration.update())
           .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
       });
