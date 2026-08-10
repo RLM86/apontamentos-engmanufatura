@@ -1,0 +1,1467 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#052630">
+  <meta name="description" content="Aponta Horas — Gestão de Apontamentos da Modular Data Centers">
+  <link rel="manifest" href="manifest.webmanifest?v=2.19.20">
+  <link rel="icon" type="image/png" href="modular-app-icon-192-v2116.png">
+  <link rel="apple-touch-icon" href="modular-app-icon-192-v2116.png">
+  <link rel="stylesheet" href="style-v2.19.20.css?build=2210">
+  <title>Modular | Aponta Horas</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Aponta Horas">
+
+  <script>
+    (function () {
+      const BUILD = "2.19.20";
+      const ASSET_BUILD = "2210";
+      const resetKey = "aponta-p3-cache-reset-" + BUILD;
+
+      async function removeOldApplicationCache() {
+        try {
+          if ("serviceWorker" in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(registrations.map(registration => registration.unregister()));
+          }
+
+          if ("caches" in window) {
+            const cacheNames = await caches.keys();
+            await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
+          }
+        } catch (error) {
+          console.warn("Não foi possível limpar todo o cache antigo:", error);
+        }
+
+        sessionStorage.setItem(resetKey, "ok");
+
+        const url = new URL(window.location.href);
+        if (url.searchParams.get("build") !== ASSET_BUILD) {
+          url.searchParams.set("build", ASSET_BUILD);
+          window.location.replace(url.toString());
+        }
+      }
+
+      if (sessionStorage.getItem(resetKey) !== "ok") {
+        removeOldApplicationCache();
+      }
+    })();
+  </script>
+
+</head>
+<body>
+  <div id="toast" class="toast" hidden></div>
+  <div id="loading" class="loading" hidden><div class="spinner"></div><span>Carregando...</span></div>
+
+  <section id="setupScreen" class="center-screen" hidden>
+    <div class="auth-card wide">
+      <div class="brand">
+        <img src="assets/brand/modular-symbol.png" class="brand-symbol" alt="Modular">
+        <div><h1>Configuração necessária</h1><p>Conecte o aplicativo ao banco compartilhado.</p></div>
+      </div>
+      <p>O arquivo <strong>config.js</strong> ainda não contém a URL e a chave pública do projeto Supabase.</p>
+      <ol>
+        <li>Crie um projeto gratuito no Supabase.</li>
+        <li>Execute o arquivo <strong>schema.sql</strong> no SQL Editor.</li>
+        <li>Abra <strong>configurador.html</strong> e informe a URL e a chave pública.</li>
+        <li>Substitua o arquivo <strong>config.js</strong> pelo arquivo gerado.</li>
+      </ol>
+      <a class="btn primary inline" href="configurador.html">Abrir configurador</a>
+    </div>
+  </section>
+
+  <section id="authScreen" class="center-screen" hidden>
+    <div class="auth-card">
+      <div class="brand">
+        <img src="assets/brand/modular-symbol.png" class="brand-symbol" alt="Modular">
+        <div><h1>Aponta Horas</h1><p>Gestão de Apontamentos</p></div>
+      </div>
+
+      <div class="tabs auth-tabs">
+        <button type="button" class="tab active" data-auth-tab="login">Entrar</button>
+        <button type="button" class="tab" data-auth-tab="signup">Criar conta</button>
+      </div>
+
+      <form id="loginForm" class="auth-form active">
+        <label>E-mail<input id="loginEmail" type="email" autocomplete="email" required></label>
+        <label>Senha<input id="loginPassword" type="password" autocomplete="current-password" minlength="6" required></label>
+        <button class="btn primary full" type="submit">Entrar</button>
+        <button class="link-button" id="forgotPasswordBtn" type="button">Esqueci minha senha</button>
+              </form>
+      <div id="authMessage" class="auth-message" role="status" aria-live="polite" hidden></div>
+
+      <form id="signupForm" class="auth-form">
+        <label>Nome completo<input id="signupName" type="text" autocomplete="name" required></label>
+        <label>E-mail<input id="signupEmail" type="email" autocomplete="email" required></label>
+        <label>Senha<input id="signupPassword" type="password" autocomplete="new-password" minlength="6" required></label>
+        <button class="btn primary full" type="submit">Criar conta</button>
+        <p class="help">Após criar a conta, o cadastro ficará pendente. Um Gestor ou Administrador deverá aprovar antes do primeiro apontamento.</p>
+      </form>
+    </div>
+  </section>
+
+  <div id="app" hidden>
+    <header class="topbar">
+      <div class="brand top">
+        <img src="assets/brand/modular-logo-white-transparent.png" class="brand-logo-full" alt="Modular Data Centers">
+        <div><strong>Aponta Horas</strong><small>Gestão de Apontamentos · <span id="connectionStatus">Banco online</span></small></div>
+      </div>
+      <div class="user-box">
+        <span id="currentUser"></span>
+        <span id="currentRole" class="badge"></span>
+        <span id="currentRegistration" class="badge registration-top-badge"></span>
+        <button id="logoutBtn" class="btn ghost small">Sair</button>
+      </div>
+    </header>
+
+    <nav id="mainNav" class="nav" aria-label="Navegação principal">
+      <button class="active" data-page="dashboard">Painel</button>
+      <button data-page="presentation">Apresentação</button>
+      <button data-page="entries" data-entry-approval-required>Apontamentos</button>
+      <button data-page="absences">Férias e Afastamentos</button>
+      <button data-page="closing" data-entry-approval-required>Fechamento</button>
+      <button data-page="reports">Relatórios</button>
+      <button data-page="profile">Meu perfil</button>
+      <button data-page="catalogs" data-manager-only>Cadastros</button>
+      <button data-page="importExcel" data-admin-only>Importar Excel</button>
+      <button data-page="backupRestore" data-admin-only>Backup</button>
+      <button data-page="team" data-manager-only>Equipe</button>
+    </nav>
+
+    <main>
+      <section id="dashboard" class="page active">
+        <div class="page-title">
+          <div><h2>Painel</h2><p id="dashboardPeriod"></p></div>
+          <button class="btn secondary" id="refreshDashboard">Atualizar</button>
+        </div>
+        <article id="registrationApprovalBanner" class="registration-access-banner" hidden>
+          <div>
+            <strong id="registrationApprovalTitle">Cadastro pendente de aprovação</strong>
+            <p id="registrationApprovalMessage">Um Gestor ou Administrador precisa liberar seu acesso antes do primeiro apontamento.</p>
+          </div>
+          <span id="registrationApprovalBadge" class="badge registration-pendente">Pendente</span>
+        </article>
+        <div class="metrics">
+          <article><span>Horas no mês</span><strong id="metricHours">0,00</strong></article>
+          <article><span>Apontamentos</span><strong id="metricEntries">0</strong></article>
+          <article><span>Colaboradores</span><strong id="metricUsers">0</strong></article>
+          <article><span>Projetos ativos</span><strong id="metricProjects">0</strong></article>
+        </div>
+        <div class="grid">
+          <article class="card span-6"><h3>Horas por colaborador</h3><div class="table-wrap"><table><thead><tr><th>Colaborador</th><th>Horas</th></tr></thead><tbody id="dashboardUsers"></tbody></table></div></article>
+          <article class="card span-6"><h3>Horas por projeto</h3><div class="table-wrap"><table><thead><tr><th>Projeto</th><th>Horas</th></tr></thead><tbody id="dashboardProjects"></tbody></table></div></article>
+        </div>
+      </section>
+
+
+      <section id="presentation" class="page">
+        <div class="presentation-hero">
+          <div class="presentation-hero-text">
+            <span class="eyebrow">MODULAR DATA CENTERS</span>
+            <h2>Aponta Horas</h2>
+            <p>Plataforma compartilhada para registrar horas, acompanhar jornadas, enviar fechamentos e apoiar a aprovação mensal com rastreabilidade.</p>
+            <div class="actions">
+              <a class="btn primary" href="docs/Apresentacao_Apontamento_Horas_Modular.pptx" download>Baixar apresentação</a>
+              <button class="btn secondary" data-page-jump="entries" data-entry-approval-required type="button">Começar apontamento</button>
+            </div>
+          </div>
+          <div class="presentation-hero-logo">
+            <img src="assets/brand/modular-symbol.png" alt="Modular">
+          </div>
+        </div>
+
+        <div class="presentation-grid">
+          <article class="presentation-card">
+            <span>01</span>
+            <h3>Registro centralizado</h3>
+            <p>Cada colaborador aponta horas por projeto, atividade e data, eliminando controles paralelos em planilhas.</p>
+          </article>
+          <article class="presentation-card">
+            <span>02</span>
+            <h3>Controle de jornada</h3>
+            <p>O sistema compara o total do dia com a jornada prevista e alerta quando houver excedente.</p>
+          </article>
+          <article class="presentation-card">
+            <span>03</span>
+            <h3>Fechamento mensal</h3>
+            <p>O colaborador envia o mês para aprovação e o gestor recebe notificação por e-mail.</p>
+          </article>
+          <article class="presentation-card">
+            <span>04</span>
+            <h3>Gestão e relatórios</h3>
+            <p>Dashboards e exportações mostram horas por colaborador, projeto, atividade e período.</p>
+          </article>
+        </div>
+
+        <article class="card modular-flow-card">
+          <h3>Fluxo operacional</h3>
+          <div class="modular-flow">
+            <div><strong>1</strong><span>Colaborador registra as horas</span></div>
+            <div><strong>2</strong><span>Sistema valida jornada e status</span></div>
+            <div><strong>3</strong><span>Fechamento enviado para aprovação</span></div>
+            <div><strong>4</strong><span>Gestor aprova ou devolve</span></div>
+            <div><strong>5</strong><span>Relatório fica disponível</span></div>
+          </div>
+        </article>
+      </section>
+
+      <section id="entries" class="page">
+        <div class="page-title"><div><h2>Apontamentos</h2><p>Registre as horas de trabalho por projeto e atividade.</p></div></div>
+        <div class="grid">
+          <article class="card span-4">
+            <h3>Novo apontamento</h3>
+            <form id="entryForm" class="form-grid entry-flow-form">
+              <label class="full manager-user-field">Colaborador<select id="entryUser"></select></label>
+              <label class="full flow-step"><span><b>1</b> Projeto</span><select id="entryProject" required></select></label>
+              <label class="full flow-step"><span><b>2</b> Área</span><select id="entryArea" required></select></label>
+              <label id="entrySectorField" class="full flow-step conditional-flow-field" hidden><span><b id="entrySectorStep">3</b> Setor de fabricação</span><select id="entrySector"></select></label>
+              <label id="entryPanelTypeField" class="full flow-step conditional-flow-field" hidden><span><b id="entryPanelTypeStep">3</b> Tipo de painel</span><select id="entryPanelType"></select></label>
+              <label id="entryRoomField" class="full flow-step conditional-flow-field" hidden><span><b id="entryRoomStep">3</b> <span id="entryRoomLabel">Sala do projeto</span></span><select id="entryRoom"></select></label>
+              <label id="entryModuleField" class="full flow-step conditional-flow-field" hidden><span><b id="entryModuleStep">4</b> Módulo da sala</span><select id="entryModule"></select></label>
+              <label id="entryModulePartField" class="full flow-step conditional-flow-field" hidden><span><b id="entryModulePartStep">5</b> Parte do módulo</span><select id="entryModulePart"><option value="">Selecione a parte</option><option value="inferior">Parte inferior</option><option value="superior">Parte superior</option></select></label>
+              <label class="full flow-step activity-picker-field">
+                <span><b id="entryActivityStep">4</b> Atividade</span>
+                <input
+                  id="entryActivitySearch"
+                  class="activity-search-input"
+                  type="search"
+                  placeholder="Buscar por código, nome ou disciplina"
+                  autocomplete="off"
+                  disabled>
+                <select id="entryActivity" required></select>
+                <small id="entryActivityFilterSummary" class="activity-filter-summary">
+                  Selecione primeiro a área.
+                </small>
+              </label>
+              <div id="entryActivityHelp" class="activity-context-help full" hidden></div>
+              <label>Data<input id="entryDate" type="date" max="" required></label>
+              <label>Horas<input id="entryHours" type="number" min="0.25" max="24" step="0.25" required></label>
+              <label class="full">Observação <span id="entryObservationRule" class="field-rule">Opcional</span><textarea id="entryDetails" maxlength="500"></textarea></label>
+              <button class="btn primary full" type="submit">Salvar apontamento</button>
+            </form>
+            <div id="dayTotal" class="day-total" role="status" aria-live="polite"></div>
+          </article>
+
+          <article class="card span-8">
+            <div class="section-heading"><h3>Histórico</h3><button id="copyPreviousBtn" class="btn secondary small">Copiar último dia</button></div>
+            <div class="filters">
+              <label class="manager-user-field">Colaborador<select id="filterEntryUser"><option value="">Todos</option></select></label>
+              <label>Início<input id="filterEntryStart" type="date"></label>
+              <label>Fim<input id="filterEntryEnd" type="date"></label>
+              <button id="filterEntriesBtn" class="btn secondary">Filtrar</button>
+            </div>
+            <div id="entryBulkToolbar" class="entry-bulk-toolbar">
+              <label class="entry-select-all">
+                <input id="selectAllVisibleEntries" type="checkbox">
+                Selecionar todos os apontamentos editáveis visíveis
+              </label>
+              <span id="selectedEntriesCount" class="badge">0 selecionados</span>
+              <button id="clearSelectedEntriesBtn" class="btn secondary small" type="button" disabled>Limpar seleção</button>
+              <button id="deleteSelectedEntriesBtn" class="btn danger small" type="button" disabled>Excluir selecionados</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Selecionar</th><th>Data</th><th>Colaborador</th><th>Projeto</th><th>Área</th><th>Referência</th><th>Atividade</th><th>Horas</th><th>Status</th><th>Ações</th></tr></thead>
+                <tbody id="entriesTable"></tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="absences" class="page">
+        <div class="page-title">
+          <div><h2>Férias e Afastamentos</h2><p>Cadastre os períodos e acompanhe a aprovação do Gestor ou Administrador.</p></div>
+        </div>
+        <div class="grid">
+          <article class="card span-4">
+            <h3 id="absenceFormTitle">Novo período</h3>
+            <form id="absenceForm" class="form-grid">
+              <input id="absenceId" type="hidden">
+              <label class="full manager-user-field">Colaborador<select id="absenceUser"></select></label>
+              <label>Início<input id="absenceStart" type="date" required></label>
+              <label>Fim<input id="absenceEnd" type="date" required></label>
+              <label class="full">Tipo
+                <select id="absenceType" required>
+                  <option value="Férias">Férias</option>
+                  <option value="Atestado médico">Atestado médico</option>
+                  <option value="Afastamento">Afastamento</option>
+                  <option value="Afastamento pelo INSS">Afastamento pelo INSS</option>
+                  <option value="Licença-maternidade">Licença-maternidade</option>
+                  <option value="Licença-paternidade">Licença-paternidade</option>
+                  <option value="Licença não remunerada">Licença não remunerada</option>
+                  <option value="Folga">Folga</option>
+                  <option value="Outro afastamento">Outro afastamento</option>
+                </select>
+              </label>
+              <label class="full">Observação ou motivo<textarea id="absenceNotes" maxlength="500"></textarea></label>
+              <button id="saveAbsenceBtn" class="btn primary full" type="submit">Salvar período</button>
+              <button id="cancelAbsenceEditBtn" class="btn secondary full" type="button" hidden>Cancelar edição</button>
+            </form>
+            <p class="help absence-help">O colaborador pode corrigir o registro enquanto estiver pendente. Após a aprovação, somente Gestor ou Administrador poderá editar ou excluir.</p>
+          </article>
+          <article class="card span-8">
+            <div class="section-heading"><h3>Períodos cadastrados</h3><span class="badge">Individual por colaborador</span></div>
+            <div class="filters absence-filters">
+              <label class="manager-user-field">Colaborador<select id="absenceFilterUser"><option value="">Todos</option></select></label>
+              <label>Tipo<select id="absenceFilterType"><option value="">Todos</option><option value="Férias">Férias</option><option value="Atestado">Atestados</option><option value="Afastamento">Afastamentos</option><option value="Licença">Licenças</option><option value="Folga">Folgas</option><option value="Outro">Outros</option></select></label>
+              <label>Situação<select id="absenceFilterStatus"><option value="">Todas</option><option value="programado">Programado</option><option value="em_andamento">Em andamento</option><option value="encerrado">Encerrado</option></select></label>
+              <label>Aprovação<select id="absenceFilterApproval"><option value="">Todas</option><option value="pendente">Pendente</option><option value="aprovado">Aprovado</option></select></label>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th>Colaborador</th><th>Período</th><th>Dias</th><th>Tipo</th><th>Situação</th><th>Aprovação</th><th>Observação</th><th>Ações</th></tr></thead><tbody id="absencesTable"></tbody></table></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="closing" class="page">
+        <div class="page-title"><div><h2>Fechamento mensal</h2><p>Envie o período para aprovação e acompanhe os fechamentos já enviados.</p></div></div>
+
+        <div class="tabs closing-tabs" role="tablist" aria-label="Opções do fechamento mensal">
+          <button class="tab active" type="button" data-closing-view="current" aria-selected="true">Fechamento do mês</button>
+          <button class="tab" type="button" data-closing-view="history" aria-selected="false">Fechamentos enviados</button>
+        </div>
+
+        <section id="currentClosingPanel" class="closing-panel">
+        <article class="card">
+          <div class="filters">
+            <label class="manager-user-field">Colaborador<select id="closingUser"></select></label>
+            <label>Mês<input id="closingMonth" type="month"></label>
+            <button id="loadClosingBtn" class="btn secondary">Consultar</button>
+          </div>
+          <div class="closing-summary closing-workload-summary">
+            <div>
+              <span>Horas planejadas</span>
+              <strong id="closingPlannedHours">0,00</strong>
+            </div>
+            <div>
+              <span>Horas apontadas</span>
+              <strong id="closingHours">0,00</strong>
+            </div>
+            <div>
+              <span>Saldo</span>
+              <strong id="closingBalance">0,00</strong>
+            </div>
+            <div>
+              <span>Situação</span>
+              <strong id="closingStatus">Aberto</strong>
+            </div>
+          </div>
+          <p id="closingPlanDetails" class="closing-plan-details">
+            O planejado considera a jornada diária, os dias úteis, os feriados e as ausências aprovadas.
+          </p>
+          <div class="actions">
+            <button id="submitClosingBtn" class="btn primary">Enviar para aprovação</button>
+            <button id="approveClosingBtn" class="btn success" data-manager-only>Aprovar</button>
+            <button id="rejectClosingBtn" class="btn danger" data-manager-only>Devolver</button>
+          </div>
+          <label>Observação do gestor<textarea id="closingNote" maxlength="500"></textarea></label>
+
+          <section id="adminApprovedReturnPanel" class="admin-approved-return-panel" data-admin-only>
+            <div class="admin-approved-return-heading">
+              <div>
+                <span class="eyebrow">Ação administrativa</span>
+                <h3>Devolver período depois da aprovação</h3>
+                <p id="adminApprovedReturnHelp">
+                  Selecione um período aprovado para liberar correções ou enviá-lo novamente ao gestor.
+                </p>
+              </div>
+              <span id="adminApprovedReturnStatus" class="badge">Aguardando período aprovado</span>
+            </div>
+
+            <label>
+              Motivo da devolução
+              <textarea
+                id="adminApprovedReturnReason"
+                maxlength="500"
+                placeholder="Informe o motivo da devolução. Esta mensagem ficará registrada no fechamento."></textarea>
+            </label>
+
+            <div class="admin-approved-return-options">
+              <article>
+                <h4>Devolver ao colaborador</h4>
+                <p>Os apontamentos passam para “Devolvido” e poderão ser editados, excluídos e enviados novamente.</p>
+                <button id="returnClosingToCollaboratorBtn" class="btn danger" type="button" disabled>
+                  Devolver ao colaborador
+                </button>
+              </article>
+
+              <article>
+                <h4>Voltar para o gestor</h4>
+                <p>O período volta para “Enviado” e permanece bloqueado para edição pelo colaborador.</p>
+                <button id="returnClosingToManagerBtn" class="btn secondary" type="button" disabled>
+                  Voltar para aprovação do gestor
+                </button>
+              </article>
+            </div>
+          </section>
+        </article>
+        </section>
+
+        <section id="closingHistoryPanel" class="closing-panel" hidden>
+          <article class="card">
+            <div class="section-heading">
+              <div>
+                <h3>Fechamentos enviados</h3>
+                <p>Consulte períodos enviados, aprovados ou devolvidos e abra qualquer fechamento para análise.</p>
+              </div>
+              <span id="closingHistoryCountBadge" class="badge">0 registros</span>
+            </div>
+
+            <div class="filters closing-history-filters">
+              <label>
+                Buscar
+                <input id="closingHistorySearch" type="search" placeholder="Nome, projeto ou observação" autocomplete="off">
+              </label>
+
+              <label class="manager-user-field">
+                Colaborador
+                <select id="closingHistoryUser"><option value="">Todos</option></select>
+              </label>
+
+              <label>
+                Mês inicial
+                <input id="closingHistoryStartMonth" type="month">
+              </label>
+
+              <label>
+                Mês final
+                <input id="closingHistoryEndMonth" type="month">
+              </label>
+
+              <label>
+                Situação
+                <select id="closingHistoryStatus">
+                  <option value="">Todas as situações</option>
+                  <option value="enviado">Enviado</option>
+                  <option value="aprovado">Aprovado</option>
+                  <option value="devolvido">Devolvido</option>
+                </select>
+              </label>
+
+              <label>
+                Projeto
+                <select id="closingHistoryProject"><option value="">Todos os projetos</option></select>
+              </label>
+
+              <button id="filterClosingHistoryBtn" class="btn secondary" type="button">Filtrar</button>
+              <button id="clearClosingHistoryFiltersBtn" class="btn secondary" type="button">Limpar filtros</button>
+              <button id="exportClosingHistoryBtn" class="btn primary" type="button">Exportar CSV</button>
+            </div>
+
+            <div class="closing-history-summary closing-workload-history-summary" aria-label="Resumo dos fechamentos filtrados">
+              <div><span>Fechamentos</span><strong id="closingHistoryTotal">0</strong></div>
+              <div><span>Horas planejadas</span><strong id="closingHistoryPlannedHours">0,00</strong></div>
+              <div><span>Horas apontadas</span><strong id="closingHistoryHours">0,00</strong></div>
+              <div><span>Aguardando aprovação</span><strong id="closingHistoryPending">0</strong></div>
+              <div><span>Aprovados</span><strong id="closingHistoryApproved">0</strong></div>
+            </div>
+
+            <section id="closingHistoryBulkActions" class="closing-history-bulk-toolbar" data-manager-only>
+              <label class="closing-history-select-all">
+                <input id="selectAllVisibleClosings" type="checkbox">
+                Selecionar todos os fechamentos enviados visíveis
+              </label>
+
+              <span id="selectedClosingsCount" class="badge">0 selecionados</span>
+              <button id="clearSelectedClosingsBtn" class="btn secondary" type="button" disabled>Limpar seleção</button>
+
+              <label class="closing-history-bulk-note">
+                Observação da análise em lote
+                <textarea id="closingHistoryBulkNote" maxlength="500" placeholder="Obrigatória para devolver. Opcional para aprovar."></textarea>
+              </label>
+
+              <div class="closing-history-bulk-buttons">
+                <button id="approveSelectedClosingsBtn" class="btn success" type="button" disabled>Aprovar selecionados</button>
+                <button id="returnSelectedClosingsBtn" class="btn danger" type="button" disabled>Devolver selecionados</button>
+              </div>
+            </section>
+
+            <div class="table-wrap closing-history-table-wrap">
+              <table class="responsive-mobile-table closing-history-compact-table">
+                <thead>
+                  <tr>
+                    <th data-manager-only>Sel.</th>
+                    <th>Colaborador / Mês</th>
+                    <th>Planejado</th>
+                    <th>Apontado</th>
+                    <th>Saldo / Conferência</th>
+                    <th>Situação</th>
+                    <th>Projetos</th>
+                    <th>Conferir</th>
+                  </tr>
+                </thead>
+                <tbody id="closingHistoryTable"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <section id="reports" class="page">
+        <div class="page-title"><div><h2>Relatórios</h2><p>Consulte horas, projetos, férias e afastamentos permitidos ao seu perfil.</p></div></div>
+
+        <div class="tabs report-tabs" role="tablist" aria-label="Tipos de relatório">
+          <button class="tab active" type="button" data-report-view="projects">Projetos e horas</button>
+          <button class="tab" type="button" data-report-view="people">Equipe: horas, férias e afastamentos</button>
+        </div>
+
+        <section id="projectReportPanel" class="report-panel">
+          <article class="card">
+            <div class="filters">
+              <label class="manager-user-field">Colaborador<select id="reportUser"><option value="">Todos</option></select></label>
+              <label>Início<input id="reportStart" type="date"></label>
+              <label>Fim<input id="reportEnd" type="date"></label>
+              <label>Projeto<select id="reportProject"><option value="">Todos</option></select></label>
+              <button id="generateReportBtn" class="btn secondary">Gerar</button>
+              <button id="exportReportBtn" class="btn primary">Exportar CSV</button>
+            </div>
+            <div class="report-total">Total: <strong id="reportTotal">0,00 horas</strong></div>
+            <div class="table-wrap"><table><thead><tr><th>Data</th><th>Colaborador</th><th>Projeto</th><th>Área</th><th>Referência</th><th>Atividade</th><th>Horas</th><th>Observação</th><th>Status</th></tr></thead><tbody id="reportTable"></tbody></table></div>
+          </article>
+        </section>
+
+        <section id="peopleReportPanel" class="report-panel" hidden>
+          <article class="card">
+            <div class="filters">
+              <label class="manager-user-field">Colaborador<select id="peopleReportUser"><option value="">Todos</option></select></label>
+              <label>Início<input id="peopleReportStart" type="date"></label>
+              <label>Fim<input id="peopleReportEnd" type="date"></label>
+              <label>Tipo<select id="peopleReportType"><option value="">Todos</option><option value="Férias">Férias</option><option value="Atestado">Atestados</option><option value="Afastamento">Afastamentos</option><option value="Licença">Licenças</option><option value="Folga">Folgas</option><option value="Outro">Outros</option></select></label>
+              <button id="generatePeopleReportBtn" class="btn secondary">Gerar</button>
+              <button id="exportPeopleReportBtn" class="btn primary">Exportar resumo CSV</button>
+              <button id="exportPeopleAbsencesBtn" class="btn secondary">Exportar detalhes CSV</button>
+            </div>
+
+            <div class="report-metrics">
+              <article><span>Horas apontadas</span><strong id="peopleReportHours">0,00</strong></article>
+              <article><span>Dias de férias</span><strong id="peopleReportVacationDays">0</strong></article>
+              <article><span>Dias afastados</span><strong id="peopleReportAwayDays">0</strong></article>
+              <article><span>Colaboradores com ocorrência</span><strong id="peopleReportUsersWithAbsence">0</strong></article>
+            </div>
+
+            <div class="section-heading report-section-heading">
+              <div><h3>Resumo por colaborador</h3><p>Horas apontadas e dias de ausência dentro do período escolhido.</p></div>
+            </div>
+            <div class="table-wrap report-summary-table"><table><thead><tr><th>Colaborador</th><th>Horas</th><th>Férias</th><th>Atestados</th><th>Afastamentos/licenças</th><th>Folgas</th><th>Outros</th><th>Total de dias</th><th>Ocorrências no período</th></tr></thead><tbody id="peopleReportTable"></tbody></table></div>
+
+            <div class="section-heading report-section-heading report-details-heading">
+              <div><h3>Detalhamento de férias e afastamentos</h3><p>Períodos que cruzam as datas selecionadas.</p></div>
+            </div>
+            <div class="table-wrap"><table><thead><tr><th>Colaborador</th><th>Tipo</th><th>Início</th><th>Fim</th><th>Dias no filtro</th><th>Situação</th><th>Aprovação</th><th>Observação</th></tr></thead><tbody id="peopleAbsenceReportTable"></tbody></table></div>
+          </article>
+        </section>
+      </section>
+
+
+      <section id="profile" class="page">
+        <div class="page-title"><div><h2>Meu perfil</h2><p>Atualize seu nome e sua jornada diária.</p></div></div>
+        <article class="card profile-card">
+          <form id="profileForm" class="form-grid">
+            <label class="full">Nome completo<input id="profileName" required></label>
+            <label class="full">E-mail<input id="profileEmail" type="email" disabled></label>
+            <label>Jornada diária<input id="profileDailyHours" type="number" min="1" max="24" step="0.5" required></label>
+            <label>Perfil<input id="profileRole" disabled></label>
+            <button class="btn primary full" type="submit">Salvar meu perfil</button>
+          </form>
+        </article>
+      </section>
+
+      <section id="catalogs" class="page">
+        <div class="page-title catalog-page-title">
+          <div>
+            <h2>Cadastros</h2>
+            <p>Cadastre projetos, atividades, referências, composição física e feriados.</p>
+          </div>
+        </div>
+
+        <div class="tabs catalog-tabs catalog-tabs-four" role="tablist" aria-label="Tipos de cadastro">
+          <button class="tab active" type="button" data-catalog-view="general">1. Projetos e atividades</button>
+          <button class="tab" type="button" data-catalog-view="references">2. Referências</button>
+          <button class="tab" type="button" data-catalog-view="projects">3. Composição do projeto</button>
+          <button class="tab" type="button" data-catalog-view="holidays">4. Feriados</button>
+        </div>
+
+        <section id="generalCatalogPanel" class="catalog-panel">
+          <div class="grid catalog-general-grid">
+            <article class="card span-4 catalog-compact-card">
+              <div class="section-heading compact-heading">
+                <div>
+                  <h3>Projetos</h3>
+                  <p>Inclua, pesquise e administre todos os projetos.</p>
+                </div>
+                <span id="projectCatalogCount" class="badge">0 projetos</span>
+              </div>
+              <form id="projectForm" class="form-grid compact-form-grid">
+                <label>Código<input id="projectCode" placeholder="TB14"></label>
+                <label>Cliente<input id="projectClient"></label>
+                <label class="full">Nome<input id="projectName" required></label>
+                <label class="full">Descrição<input id="projectDescription"></label>
+                <button class="btn primary full">Adicionar projeto</button>
+              </form>
+              <section class="project-catalog-filters" aria-label="Filtros dos projetos cadastrados">
+                <label class="project-filter-search">
+                  Buscar projeto
+                  <input id="projectFilterSearch" type="search"
+                    placeholder="Código, projeto, cliente ou descrição..."
+                    autocomplete="off">
+                </label>
+
+                <label>
+                  Situação
+                  <select id="projectFilterStatus">
+                    <option value="">Ativos e inativos</option>
+                    <option value="active">Somente ativos</option>
+                    <option value="inactive">Somente inativos</option>
+                  </select>
+                </label>
+
+                <button id="clearProjectFiltersBtn" class="btn secondary" type="button">
+                  Limpar filtros
+                </button>
+              </section>
+
+              <div class="table-wrap compact catalog-table-wrap">
+                <table class="catalog-data-table project-catalog-table">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Projeto</th>
+                      <th>Cliente</th>
+                      <th>Status</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="projectsTable"></tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="card span-8 catalog-compact-card">
+              <div class="section-heading compact-heading">
+                <div><h3>Atividades</h3><p>Defina em quais áreas cada atividade poderá ser utilizada.</p></div>
+                <span id="activityCatalogCount" class="badge">0</span>
+              </div>
+              <form id="activityForm" class="form-grid compact-form-grid">
+                <label class="activity-code-field">Código
+                  <input
+                    id="activityCode"
+                    placeholder="Selecione primeiro a disciplina"
+                    autocomplete="off"
+                    required>
+                  <small id="activityCodeSequenceHint" class="activity-code-sequence-hint">
+                    Selecione a disciplina para consultar o último código cadastrado.
+                  </small>
+                </label>
+                <label>Disciplina
+                  <select id="activityDiscipline" required>
+                    <option value="">Selecione a disciplina</option>
+                  </select>
+                </label>
+                <label class="full">Nome<input id="activityName" required></label>
+                <label>Natureza
+                  <select id="activityNature" required>
+                    <option value="">Selecione a natureza</option>
+                  </select>
+                </label>
+                <label>Observação
+      <select id="activityObservationRequirement">
+        <option value="Opcional">Opcional</option>
+        <option value="Obrigatória">Obrigatória</option>
+      </select>
+    </label>
+                <div class="full activity-area-editor">
+      <div class="activity-area-editor-header">
+        <span class="field-title">Áreas aplicáveis</span>
+        <div class="activity-area-editor-actions">
+          <button id="selectAllActivityAreasBtn" class="btn secondary small" type="button">Marcar todas</button>
+          <button id="clearActivityAreasBtn" class="btn secondary small" type="button">Limpar</button>
+        </div>
+      </div>
+      <div id="activityAreasCheckboxes" class="area-checkbox-grid"></div>
+      <small>Marque todas as áreas nas quais esta atividade poderá aparecer.</small>
+    </div>
+                <label class="full">Orientação de uso<textarea id="activityUsageDescription" maxlength="500"></textarea></label>
+                <button class="btn primary full">Adicionar atividade</button>
+              </form>
+
+
+
+              <section class="activity-catalog-filters" aria-label="Filtros de atividades">
+                <div class="activity-filter-heading">
+                  <div>
+                    <h4>Filtrar atividades</h4>
+                    <p>Localize rapidamente por código, nome, área, disciplina, observação ou situação.</p>
+                  </div>
+                  <span id="activityFilterResultCount" class="badge">0 resultados</span>
+                </div>
+
+                <div class="activity-filter-grid">
+                  <label class="activity-filter-search">Código, nome ou texto
+                    <input id="activityFilterSearch" type="search" placeholder="Ex.: TST-004, FAT, pintura..." autocomplete="off">
+                  </label>
+
+                  <label>Área
+                    <select id="activityFilterArea">
+                      <option value="">Todas as áreas</option>
+                    </select>
+                  </label>
+
+                  <label>Disciplina
+                    <select id="activityFilterDiscipline">
+                      <option value="">Todas as disciplinas</option>
+                    </select>
+                  </label>
+
+                  <label>Observação
+                    <select id="activityFilterObservation">
+                      <option value="">Todas</option>
+                      <option value="Opcional">Opcional</option>
+                      <option value="Obrigatória">Obrigatória</option>
+                    </select>
+                  </label>
+
+                  <label>Situação
+                    <select id="activityFilterStatus">
+                      <option value="">Ativas e inativas</option>
+                      <option value="ativa">Ativas</option>
+                      <option value="inativa">Inativas</option>
+                    </select>
+                  </label>
+
+                  <button id="clearActivityFiltersBtn" class="btn secondary" type="button">
+                    Limpar filtros
+                  </button>
+                </div>
+              </section>
+
+              <section id="activityListAdminTools" class="activity-list-admin-tools" data-admin-only>
+                <div class="activity-file-actions">
+                  <button id="downloadActivitiesWorkbookBtn" class="btn primary small" type="button">
+                    Baixar lista atual
+                  </button>
+                  <button id="uploadActivitiesWorkbookBtn" class="btn secondary small" type="button">
+                    Enviar lista atualizada
+                  </button>
+                  <input id="activitiesWorkbookFile" type="file" accept=".xlsx,.xls,.csv" hidden>
+                </div>
+
+                <div class="activity-bulk-actions">
+                  <label>
+                    <input id="selectAllVisibleActivities" type="checkbox">
+                    Selecionar todas visíveis
+                  </label>
+                  <span id="selectedActivitiesCount" class="badge">0 selecionadas</span>
+                  <button id="clearSelectedActivitiesBtn" class="btn secondary small" type="button" disabled>
+                    Limpar seleção
+                  </button>
+                  <button id="inactivateSelectedActivitiesBtn" class="btn secondary small" type="button" disabled>
+                    Inativar selecionadas
+                  </button>
+                  <button id="deleteSelectedActivitiesBtn" class="btn danger small" type="button" disabled>
+                    Excluir selecionadas
+                  </button>
+                </div>
+
+                <p id="activityWorkbookStatus" class="help">
+                  O Excel baixado pode ser editado e enviado novamente. Linhas removidas do arquivo não são apagadas automaticamente.
+                </p>
+              </section>
+
+              <div class="table-wrap compact catalog-table-wrap">
+                <table class="catalog-data-table activity-catalog-table">
+                  <thead>
+                    <tr>
+                      <th data-admin-only>Selecionar</th>
+                      <th>Código</th>
+                      <th>Atividade</th>
+                      <th>Áreas</th>
+                      <th>Disciplina</th>
+                      <th>Observação</th>
+                      <th>Status</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="activitiesTable"></tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="referenceCatalogPanel" class="catalog-panel" hidden>
+          <div class="grid catalog-reference-grid">
+            <article class="card span-4 reference-card catalog-compact-card">
+              <div class="section-heading compact-heading">
+                <div>
+                  <h3>Áreas de trabalho</h3>
+                  <p>Cadastre as áreas que aparecerão nos apontamentos e nas atividades.</p>
+                </div>
+                <span id="workAreasCount" class="badge">0 áreas</span>
+              </div>
+
+              <form id="workAreaForm" class="work-area-form" data-admin-only>
+                <label>Código
+                  <input id="workAreaCode" maxlength="12" placeholder="Ex.: QLD" required>
+                </label>
+                <label>Nome
+                  <input id="workAreaName" maxlength="80" placeholder="Ex.: Qualidade" required>
+                </label>
+                <label>Fluxo da referência
+                  <select id="workAreaDetailType" required>
+                    <option value="none">Sem referência adicional</option>
+                    <option value="sector">Selecionar setor</option>
+                    <option value="module">Selecionar sala, módulo e parte</option>
+                    <option value="panel_type">Selecionar tipo de painel</option>
+                    <option value="room">Selecionar sala do projeto</option>
+                  </select>
+                </label>
+                <label>Ordem
+                  <input id="workAreaOrder" type="number" min="0" step="1" value="10" required>
+                </label>
+                <button class="btn primary" type="submit">Adicionar área</button>
+              </form>
+
+              <div class="catalog-note">
+                <strong>Fluxo:</strong> define se o apontamento exigirá setor, sala/módulo, tipo de painel, sala ou nenhuma referência adicional.
+              </div>
+
+              <div class="table-wrap compact catalog-table-wrap">
+                <table class="catalog-data-table work-area-catalog-table">
+                  <thead>
+                    <tr>
+                      <th>Código</th>
+                      <th>Área</th>
+                      <th>Fluxo</th>
+                      <th>Ordem</th>
+                      <th>Status</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="workAreasTable"></tbody>
+                </table>
+              </div>
+            </article>
+            <article class="card span-4 reference-card catalog-compact-card">
+              <div class="section-heading compact-heading"><div><h3>Setores de fabricação</h3><p>Exibidos quando a área for Fabricação.</p></div></div>
+              <form id="sectorForm" class="mini-catalog-form compact-inline-form">
+                <input id="sectorCode" placeholder="Código" required>
+                <input id="sectorName" placeholder="Nome do setor" required>
+                <button class="btn primary small">Adicionar</button>
+              </form>
+              <div class="table-wrap compact catalog-table-wrap"><table class="catalog-data-table sector-catalog-table"><thead><tr><th>Código</th><th>Setor</th><th>Status</th><th>Ações</th></tr></thead><tbody id="sectorsTable"></tbody></table></div>
+            </article>
+
+            <article class="card span-4 reference-card catalog-compact-card">
+              <div class="section-heading compact-heading"><div><h3>Tipos de painel</h3><p>UPS, BMS, RPP, QGBT, PDU, ATS e outros.</p></div></div>
+              <form id="panelTypeForm" class="mini-catalog-form compact-inline-form">
+                <input id="panelTypeCode" placeholder="Código" required>
+                <input id="panelTypeName" placeholder="Tipo de painel" required>
+                <button class="btn primary small">Adicionar</button>
+              </form>
+              <div class="table-wrap compact catalog-table-wrap"><table class="catalog-data-table panel-catalog-table"><thead><tr><th>Código</th><th>Tipo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="panelTypesTable"></tbody></table></div>
+            </article>
+
+            <article class="card span-4 reference-card catalog-compact-card">
+              <div class="section-heading compact-heading"><div><h3>Catálogo de salas</h3><p>Padrão: DH, SE, SC, SM, HVAC e MONOBLOCO.</p></div></div>
+              <form id="roomForm" class="mini-catalog-form compact-inline-form">
+                <input id="roomCode" placeholder="Código: DH" required>
+                <input id="roomName" placeholder="Nome: Data Hall" required>
+                <button class="btn primary small">Adicionar</button>
+              </form>
+              <div class="table-wrap compact catalog-table-wrap"><table class="catalog-data-table room-catalog-table"><thead><tr><th>Código</th><th>Sala</th><th>Status</th><th>Ações</th></tr></thead><tbody id="roomsTable"></tbody></table></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="projectStructureCatalogPanel" class="catalog-panel" hidden>
+          <article class="card room-instance-builder-card">
+            <div class="composition-heading">
+              <div>
+                <span class="eyebrow-small">COMPOSIÇÃO FÍSICA</span>
+                <h3>Salas e módulos do projeto</h3>
+                <p>Cadastre quantas salas de cada tipo o projeto possui e quantos módulos existem em cada sala.</p>
+              </div>
+              <span id="projectRoomsCount" class="badge">0 salas</span>
+            </div>
+
+            <form id="projectRoomInstanceForm" class="room-instance-builder-form">
+              <label>Projeto<select id="projectCompositionProject" required></select></label>
+              <label>Tipo de sala<select id="projectRoomInstanceRoom" required></select></label>
+              <label>Quantidade de salas<input id="projectRoomInstanceCount" type="number" min="1" step="1" value="1" required></label>
+              <label>Módulos por sala<input id="projectRoomInstanceModuleCount" type="number" min="1" step="1" value="1" required></label>
+              <label>Prefixo do nome<input id="projectRoomInstanceNamePrefix" placeholder="Ex.: HVAC, SE, DH"></label>
+              <button class="btn primary" type="submit">Adicionar salas ao projeto</button>
+            </form>
+
+            <div id="projectCompositionStatus" class="composition-status">Selecione um projeto para configurar.</div>
+            <div class="composition-rule">
+              <strong>Exemplo CRUSOE:</strong> 1 DH com 8 módulos; 2 HVAC com 2 módulos cada; 4 SE com 2 módulos cada; 2 SM com 2 módulos cada. Os módulos possuem parte inferior e superior, exceto os módulos de MONOBLOCO.
+            </div>
+          </article>
+
+          <article class="card structure-summary-card">
+            <div class="section-heading compact-heading">
+              <div>
+                <h3>Salas cadastradas</h3>
+                <p>Pesquise e filtre as salas de todos os projetos. A seleção em massa considera somente as linhas visíveis.</p>
+              </div>
+              <span id="projectRoomsFilterCount" class="badge">0 resultados</span>
+            </div>
+
+            <section class="project-room-filter-panel" aria-label="Filtros das salas cadastradas">
+              <label>
+                Buscar por projeto ou sala
+                <input id="projectRoomsSearch" type="search" placeholder="Ex.: BOGOTA, HVAC 01, DH..." autocomplete="off">
+              </label>
+
+              <label>
+                Projeto
+                <select id="projectRoomsProjectFilter">
+                  <option value="">Todos os projetos</option>
+                </select>
+              </label>
+
+              <label>
+                Tipo de sala
+                <select id="projectRoomsTypeFilter">
+                  <option value="">Todos os tipos</option>
+                </select>
+              </label>
+
+              <label>
+                Situação
+                <select id="projectRoomsStatusFilter">
+                  <option value="">Ativas e inativas</option>
+                  <option value="active">Somente ativas</option>
+                  <option value="inactive">Somente inativas</option>
+                </select>
+              </label>
+
+              <button id="clearProjectRoomFiltersBtn" class="btn secondary" type="button">
+                Limpar filtros
+              </button>
+            </section>
+
+            <div id="bulkProjectRoomActions" class="bulk-room-actions">
+              <label class="bulk-select-all"><input id="selectAllProjectRooms" type="checkbox"> Selecionar todas visíveis</label>
+              <span id="selectedProjectRoomsCount" class="badge">0 selecionadas</span>
+              <button id="clearSelectedProjectRoomsBtn" class="btn secondary small" type="button">Limpar seleção</button>
+              <button id="inactivateSelectedProjectRoomsBtn" class="btn secondary small" type="button">Inativar selecionadas</button>
+              <button id="deleteSelectedProjectRoomsBtn" class="btn danger small" type="button">Excluir selecionadas</button>
+            </div>
+            <div class="table-wrap compact catalog-table-wrap structure-summary-table">
+              <table class="catalog-data-table project-room-catalog-table"><thead><tr><th>Selecionar</th><th>Projeto</th><th>Tipo</th><th>Sala</th><th>Nº</th><th>Módulos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="projectRoomsTable"></tbody></table>
+            </div>
+          </article>
+
+          <details class="card advanced-module-card">
+            <summary>
+              <span><strong>Ajustes avançados de módulos</strong><small>Edite nome, código e as partes inferior/superior quando aplicável. No MONOBLOCO não há divisão por partes.</small></span>
+              <span id="projectRoomModulesCount" class="badge">0 módulos</span>
+            </summary>
+            <div class="advanced-module-content">
+              <form id="projectRoomModuleForm" class="form-grid compact-form-grid advanced-module-form">
+                <label>Projeto<select id="projectRoomModuleProject" required></select></label>
+                <label>Sala específica<select id="projectRoomModuleRoom" required></select></label>
+                <label>Código<input id="projectRoomModuleCode" placeholder="MOD01" required></label>
+                <label>Nome exibido<input id="projectRoomModuleName" placeholder="Módulo 01" required></label>
+                <label>Ordem<input id="projectRoomModuleOrder" type="number" min="1" step="1" value="1"></label>
+                <div id="projectRoomModulePartsEditor" class="module-parts-editor"><span>Partes disponíveis</span><label><input id="projectRoomModuleLower" type="checkbox" checked> Inferior</label><label><input id="projectRoomModuleUpper" type="checkbox" checked> Superior</label></div>
+                <button class="btn primary">Adicionar módulo</button>
+              </form>
+              <div class="table-wrap compact catalog-table-wrap">
+                <table class="catalog-data-table module-catalog-table"><thead><tr><th>Projeto</th><th>Sala</th><th>Código</th><th>Módulo</th><th>Partes</th><th>Status</th><th>Ações</th></tr></thead><tbody id="projectRoomModulesTable"></tbody></table>
+              </div>
+            </div>
+          </details>
+        </section>
+
+        <section id="holidayCatalogPanel" class="catalog-panel" hidden>
+          <article class="card holiday-only-card">
+            <div class="section-heading compact-heading">
+              <div><h3>Feriados</h3><p>Cadastre, edite ou exclua os dias que não compõem a jornada normal.</p></div>
+            </div>
+            <form id="holidayForm" class="holiday-catalog-form compact-holiday-form">
+              <label>Data<input id="holidayDate" type="date" required></label>
+              <label>Descrição<input id="holidayName" required></label>
+              <button class="btn primary">Adicionar feriado</button>
+            </form>
+            <div class="table-wrap compact catalog-table-wrap holiday-table-wrap">
+              <table class="catalog-data-table holiday-catalog-table"><thead><tr><th>Data</th><th>Descrição</th><th>Ações</th></tr></thead><tbody id="holidaysTable"></tbody></table>
+            </div>
+          </article>
+        </section>
+      </section>
+
+
+      <section id="importExcel" class="page">
+        <div class="page-title">
+          <div>
+            <h2>Importar banco de dados</h2>
+            <p>Importe a planilha original de apontamentos para o banco compartilhado.</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <article class="card span-4">
+            <h3>1. Selecionar planilha</h3>
+            <label class="file-field">
+              Arquivo Excel
+              <input id="importExcelFile" type="file" accept=".xlsx,.xls">
+            </label>
+
+            <div class="import-options">
+              <label><input id="importCatalogs" type="checkbox" checked> Projetos e atividades</label>
+              <label><input id="importEntries" type="checkbox" checked> Apontamentos de horas</label>
+              <label><input id="importHolidays" type="checkbox" checked> Feriados</label>
+              <label><input id="importVacations" type="checkbox" checked> Férias</label>
+            </div>
+
+            <div class="actions">
+              <button id="analyzeExcelBtn" class="btn secondary" type="button">Analisar planilha</button>
+              <button id="executeExcelImportBtn" class="btn primary" type="button" disabled>Importar dados</button>
+            </div>
+
+            <div class="import-note">
+              <strong>Importante:</strong> cada aba de colaborador precisa ser relacionada a um usuário já cadastrado no aplicativo.
+              Datas futuras são ignoradas.
+            </div>
+          </article>
+
+          <article class="card span-8">
+            <div class="section-heading">
+              <h3>Resumo da análise</h3>
+              <span id="importFileName" class="badge">Nenhum arquivo analisado</span>
+            </div>
+
+            <div class="metrics import-metrics">
+              <article><span>Abas de colaboradores</span><strong id="importMetricSheets">0</strong></article>
+              <article><span>Apontamentos válidos</span><strong id="importMetricEntries">0</strong></article>
+              <article><span>Projetos</span><strong id="importMetricProjects">0</strong></article>
+              <article><span>Atividades</span><strong id="importMetricActivities">0</strong></article>
+            </div>
+
+            <div id="importWarnings" class="import-warnings" hidden></div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Aba da planilha</th>
+                    <th>Relacionar ao usuário</th>
+                    <th>Período</th>
+                    <th>Horas</th>
+                    <th>Registros</th>
+                    <th>Ignorados</th>
+                  </tr>
+                </thead>
+                <tbody id="importMappingTable">
+                  <tr><td colspan="6" class="empty">Selecione e analise a planilha.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div id="importProgress" class="import-progress" hidden>
+              <div class="import-progress-bar"><span id="importProgressBar"></span></div>
+              <p id="importProgressText"></p>
+            </div>
+
+            <div id="importResult" class="import-result" hidden></div>
+          </article>
+        </div>
+      </section>
+
+
+      <section id="backupRestore" class="page">
+        <div class="page-title">
+          <div>
+            <h2>Backup e restauração</h2>
+            <p>Proteja os dados do Aponta Horas e recupere registros em caso de perda.</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <article class="card span-6">
+            <div class="backup-card-heading">
+              <div class="backup-icon">↓</div>
+              <div>
+                <h3>Baixar backup agora</h3>
+                <p>Gera um arquivo JSON com os dados atuais do sistema.</p>
+              </div>
+            </div>
+
+            <div class="backup-info">
+              <span>Conteúdo do backup</span>
+              <ul>
+                <li>Usuários e perfis</li>
+                <li>Projetos e atividades</li>
+                <li>Apontamentos e ausências</li>
+                <li>Fechamentos mensais e feriados</li>
+              </ul>
+            </div>
+
+            <button id="downloadBackupBtn" class="btn primary" type="button">Baixar backup agora</button>
+            <p id="manualBackupStatus" class="help">O arquivo será salvo na pasta de downloads do navegador.</p>
+          </article>
+
+          <article class="card span-6">
+            <div class="backup-card-heading">
+              <div class="backup-icon restore">↑</div>
+              <div>
+                <h3>Restaurar backup</h3>
+                <p>Envie um arquivo JSON gerado pelo próprio sistema.</p>
+              </div>
+            </div>
+
+            <label class="file-field">
+              Arquivo de backup
+              <input id="restoreBackupFile" type="file" accept=".json,application/json">
+            </label>
+
+            <label class="restore-confirm-field">
+              Para confirmar, digite <strong>RESTAURAR</strong>
+              <input id="restoreConfirmation" autocomplete="off" placeholder="RESTAURAR">
+            </label>
+
+            <button id="restoreBackupBtn" class="btn danger" type="button">Restaurar dados</button>
+
+            <div class="import-note">
+              A restauração trabalha em modo de mesclagem: repõe registros do arquivo sem apagar os dados atuais.
+              Usuários de autenticação precisam continuar existentes no Supabase.
+            </div>
+          </article>
+
+          <article class="card span-12">
+            <h3>Backup automático no Windows</h3>
+            <div class="backup-path-box">
+              <span>Caminho configurado</span>
+              <strong>Y:\PLANTA 3\GESTÃO (APONTAMENTOS, HORAS...)\Apontamento Horas\2026</strong>
+            </div>
+            <p>
+              O navegador não pode gravar diretamente em uma unidade de rede. Use o pacote
+              <strong>Agente_Backup_Automatico_Aponta_P3</strong> para criar uma tarefa diária no Windows.
+            </p>
+            <div class="backup-steps">
+              <span>1. Configurar a função no Supabase</span>
+              <span>2. Executar o configurador do agente</span>
+              <span>3. Escolher o horário diário</span>
+              <span>4. Testar o backup imediatamente</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="team" class="page">
+        <div class="page-title">
+          <div>
+            <h2>Equipe e Aprovação de Inscrições</h2>
+            <p>Gestores e Administradores aprovam quem pode realizar apontamentos. Alterações de perfil e exclusões continuam restritas ao Administrador.</p>
+          </div>
+        </div>
+        <article id="pendingRegistrationsPanel" class="card pending-registrations-card">
+          <div class="pending-registrations-header">
+            <div>
+              <h3>Inscrições aguardando aprovação</h3>
+              <p>Use esta área para liberar novos colaboradores para realizar apontamentos.</p>
+            </div>
+            <div class="pending-registrations-header-actions">
+              <span id="pendingRegistrationsCount" class="badge registration-pendente">0 pendentes</span>
+              <button id="refreshPendingRegistrationsBtn" class="btn secondary small" type="button">Atualizar</button>
+            </div>
+          </div>
+          <div id="registrationFeatureWarning" class="registration-feature-warning" hidden></div>
+          <div id="pendingRegistrationsList" class="pending-registrations-list"></div>
+        </article>
+
+        <article class="card">
+          <div class="team-legend">
+            <span class="badge registration-pendente">Pendente</span>
+            <span>Ainda não pode apontar horas.</span>
+            <span class="badge registration-aprovado">Aprovado</span>
+            <span>Liberado para apontamentos.</span>
+            <span class="badge registration-rejeitado">Rejeitado</span>
+            <span>Acesso aos apontamentos bloqueado.</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th><th>E-mail</th><th>Perfil</th><th>Jornada</th>
+                  <th>Ativo</th><th>Inscrição</th><th>Revisão</th><th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="teamTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+
+  <dialog id="editProjectDialog">
+    <form method="dialog" id="editProjectForm" class="dialog-card">
+      <h3>Editar projeto</h3>
+      <input id="editProjectId" type="hidden">
+      <label>Código<input id="editProjectCode"></label>
+      <label>Cliente<input id="editProjectClient"></label>
+      <label>Nome<input id="editProjectName" required></label>
+      <label>Descrição<input id="editProjectDescription"></label>
+      <label>Situação<select id="editProjectActive"><option value="true">Ativo</option><option value="false">Inativo</option></select></label>
+      <div class="actions"><button class="btn secondary" value="cancel">Cancelar</button><button id="saveProjectEditBtn" class="btn primary" value="default">Salvar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="editActivityDialog">
+    <form method="dialog" id="editActivityForm" class="dialog-card">
+      <h3>Editar atividade</h3>
+      <input id="editActivityId" type="hidden">
+      <label class="activity-code-field">Código
+        <input id="editActivityCode" autocomplete="off" required>
+        <small id="editActivityCodeSequenceHint" class="activity-code-sequence-hint">
+          Selecione a disciplina para consultar o último código cadastrado.
+        </small>
+      </label>
+      <label>Disciplina
+        <select id="editActivityDiscipline" required>
+          <option value="">Selecione a disciplina</option>
+        </select>
+      </label>
+      <label>Nome<input id="editActivityName" required></label>
+      <label>Natureza
+        <select id="editActivityNature" required>
+          <option value="">Selecione a natureza</option>
+        </select>
+      </label>
+      <label>Observação
+      <select id="editActivityObservationRequirement">
+        <option value="Opcional">Opcional</option>
+        <option value="Obrigatória">Obrigatória</option>
+      </select>
+    </label>
+      <div class="activity-area-editor">
+      <div class="activity-area-editor-header">
+        <span class="field-title">Áreas aplicáveis</span>
+        <div class="activity-area-editor-actions">
+          <button id="selectAllEditActivityAreasBtn" class="btn secondary small" type="button">Marcar todas</button>
+          <button id="clearEditActivityAreasBtn" class="btn secondary small" type="button">Limpar</button>
+        </div>
+      </div>
+      <div id="editActivityAreasCheckboxes" class="area-checkbox-grid"></div>
+      <small>As áreas marcadas substituem os vínculos anteriores ao salvar.</small>
+    </div>
+      <label>Orientação de uso<textarea id="editActivityUsageDescription" maxlength="500"></textarea></label>
+      <label>Situação<select id="editActivityActive"><option value="true">Ativa</option><option value="false">Inativa</option></select></label>
+      <div class="actions"><button class="btn secondary" value="cancel">Cancelar</button><button id="saveActivityEditBtn" class="btn primary" value="default">Salvar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="editHolidayDialog">
+    <form method="dialog" id="editHolidayForm" class="dialog-card">
+      <h3>Editar feriado</h3>
+      <input id="editHolidayId" type="hidden">
+      <label>Data<input id="editHolidayDate" type="date" required></label>
+      <label>Descrição<input id="editHolidayName" required></label>
+      <div class="actions"><button class="btn secondary" value="cancel">Cancelar</button><button id="saveHolidayEditBtn" class="btn primary" value="default">Salvar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="editWorkAreaDialog">
+    <form method="dialog" id="editWorkAreaForm" class="dialog-card">
+      <h3>Editar área de trabalho</h3>
+      <input id="editWorkAreaOriginalCode" type="hidden">
+      <label>Código
+        <input id="editWorkAreaCode" readonly>
+      </label>
+      <small>O código não pode ser alterado após o cadastro porque identifica os apontamentos e vínculos históricos.</small>
+      <label>Nome
+        <input id="editWorkAreaName" maxlength="80" required>
+      </label>
+      <label>Fluxo da referência
+        <select id="editWorkAreaDetailType" required>
+          <option value="none">Sem referência adicional</option>
+          <option value="sector">Selecionar setor</option>
+          <option value="module">Selecionar sala, módulo e parte</option>
+          <option value="panel_type">Selecionar tipo de painel</option>
+          <option value="room">Selecionar sala do projeto</option>
+        </select>
+      </label>
+      <small id="editWorkAreaFlowLockNote" class="work-area-flow-lock-note" hidden>
+        Comissionamento e Montagem Final utilizam somente a sala do projeto.
+      </small>
+      <label>Ordem
+        <input id="editWorkAreaOrder" type="number" min="0" step="1" required>
+      </label>
+      <label>Situação
+        <select id="editWorkAreaActive">
+          <option value="true">Ativa</option>
+          <option value="false">Inativa</option>
+        </select>
+      </label>
+      <div class="actions">
+        <button class="btn secondary" value="cancel">Cancelar</button>
+        <button id="saveWorkAreaEditBtn" class="btn primary" value="default">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="editSectorDialog">
+    <form method="dialog" id="editSectorForm" class="dialog-card">
+      <h3>Editar setor de fabricação</h3>
+      <input id="editSectorId" type="hidden">
+      <label>Código<input id="editSectorCode" required></label>
+      <label>Nome<input id="editSectorName" required></label>
+      <label>Situação<select id="editSectorActive"><option value="true">Ativo</option><option value="false">Inativo</option></select></label>
+      <div class="actions"><button class="btn secondary" value="cancel">Cancelar</button><button id="saveSectorEditBtn" class="btn primary" value="default">Salvar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="editPanelTypeDialog">
+    <form method="dialog" id="editPanelTypeForm" class="dialog-card">
+      <h3>Editar tipo de painel</h3>
+      <input id="editPanelTypeId" type="hidden">
+      <label>Código<input id="editPanelTypeCode" required></label>
+      <label>Nome<input id="editPanelTypeName" required></label>
+      <label>Situação<select id="editPanelTypeActive"><option value="true">Ativo</option><option value="false">Inativo</option></select></label>
+      <div class="actions"><button class="btn secondary" value="cancel">Cancelar</button><button id="savePanelTypeEditBtn" class="btn primary" value="default">Salvar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="editRoomDialog">
+    <form method="dialog" id="editRoomForm" class="dialog-card">
+      <h3>Editar sala do catálogo</h3>
+      <input id="editRoomId" type="hidden">
+      <label>Código<input id="editRoomCode" required></label>
+      <label>Nome<input id="editRoomName" required></label>
+      <label>Situação<select id="editRoomActive"><option value="true">Ativa</option><option value="false">Inativa</option></select></label>
+      <div class="actions"><button class="btn secondary" value="cancel">Cancelar</button><button id="saveRoomEditBtn" class="btn primary" value="default">Salvar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="editProjectRoomDialog">
+    <form method="dialog" id="editProjectRoomForm" class="dialog-card">
+      <h3>Editar sala específica</h3>
+      <input id="editProjectRoomInstanceId" type="hidden">
+      <label>Projeto<input id="editProjectRoomProjectName" readonly></label>
+      <label>Tipo de sala<input id="editProjectRoomCatalogName" readonly></label>
+      <label>Número da sala<input id="editProjectRoomInstanceNumber" type="number" min="1" required></label>
+      <label>Nome exibido<input id="editProjectRoomDisplayName" required></label>
+      <label>Quantidade de módulos<input id="editProjectRoomModuleQuantity" type="number" min="1" step="1" required></label>
+      <label>Ordem<input id="editProjectRoomOrder" type="number" min="0" required></label>
+      <label>Situação<select id="editProjectRoomActive"><option value="true">Ativa</option><option value="false">Inativa</option></select></label>
+      <div class="actions"><button class="btn secondary" value="cancel">Cancelar</button><button id="saveProjectRoomEditBtn" class="btn primary" value="default">Salvar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="editProjectRoomModuleDialog">
+    <form method="dialog" id="editProjectRoomModuleForm" class="dialog-card">
+      <h3>Editar módulo da sala</h3>
+      <input id="editProjectRoomInstanceModuleId" type="hidden">
+      <label>Projeto<input id="editProjectRoomModuleProjectName" readonly></label>
+      <label>Sala<input id="editProjectRoomModuleRoomName" readonly></label>
+      <label>Número do módulo<input id="editProjectRoomModuleNumber" type="number" min="1" required></label>
+      <label>Código do módulo<input id="editProjectRoomModuleCode" required></label>
+      <label>Nome exibido<input id="editProjectRoomModuleDisplayName" required></label>
+      <label>Ordem<input id="editProjectRoomModuleOrder" type="number" min="0" required></label>
+      <div id="editProjectRoomModulePartsEditor" class="module-parts-editor"><span>Partes disponíveis</span><label><input id="editProjectRoomModuleLower" type="checkbox"> Inferior</label><label><input id="editProjectRoomModuleUpper" type="checkbox"> Superior</label></div>
+      <label>Situação<select id="editProjectRoomModuleActive"><option value="true">Ativo</option><option value="false">Inativo</option></select></label>
+      <div class="actions"><button class="btn secondary" value="cancel">Cancelar</button><button id="saveProjectRoomModuleEditBtn" class="btn primary" value="default">Salvar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="editEntryDialog">
+    <form method="dialog" id="editEntryForm" class="dialog-card">
+      <h3>Editar apontamento</h3>
+      <input id="editEntryId" type="hidden">
+      <label>Projeto<select id="editEntryProject" required></select></label>
+      <label>Área<select id="editEntryArea" required></select></label>
+      <label id="editEntrySectorField" class="conditional-flow-field" hidden>Setor<select id="editEntrySector"></select></label>
+      <label id="editEntryPanelTypeField" class="conditional-flow-field" hidden>Tipo de painel<select id="editEntryPanelType"></select></label>
+      <label id="editEntryRoomField" class="conditional-flow-field" hidden><span id="editEntryRoomLabel">Sala do projeto</span><select id="editEntryRoom"></select></label>
+      <label id="editEntryModuleField" class="conditional-flow-field" hidden>Módulo da sala<select id="editEntryModule"></select></label>
+      <label id="editEntryModulePartField" class="conditional-flow-field" hidden>Parte do módulo<select id="editEntryModulePart"><option value="">Selecione a parte</option><option value="inferior">Parte inferior</option><option value="superior">Parte superior</option></select></label>
+      <label class="activity-picker-field">
+        Atividade
+        <input
+          id="editEntryActivitySearch"
+          class="activity-search-input"
+          type="search"
+          placeholder="Buscar por código, nome ou disciplina"
+          autocomplete="off"
+          disabled>
+        <select id="editEntryActivity" required></select>
+        <small id="editEntryActivityFilterSummary" class="activity-filter-summary">
+          Selecione primeiro a área.
+        </small>
+      </label>
+      <div id="editEntryActivityHelp" class="activity-context-help" hidden></div>
+      <label>Data<input id="editEntryDate" type="date" max="" required></label>
+      <label>Horas<input id="editEntryHours" type="number" min="0.25" max="24" step="0.25" required></label>
+      <label>Observação <span id="editEntryObservationRule" class="field-rule">Opcional</span><textarea id="editEntryDetails" maxlength="500"></textarea></label>
+      <div class="actions"><button class="btn secondary" value="cancel">Cancelar</button><button id="saveEditEntryBtn" class="btn primary" value="default">Salvar</button></div>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="config.js"></script>
+  <script src="app-v2.19.20.js?build=2210"></script>
+
+  <div id="installAppOverlay" class="install-app-overlay" hidden>
+    <section class="install-app-card" role="dialog" aria-modal="true" aria-labelledby="installAppTitle">
+      <button id="closeInstallAppBtn" class="install-app-close" type="button" aria-label="Fechar">×</button>
+      <div class="install-app-icon" aria-hidden="true">
+        <img src="modular-app-icon-192-v2116.png" alt="Símbolo oficial da Modular Data Centers">
+      </div>
+      <h2 id="installAppTitle">Instalar Aponta Horas</h2>
+      <p id="installAppMessage">
+        Adicione o Aponta Horas à tela inicial para abrir como aplicativo no Android ou iPhone.
+      </p>
+
+      <div id="androidInstallActions" class="install-app-actions" hidden>
+        <button id="installAppBtn" class="btn primary install-main-btn" type="button">
+          Instalar app
+        </button>
+        <button id="installLaterBtn" class="btn secondary" type="button">
+          Agora não
+        </button>
+      </div>
+
+      <div id="iosInstallInstructions" class="ios-install-instructions" hidden>
+        <ol>
+          <li>Toque no botão <strong>Compartilhar</strong> do Safari.</li>
+          <li>Escolha <strong>Adicionar à Tela de Início</strong>.</li>
+          <li>Toque em <strong>Adicionar</strong>.</li>
+        </ol>
+        <button id="iosUnderstoodBtn" class="btn primary install-main-btn" type="button">
+          Entendi
+        </button>
+      </div>
+
+      <div id="manualInstallInstructions" class="manual-install-instructions" hidden>
+        <p>
+          Abra o menu do navegador e escolha <strong>Instalar aplicativo</strong> ou
+          <strong>Adicionar à tela inicial</strong>.
+        </p>
+        <button id="manualUnderstoodBtn" class="btn primary install-main-btn" type="button">
+          Entendi
+        </button>
+      </div>
+    </section>
+  </div>
+
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js?v=2.19.20", { updateViaCache: "none" })
+          .then(registration => registration.update())
+          .catch(error => console.warn("Falha ao registrar o aplicativo:", error));
+      });
+    }
+  </script>
+
+</body>
+</html>

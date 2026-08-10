@@ -1,0 +1,29 @@
+APONTA HORAS v2.19.22
+
+MOTIVO DESTA VERSAO
+O projeto atual ja esta na v2.19.21. O pacote anterior procurava v2.19.20
+e por isso parou com "Nao encontrei: versao 2.19.20".
+
+ESTA REVISAO PARTE DA v2.19.21 ATUAL.
+
+O QUE MUDA
+- No Fechamento do mes, o colaborador ve os dias com jornada excedida.
+- Mostra data, planejado, apontado, excedente e quantidade de lancamentos.
+- Antes de enviar, pode clicar "Ajustar apontamentos".
+- O sistema abre a aba Apontamentos filtrada exatamente naquele dia.
+- O colaborador usa a edicao que ja existe para Rascunho/Devolvido.
+- Horas extras reais nao bloqueiam o fechamento.
+- Se houver excedentes ao enviar, aparece uma confirmacao.
+- Enviado/Aprovado continua bloqueado.
+- A conferencia de dias excedentes do Gestor na aba Fechamentos enviados e preservada.
+- O service worker/cache tambem e corrigido para a versao nova.
+- Nao exige SQL novo.
+
+COMO USAR
+1. Extraia este ZIP DENTRO da raiz do projeto.
+2. Execute apenas:
+   ATUALIZAR_E_SUBIR_v2.19.22.cmd
+3. Aguarde:
+   SUCESSO - v2.19.22 ENVIADA PARA O GITHUB
+
+O script cria um backup automatico antes de alterar a raiz.

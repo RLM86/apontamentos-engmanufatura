@@ -1,0 +1,14 @@
+REVISAO TECNICA v2.19.20
+
+ARQUIVOS ALTERADOS
+- index.html
+- app-v2.19.20.js (gerado a partir de app-v2.19.5.js)
+- style-v2.19.20.css (gerado a partir de style-v2.19.5.css)
+- sw.js
+
+PONTOS PRINCIPAIS NO APP
+- buildImportProjectLookup(): resolve projeto por project.code ou project.name.
+- buildExcelPreflight(): calcula existentes/novos/bloqueios.
+- renderExcelPreflight(): exibe a prévia e controla o botão Importar dados.
+- importCatalogs=false: não cria nem atualiza catálogos.
+- activity_area_links: verificação passa a exigir especificamente area_code="ADM" antes dos históricos.

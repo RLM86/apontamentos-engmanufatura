@@ -1,0 +1,36 @@
+APONTА HORAS v2.19.20 — PRE-VALIDACAO DE IMPORTACAO
+
+ARQUIVOS PARA SUBIR:
+- index.html
+- app-v2.19.20.js
+- style-v2.19.20.css
+- sw.js
+
+ALTERACOES:
+1. A tela Importar Excel mostra ANTES da gravacao:
+   - projetos existentes;
+   - projetos novos;
+   - atividades existentes;
+   - atividades novas;
+   - atividades que precisam receber vinculo ADM;
+   - colaboradores vinculados;
+   - erros bloqueantes.
+2. O botao Importar dados fica bloqueado quando:
+   - esta em modo Somente apontamentos;
+   - existe projeto nao cadastrado;
+   - existe atividade nao cadastrada;
+   - existe atividade sem vinculo ADM.
+3. Se Projetos e atividades estiver marcado:
+   - novos projetos/atividades sao mostrados como "sera cadastrado";
+   - vinculos ADM necessarios sao mostrados antes;
+   - a importacao prepara esses cadastros antes dos apontamentos.
+4. O checkbox Projetos e atividades passa a ser respeitado:
+   - desmarcado = NAO cria nem atualiza projetos/atividades.
+5. Projetos passam a ser encontrados por CODIGO OU NOME.
+   Ex.: CORP encontra o projeto cujo nome e CORPORATIVO e codigo CORP.
+6. Atividades historicas usadas em ADM:
+   - a verificacao considera especificamente se existe vinculo ADM;
+   - com Projetos e atividades marcado, o vinculo ADM faltante e incluido.
+7. Cache atualizado para v2.19.20 / build 2210.
+
+NAO EXIGE SQL NOVO.

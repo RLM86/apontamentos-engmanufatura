@@ -1,0 +1,32 @@
+﻿APONTA P3 — CORREÇÃO AUTOMÁTICA DO LIMITE DE 1.000
+
+COMO USAR
+1. Extraia o ZIP.
+2. Dê duplo clique em CORRIGIR_RELATORIOS_1000_AUTO.bat
+   OU abra o CMD na pasta e execute:
+   CORRIGIR_RELATORIOS_1000_AUTO.bat
+
+O script procura automaticamente:
+C:\Projetos\apontamentos-engmanufatura
+
+Se o repositório estiver em outro local:
+CORRIGIR_RELATORIOS_1000_AUTO.bat "C:\CAMINHO\DO\REPOSITORIO"
+
+O QUE ELE FAZ
+- Confirma que o repositório é RLM86/apontamentos-engmanufatura.
+- Exige branch main e repositório limpo.
+- Faz git pull --ff-only.
+- Cria backup local de app-v2.19.23.js, index.html e sw.js.
+- Cria app-v2.19.24.js.
+- Pagina selectEntries em blocos de 1.000.
+- Atualiza index.html para versão 2.19.24 / build 2214.
+- Atualiza o cache do service worker.
+- Valida JavaScript com node --check quando Node estiver instalado.
+- Executa git diff --check.
+- Faz commit.
+- Faz push origin main.
+- Abre o site com ?build=2214.
+
+IMPORTANTE
+O script NÃO mexe no banco Supabase e NÃO altera apontamentos.
+É somente uma correção da consulta exibida pelo aplicativo.

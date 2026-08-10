@@ -1,0 +1,21 @@
+APONTA HORAS v2.19.21
+FECHAMENTO - DIAS EXCEDENTES E AJUSTE
+
+ALTERACOES
+- Fechamentos enviados > Conferir mostra cada dia que excedeu a jornada.
+- Exibe data, tipo do dia, planejado, apontado, excedente e quantidade de lancamentos.
+- Mostra o excedente diario acumulado.
+- Gestor/Administrador pode clicar em Ajustar horas.
+- Abre uma janela com os apontamentos daquele dia.
+- Permite alterar somente as horas diretamente nessa tela.
+- Mostra o novo total e o novo saldo antes de salvar.
+- Possui opcao Abrir dia em Apontamentos para ajustes completos.
+- Fechamentos aprovados ficam bloqueados para ajuste direto.
+- Nesses casos, o periodo deve ser devolvido antes.
+- Nao exige SQL novo.
+
+ARQUIVOS PARA SUBIR
+- index.html
+- app-v2.19.21.js
+- style-v2.19.21.css
+- sw.js

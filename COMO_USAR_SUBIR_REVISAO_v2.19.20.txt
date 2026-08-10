@@ -1,0 +1,23 @@
+APONTA HORAS - SUBIR REVISAO v2.19.20
+
+1. Coloque o arquivo SUBIR_REVISAO_v2.19.20_GITHUB.cmd dentro da pasta raiz do projeto:
+   a mesma pasta que contem .git, index.html e REVISAO_PRONTA_PARA_SUBIR_v2.19.20.
+
+2. De duplo clique no CMD.
+
+3. Ele vai copiar:
+   index.html
+   app-v2.19.20.js
+   style-v2.19.20.css
+   sw.js
+
+4. Depois vai executar automaticamente:
+   git add
+   git commit
+   git push
+
+5. Quando aparecer:
+   SUCESSO - REVISAO ENVIADA PARA O GITHUB
+   o push terminou.
+
+A janela nao fecha em caso de erro.
