@@ -505,11 +505,7 @@
   function activityDiscipline(id) {
     return activities.find(a => a.id === id)?.discipline_name || "â€”";
   }
-function macroActivityName(id){
-  const m = macroActivities.find(x => x.id === id);
-  return m ? m.name : "";
-}
-  function areaName(code) {
+    function areaName(code) {
     return workAreas.find(area => area.code === code)?.name || "â€”";
   }
 
@@ -736,7 +732,7 @@ function macroActivityName(id){
   }
 
   async function loadBaseData() {
-    const [p, pr, ac, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim] = await Promise.all([
+   const [p, pr, ac, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim] = await Promise.all([
       sb.from("profiles").select("*").order("full_name"),
       loadAllProjects(),
       sb.from("activities").select("*").order("name"),
@@ -4378,9 +4374,8 @@ function macroActivityName(id){
   $("generatePeopleReportBtn").onclick=renderPeopleReport;
 
   $("exportReportBtn").onclick=()=>{
-    const lines=[["Data","Colaborador","Projeto","Ãrea","ReferÃªncia","Atividade","Disciplina","Macro Atividade","Horas","ObservaÃ§Ã£o","Status"],...lastReportRows.map(x=>[x.entry_date,profileName(x.user_id),projectName(x.project_id),areaName(x.area_code),entryReferenceName(x),activityName(x.activity_id),
+    const lines=[["Data","Colaborador","Projeto","Ãrea","ReferÃªncia","Atividade","Disciplina","Horas","ObservaÃ§Ã£o","Status"],...lastReportRows.map(x=>[x.entry_date,profileName(x.user_id),projectName(x.project_id),areaName(x.area_code),entryReferenceName(x),activityName(x.activity_id),
 activityDiscipline(x.activity_id),
-macroActivityName(x.macro_atividade_id),
 String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     downloadCsv(`apontamentos_${today()}.csv`,lines);
   };
