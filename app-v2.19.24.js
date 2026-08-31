@@ -780,10 +780,11 @@ sb.from("macro_atividades").select("*").order("ordem"),
     profiles=p.data||[];
     projects=pr.data||[];
     activities=(ac.data||[]).map(activity=>({
-      ...activity,
-      code:normalizeActivityCode(activity.code),
-      observation_requirement:normalizeObservationRequirement(activity.observation_requirement)
-    }));
+  ...activity,
+  code:normalizeActivityCode(activity.code),
+  observation_requirement:normalizeObservationRequirement(activity.observation_requirement),
+  macro_atividade_id: activity.macro_atividade_id
+}));
 macroActivities = mac.data || [];
     holidays=ho.data||[];
     workAreas=wa.data||[]; manufacturingSectors=ms.data||[]; modules=mo.data||[];
