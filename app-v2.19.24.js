@@ -32,6 +32,7 @@
   let profiles = [];
   let projects = [];
   let activities = [];
+let macroActivities = [];
   let holidays = [];
   let workAreas = [];
   let manufacturingSectors = [];
@@ -505,6 +506,16 @@
   function activityDiscipline(id) {
     return activities.find(a => a.id === id)?.discipline_name || "â€”";
   }
+function activityMacro(id){
+  const activity = activities.find(a => a.id === id);
+  if(!activity || !activity.macro_atividade_id) return "";
+
+  const macro = macroActivities.find(
+    m => m.id === activity.macro_atividade_id
+  );
+
+  return macro ? macro.nome : "";
+}
     function areaName(code) {
     return workAreas.find(area => area.code === code)?.name || "â€”";
   }
@@ -732,10 +743,11 @@
   }
 
   async function loadBaseData() {
-   const [p, pr, ac, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim] = await Promise.all([
+   const [p, pr, ac, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim, mac] = await Promise.all([
       sb.from("profiles").select("*").order("full_name"),
       loadAllProjects(),
       sb.from("activities").select("*").order("name"),
+sb.from("macro_atividades").select("*").order("ordem"),
       sb.from("holidays").select("*").order("holiday_date"),
       sb.from("work_areas").select("*").order("order_index"),
       sb.from("manufacturing_sectors").select("*").order("order_index"),
@@ -772,6 +784,7 @@
       code:normalizeActivityCode(activity.code),
       observation_requirement:normalizeObservationRequirement(activity.observation_requirement)
     }));
+macroActivities = mac.data || [];
     holidays=ho.data||[];
     workAreas=wa.data||[]; manufacturingSectors=ms.data||[]; modules=mo.data||[];
     rooms=ro.data||[];
@@ -4374,8 +4387,9 @@
   $("generatePeopleReportBtn").onclick=renderPeopleReport;
 
   $("exportReportBtn").onclick=()=>{
-    const lines=[["Data","Colaborador","Projeto","Ãrea","ReferÃªncia","Atividade","Disciplina","Horas","ObservaÃ§Ã£o","Status"],...lastReportRows.map(x=>[x.entry_date,profileName(x.user_id),projectName(x.project_id),areaName(x.area_code),entryReferenceName(x),activityName(x.activity_id),
+    const lines=[["Data","Colaborador","Projeto","Área","Referência","Atividade","Disciplina","Macro Atividade","Horas","Observação","Status"],...lastReportRows.map(x=>[x.entry_date,profileName(x.user_id),projectName(x.project_id),areaName(x.area_code),entryReferenceName(x),activityName(x.activity_id),
 activityDiscipline(x.activity_id),
+activityMacro(x.activity_id),
 String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     downloadCsv(`apontamentos_${today()}.csv`,lines);
   };
