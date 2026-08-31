@@ -1842,7 +1842,7 @@
         showLoading(true);
       }
 
-      const payload = {
+     const payload = {
         user_id: userId,
         entry_date: entryDate,
         project_id: $("entryProject").value,
@@ -8368,6 +8368,8 @@
                 project.id,
               activity_id:
                 activity.id,
+macro_atividade_id:
+    activity.macro_atividade_id || null,
               ...resolution.payload,
               hours:
                 Math.round(
