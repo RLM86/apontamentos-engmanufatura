@@ -1,12 +1,12 @@
-﻿const CACHE = "aponta-horas-v2.19.24-relatorios-paginados";
+const CACHE = "aponta-horas-v2.19.25-atividade-macro";
 const ASSETS = [
   "./",
   "./index.html",
-  "./app-v2.19.24.js?build=2214",
+  "./app-v2.19.25.js?build=2216",
   "./style-v2.19.22.css?build=2213",
   "./redefinir-senha.html",
   "./auth-recovery-v2.19.5.js?build=2209",
-  "./manifest.webmanifest?v=2.19.24",
+  "./manifest.webmanifest?v=2.19.25",
   "./modular-app-icon-192-v2116.png",
   "./modular-app-icon-512-v2116.png"
 ];

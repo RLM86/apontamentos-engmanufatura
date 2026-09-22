@@ -508,15 +508,19 @@ let macroActivities = [];
   }
 function activityMacro(id){
   const activity = activities.find(a => a.id === id);
-  if(!activity || !activity.macro_atividade_id) return "";
+
+  if(!activity || !activity.macro_atividade_id){
+    return "";
+  }
 
   const macro = macroActivities.find(
-    m => m.id === activity.macro_atividade_id
+    m => Number(m.id) === Number(activity.macro_atividade_id)
   );
 
   return macro ? macro.nome : "";
 }
-    function areaName(code) {
+
+function areaName(code) {
     return workAreas.find(area => area.code === code)?.name || "â€”";
   }
 
@@ -4211,7 +4215,7 @@ macroActivities = mac.data || [];
 
   async function renderReport(){
     try{
-      const user=isManager()?$("reportUser").value:me.id;
+     const user=isManager()?$("reportUser").value:(me?.id || "");
       lastReportRows=await selectEntries($("reportStart").value||firstDay(),$("reportEnd").value||lastDay(),user,$("reportProject").value);
       const reportHours=lastReportRows.reduce(
         (sum,row)=>sum+Number(row.hours||0),
@@ -9536,5 +9540,6 @@ macro_atividade_id:
 
   window.APONTA_P3_VERSION = "2.19.24";
 })();
+
 
 
