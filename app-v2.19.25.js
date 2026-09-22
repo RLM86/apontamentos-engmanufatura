@@ -9540,7 +9540,7 @@ macro_atividade_id:
     }, 350);
   });
 
-  window.APONTA_P3_VERSION = "2.19.24";
+  window.APONTA_P3_VERSION = "2.19.25";
 })();
 
 
