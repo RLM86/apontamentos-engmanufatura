@@ -1,4 +1,4 @@
-﻿(() => {
+(() => {
   "use strict";
 
   const cfg = window.APONTA_CONFIG || {};
@@ -508,19 +508,15 @@ let macroActivities = [];
   }
 function activityMacro(id){
   const activity = activities.find(a => a.id === id);
-
-  if(!activity || !activity.macro_atividade_id){
-    return "";
-  }
+  if(!activity || !activity.macro_atividade_id) return "";
 
   const macro = macroActivities.find(
-    m => Number(m.id) === Number(activity.macro_atividade_id)
+    m => m.id === activity.macro_atividade_id
   );
 
   return macro ? macro.nome : "";
 }
-
-function areaName(code) {
+    function areaName(code) {
     return workAreas.find(area => area.code === code)?.name || "â€”";
   }
 
@@ -747,7 +743,7 @@ function areaName(code) {
   }
 
   async function loadBaseData() {
-   const [p, pr, ac, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim, mac] = await Promise.all([
+   const [p, pr, ac, mac, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim] = await Promise.all([
       sb.from("profiles").select("*").order("full_name"),
       loadAllProjects(),
       sb.from("activities").select("*").order("name"),
@@ -4215,7 +4211,7 @@ macroActivities = mac.data || [];
 
   async function renderReport(){
     try{
-     const user=isManager()?$("reportUser").value:(me?.id || "");
+      const user=isManager()?$("reportUser").value:me.id;
       lastReportRows=await selectEntries($("reportStart").value||firstDay(),$("reportEnd").value||lastDay(),user,$("reportProject").value);
       const reportHours=lastReportRows.reduce(
         (sum,row)=>sum+Number(row.hours||0),
@@ -4911,6 +4907,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
         "CÃ³digo":normalizeActivityCode(activity.code),
         "Atividade":activity.name,
         "Disciplina":activity.discipline_name||"",
+        "Atividade Macro":activityMacro(activity.id),
         "Natureza":activity.nature||"",
         "Ãreas aplicÃ¡veis (cÃ³digos)":activityAreas(activity.id).join("; "),
         "OrientaÃ§Ã£o de uso":activity.usage_description||"",
@@ -4938,6 +4935,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
         "CÃ³digo",
         "Atividade",
         "Disciplina",
+        "Atividade Macro",
         "Natureza",
         "Ãreas aplicÃ¡veis (cÃ³digos)",
         "OrientaÃ§Ã£o de uso",
@@ -4951,13 +4949,14 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       {wch:16},
       {wch:48},
       {wch:28},
+      {wch:38},
       {wch:22},
       {wch:30},
       {wch:58},
       {wch:14},
       {wch:12}
     ];
-    activitySheet["!autofilter"]={ref:`A1:I${Math.max(rows.length+1,2)}`};
+    activitySheet["!autofilter"]={ref:`A1:J${Math.max(rows.length+1,2)}`};
 
     const instructionRows=[
       ["IMPORTAÃ‡ÃƒO DE ATIVIDADES â€” APONTA P3"],
@@ -4966,6 +4965,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       ["ID","NÃ£o altere o ID das atividades existentes. Para criar uma nova atividade, deixe o ID vazio."],
       ["CÃ³digo","Use cÃ³digos sem o prefixo EM-. Exemplo: SST-020."],
       ["Atividade","Campo obrigatÃ³rio e Ãºnico."],
+      ["Atividade Macro","Preenchida automaticamente pelo sistema conforme a Disciplina. NÃ£o Ã© necessÃ¡rio editar manualmente."],
       ["Ãreas aplicÃ¡veis (cÃ³digos)","Informe um ou mais cÃ³digos separados por ponto e vÃ­rgula. Exemplo: FAB; MES; MFI."],
       ["ObservaÃ§Ã£o","Use Opcional ou ObrigatÃ³ria."],
       ["Status","Use Ativa ou Inativa."],
@@ -5022,6 +5022,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       const code=normalizeActivityCode(workbookValue(row,["CÃ³digo","Codigo","code"]));
       const name=String(workbookValue(row,["Atividade","Nome","activity","name"])||"").trim();
       const disciplineName=String(workbookValue(row,["Disciplina","discipline_name"])||"").trim();
+      const macroActivityName=String(workbookValue(row,["Atividade Macro","Macro Atividade","macro_atividade"])||"").trim();
       const nature=String(workbookValue(row,["Natureza","nature"])||"").trim();
       const usageDescription=String(workbookValue(row,[
         "OrientaÃ§Ã£o de uso",
@@ -5078,6 +5079,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
         code:code||null,
         name,
         discipline_name:disciplineName,
+        macro_activity_name:macroActivityName,
         nature,
         usage_description:usageDescription,
         observation_requirement:observationRequirement,
@@ -9540,6 +9542,5 @@ macro_atividade_id:
 
   window.APONTA_P3_VERSION = "2.19.24";
 })();
-
 
 
