@@ -513,9 +513,9 @@ function activityMacro(id){
 
   if(!activity || !activity.macro_atividade_id) return "";
 
-  const macro = (macroActivities || []).find(
-    m => m && m.id === activity.macro_atividade_id
-  );
+ const macro = (macroActivities || []).find(
+  m => m && String(m.id) === String(activity.macro_atividade_id)
+);
 
   return macro?.nome || "";
 }
