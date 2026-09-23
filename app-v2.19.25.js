@@ -519,6 +519,19 @@ function activityMacro(activityOrId){
 
   return macro ? macro.nome : "";
 }
+
+  function updateActivityMacroPreview(){
+    const field = $("activityMacroPreview");
+    if(!field) return;
+
+    const code = $("activityCode")?.value?.trim();
+    const activity = (activities || []).find(
+      a => String(a.code || "").trim() === String(code || "").trim()
+    );
+
+    field.value = activity ? activityMacro(activity) : "";
+  }
+
     function areaName(code) {
     return workAreas.find(area => area.code === code)?.name || "Ã¢â‚¬â€";
   }
