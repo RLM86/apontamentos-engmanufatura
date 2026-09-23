@@ -1,4 +1,4 @@
-(() => {
+﻿(() => {
   "use strict";
 
   const cfg = window.APONTA_CONFIG || {};
@@ -5354,18 +5354,30 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     if(!field)return;
 
     const discipline=$("activityDiscipline")?.value?.trim();
+
     if(!discipline){
       field.value="";
       return;
     }
 
-    const activity=activities.find(a=>
-      normalizeText(a.discipline_name)===normalizeText(discipline) &&
-      a.macro_atividade_id
+    const activity = activities.find(a =>
+      normalizeText(a.discipline_name) === normalizeText(discipline)
+      && a.macro_atividade_id !== null
+      && a.macro_atividade_id !== undefined
+      && a.macro_atividade_id !== ""
     );
 
-    field.value=activity ? activityMacro(activity) : "";
-  }
+    if(!activity){
+      field.value="";
+      return;
+    }
+
+    const macro = (macroActivities || []).find(m =>
+      String(m.id) === String(activity.macro_atividade_id)
+    );
+
+    field.value = macro?.nome || "";
+}
 
   function activityCodeSequence(disciplineName){
     const discipline=String(disciplineName||"").trim();
