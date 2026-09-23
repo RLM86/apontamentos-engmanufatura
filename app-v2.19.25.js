@@ -515,14 +515,14 @@ function activityMacro(activityOrId){
 
   if(!activity) return "";
 
-  const macroId = String(activity.macro_atividade_id ?? "").trim();
-  if(!macroId) return "";
+  const macroId = activity.macro_atividade_id;
+  if(macroId === null || macroId === undefined || macroId === "") return "";
 
   const macro = (macroActivities || []).find(
-    m => String(m.id).trim() === macroId
+    m => String(m.id) === String(macroId)
   );
 
-  return macro?.nome || macro?.atividade_macro || "";
+  return macro?.nome || "";
 }
     function areaName(code) {
     return workAreas.find(area => area.code === code)?.name || "—";
@@ -5348,6 +5348,25 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     field.value=existing ? activityMacro(existing) : "";
   }
 
+
+  function updateActivityMacroPreviewByDiscipline(){
+    const field=$("activityMacroPreview");
+    if(!field)return;
+
+    const discipline=$("activityDiscipline")?.value?.trim();
+    if(!discipline){
+      field.value="";
+      return;
+    }
+
+    const activity=activities.find(a=>
+      normalizeText(a.discipline_name)===normalizeText(discipline) &&
+      a.macro_atividade_id
+    );
+
+    field.value=activity ? activityMacro(activity) : "";
+  }
+
   function activityCodeSequence(disciplineName){
     const discipline=String(disciplineName||"").trim();
     if(!discipline)return null;
@@ -5450,9 +5469,8 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     $("activityCode").dataset.sequenceSuggested="false";
   });
   $("activityCode")?.addEventListener("input",updateActivityMacroPreview);
-    $("activityCode")?.addEventListener("blur",updateActivityMacroPreview);
-    $("editActivityCode")?.addEventListener("blur",updateActivityMacroPreview);
   $("activityDiscipline")?.addEventListener("change",updateActivityMacroPreview);
+  $("activityDiscipline")?.addEventListener("change",updateActivityMacroPreviewByDiscipline);
 
   function populateActivityFilterOptions(){
     const areaSelect=$("activityFilterArea");

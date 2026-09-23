@@ -5348,6 +5348,25 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     field.value=existing ? activityMacro(existing) : "";
   }
 
+
+  function updateActivityMacroPreviewByDiscipline(){
+    const field=$("activityMacroPreview");
+    if(!field)return;
+
+    const discipline=$("activityDiscipline")?.value?.trim();
+    if(!discipline){
+      field.value="";
+      return;
+    }
+
+    const activity=activities.find(a=>
+      normalizeText(a.discipline_name)===normalizeText(discipline) &&
+      a.macro_atividade_id
+    );
+
+    field.value=activity ? activityMacro(activity) : "";
+  }
+
   function activityCodeSequence(disciplineName){
     const discipline=String(disciplineName||"").trim();
     if(!discipline)return null;
@@ -5451,6 +5470,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
   });
   $("activityCode")?.addEventListener("input",updateActivityMacroPreview);
   $("activityDiscipline")?.addEventListener("change",updateActivityMacroPreview);
+  $("activityDiscipline")?.addEventListener("change",updateActivityMacroPreviewByDiscipline);
 
   function populateActivityFilterOptions(){
     const areaSelect=$("activityFilterArea");
