@@ -5377,9 +5377,8 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     String(m.id) === String(map.macro_atividade_id)
   );
 
-  field.value = macro?.nome || "";
+  field.value = macro ? macro.nome : "";
 }
-
   function activityCodeSequence(disciplineName){
     const discipline=String(disciplineName||"").trim();
     if(!discipline)return null;
