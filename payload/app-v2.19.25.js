@@ -506,20 +506,17 @@ let macroActivities = [];
   function activityDiscipline(id) {
     return activities.find(a => a.id === id)?.discipline_name || "—";
   }
-function activityMacro(activityOrId){
-  const activity = typeof activityOrId === "object"
-    ? activityOrId
-    : (activities || []).find(
-        a => String(a.id) === String(activityOrId)
-      );
+function activityMacro(id){
+  const activity = (activities || []).find(
+    a => String(a.id) === String(id)
+  );
 
-  if(!activity) return "";
-
-  const macroId = activity.macro_atividade_id;
-  if(macroId === null || macroId === undefined || macroId === "") return "";
+  if(!activity || activity.macro_atividade_id === null || activity.macro_atividade_id === undefined){
+    return "";
+  }
 
   const macro = (macroActivities || []).find(
-    m => String(m.id) === String(macroId)
+    m => Number(m.id) === Number(activity.macro_atividade_id)
   );
 
   return macro?.nome || "";
@@ -4915,7 +4912,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
         "Código":normalizeActivityCode(activity.code),
         "Atividade":activity.name,
         "Disciplina":activity.discipline_name||"",
-        "Atividade Macro":activityMacro(activity),
+        "Atividade Macro":activityMacro(activity.id),
         "Natureza":activity.nature||"",
         "ÃƒÆ’Ã‚Âreas aplicáveis (cÃƒÆ’Ã‚Â³digos)":activityAreas(activity.id).join("; "),
         "Orientação de uso":activity.usage_description||"",
@@ -5338,16 +5335,6 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     updateActivityCodeSequence("edit",false);
   }
 
-  function updateActivityMacroPreview(){
-    const field=$("activityMacroPreview");
-    if(!field)return;
-
-    const code=$("activityCode")?.value?.trim();
-    const existing=activities.find(a=>String(a.code)===String(code));
-
-    field.value=existing ? activityMacro(existing) : "";
-  }
-
   function activityCodeSequence(disciplineName){
     const discipline=String(disciplineName||"").trim();
     if(!discipline)return null;
@@ -5449,8 +5436,6 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
   $("activityCode")?.addEventListener("input",()=>{
     $("activityCode").dataset.sequenceSuggested="false";
   });
-  $("activityCode")?.addEventListener("input",updateActivityMacroPreview);
-  $("activityDiscipline")?.addEventListener("change",updateActivityMacroPreview);
 
   function populateActivityFilterOptions(){
     const areaSelect=$("activityFilterArea");

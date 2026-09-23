@@ -506,21 +506,16 @@ let macroActivities = [];
   function activityDiscipline(id) {
     return activities.find(a => a.id === id)?.discipline_name || "—";
   }
-function activityMacro(activityOrId){
-  const activity = typeof activityOrId === "object"
-    ? activityOrId
-    : (activities || []).find(
-        a => String(a.id) === String(activityOrId)
-      );
+function activityMacro(id){
+  if(!id || !Array.isArray(activities)) return "";
 
-  if(!activity) return "";
+  const activity = activities.find(a => a && a.id === id);
 
-  const macroId = activity.macro_atividade_id;
-  if(macroId === null || macroId === undefined || macroId === "") return "";
+  if(!activity || !activity.macro_atividade_id) return "";
 
   const macro = (macroActivities || []).find(
-    m => String(m.id) === String(macroId)
-  );
+  m => m && String(m.id) === String(activity.macro_atividade_id)
+);
 
   return macro?.nome || "";
 }
@@ -793,7 +788,7 @@ sb.from("macro_atividades").select("*").order("ordem"),
   observation_requirement:normalizeObservationRequirement(activity.observation_requirement),
   macro_atividade_id: activity.macro_atividade_id
 }));
-macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}));
+macroActivities = mac.data || [];
     holidays=ho.data||[];
     workAreas=wa.data||[]; manufacturingSectors=ms.data||[]; modules=mo.data||[];
     rooms=ro.data||[];
@@ -4219,7 +4214,7 @@ macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}
 
   async function renderReport(){
     try{
-      const user=isManager()?($("reportUser")?.value || me?.id):me?.id;
+      const user=isManager()?$("reportUser").value:me.id;
       lastReportRows=await selectEntries($("reportStart").value||firstDay(),$("reportEnd").value||lastDay(),user,$("reportProject").value);
       const reportHours=lastReportRows.reduce(
         (sum,row)=>sum+Number(row.hours||0),
@@ -4915,7 +4910,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
         "Código":normalizeActivityCode(activity.code),
         "Atividade":activity.name,
         "Disciplina":activity.discipline_name||"",
-        "Atividade Macro":activityMacro(activity),
+        "Atividade Macro":activityMacro(activity.id),
         "Natureza":activity.nature||"",
         "ÃƒÆ’Ã‚Âreas aplicáveis (cÃƒÆ’Ã‚Â³digos)":activityAreas(activity.id).join("; "),
         "Orientação de uso":activity.usage_description||"",
@@ -5338,16 +5333,6 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     updateActivityCodeSequence("edit",false);
   }
 
-  function updateActivityMacroPreview(){
-    const field=$("activityMacroPreview");
-    if(!field)return;
-
-    const code=$("activityCode")?.value?.trim();
-    const existing=activities.find(a=>String(a.code)===String(code));
-
-    field.value=existing ? activityMacro(existing) : "";
-  }
-
   function activityCodeSequence(disciplineName){
     const discipline=String(disciplineName||"").trim();
     if(!discipline)return null;
@@ -5449,8 +5434,6 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
   $("activityCode")?.addEventListener("input",()=>{
     $("activityCode").dataset.sequenceSuggested="false";
   });
-  $("activityCode")?.addEventListener("input",updateActivityMacroPreview);
-  $("activityDiscipline")?.addEventListener("change",updateActivityMacroPreview);
 
   function populateActivityFilterOptions(){
     const areaSelect=$("activityFilterArea");
@@ -5547,7 +5530,6 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       <td>${esc(x.name)}</td>
       <td>${esc(activityAreas(x.id).map(areaName).join(", ")||"—")}</td>
       <td>${esc(x.discipline_name||"—")}</td>
-      <td>${esc(activityMacro(x.id)||"—")}</td>
       <td><span class="badge observation-${normalizeObservationRequirement(x.observation_requirement)==="Obrigatória"?"required":"optional"}">${esc(normalizeObservationRequirement(x.observation_requirement))}</span></td>
       <td><span class="badge">${x.active?"Ativa":"Inativa"}</span></td>
       <td><div class="table-actions">

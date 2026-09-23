@@ -1,0 +1,16 @@
+APONTA P3 v2.19.25 - ATIVIDADE MACRO
+
+1. Extraia este ZIP DENTRO da pasta raiz do APONT MAN P3.
+2. Execute 1_EXECUTE_AGORA_ATIVIDADE_MACRO_v2.19.25.cmd.
+3. O atualizador cria backup dos arquivos atuais.
+4. No Supabase > SQL Editor, execute TODO o arquivo ATUALIZAR_BANCO_v2.19.25_ATIVIDADE_MACRO.sql.
+5. Atualize/publice o projeto pelo procedimento que voce ja usa.
+6. Limpe cache/recarregue o app.
+
+Resultado:
+- disciplinas atuais preservadas;
+- Atividade Macro definida automaticamente pela disciplina;
+- novas atividades recebem macro automaticamente;
+- exportacao CSV de apontamentos inclui Macro Atividade;
+- exportacao Excel de atividades inclui Atividade Macro;
+- dados existentes sao retroalimentados para Power BI.

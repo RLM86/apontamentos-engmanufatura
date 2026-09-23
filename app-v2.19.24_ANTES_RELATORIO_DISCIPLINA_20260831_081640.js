@@ -1,4 +1,4 @@
-(() => {
+﻿(() => {
   "use strict";
 
   const cfg = window.APONTA_CONFIG || {};
@@ -32,7 +32,6 @@
   let profiles = [];
   let projects = [];
   let activities = [];
-let macroActivities = [];
   let holidays = [];
   let workAreas = [];
   let manufacturingSectors = [];
@@ -503,28 +502,7 @@ let macroActivities = [];
   function activityName(id) {
     return activities.find(a => a.id === id)?.name || "—";
   }
-  function activityDiscipline(id) {
-    return activities.find(a => a.id === id)?.discipline_name || "—";
-  }
-function activityMacro(activityOrId){
-  const activity = typeof activityOrId === "object"
-    ? activityOrId
-    : (activities || []).find(
-        a => String(a.id) === String(activityOrId)
-      );
-
-  if(!activity) return "";
-
-  const macroId = activity.macro_atividade_id;
-  if(macroId === null || macroId === undefined || macroId === "") return "";
-
-  const macro = (macroActivities || []).find(
-    m => String(m.id) === String(macroId)
-  );
-
-  return macro?.nome || "";
-}
-    function areaName(code) {
+  function areaName(code) {
     return workAreas.find(area => area.code === code)?.name || "—";
   }
 
@@ -570,7 +548,7 @@ function activityMacro(activityOrId){
 
     return {
       code,
-      name:code||"ÃƒÆ’Ã‚Ârea",
+      name:code||"Área",
       detail_type:legacyDetailType[code]||"none",
       active:true,
       order_index:999
@@ -751,11 +729,10 @@ function activityMacro(activityOrId){
   }
 
   async function loadBaseData() {
-   const [p, pr, ac, mac, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim] = await Promise.all([
+    const [p, pr, ac, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim] = await Promise.all([
       sb.from("profiles").select("*").order("full_name"),
       loadAllProjects(),
       sb.from("activities").select("*").order("name"),
-sb.from("macro_atividades").select("*").order("ordem"),
       sb.from("holidays").select("*").order("holiday_date"),
       sb.from("work_areas").select("*").order("order_index"),
       sb.from("manufacturing_sectors").select("*").order("order_index"),
@@ -788,12 +765,10 @@ sb.from("macro_atividades").select("*").order("ordem"),
     profiles=p.data||[];
     projects=pr.data||[];
     activities=(ac.data||[]).map(activity=>({
-  ...activity,
-  code:normalizeActivityCode(activity.code),
-  observation_requirement:normalizeObservationRequirement(activity.observation_requirement),
-  macro_atividade_id: activity.macro_atividade_id
-}));
-macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}));
+      ...activity,
+      code:normalizeActivityCode(activity.code),
+      observation_requirement:normalizeObservationRequirement(activity.observation_requirement)
+    }));
     holidays=ho.data||[];
     workAreas=wa.data||[]; manufacturingSectors=ms.data||[]; modules=mo.data||[];
     rooms=ro.data||[];
@@ -1476,7 +1451,7 @@ macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}
         $("loginEmail").value = $("signupEmail").value.trim();
         showAuthMessage(
           "A conta foi criada, mas a confirmação de e-mail ainda está ativada no Supabase. " +
-          "Desative âÃ¢â€šÂ¬Ã…â€œConfirm emailâÃ¢â€šÂ¬Ã‚Â em Authentication âÃ¢â‚¬Â ’ Providers âÃ¢â‚¬Â ’ Email para usar a aprovaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o por Gestor/Administrador.",
+          "Desative “Confirm email” em Authentication → Providers → Email para usar a aprovação por Gestor/Administrador.",
           true
         );
         return;
@@ -1847,7 +1822,7 @@ macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}
         showLoading(false);
 
         const confirmed = window.confirm(
-          `ATENÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O: JORNADA DIÃƒÆ’Ã‚ÂRIA EXCEDIDA\n\n` +
+          `ATENÇÃO: JORNADA DIÁRIA EXCEDIDA\n\n` +
           `Jornada prevista: ${fmt(dailyHours)} h\n` +
           `Horas já apontadas: ${fmt(registeredHours)} h\n` +
           `Novo lançamento: ${fmt(hoursToAdd)} h\n` +
@@ -1864,7 +1839,7 @@ macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}
         showLoading(true);
       }
 
-     const payload = {
+      const payload = {
         user_id: userId,
         entry_date: entryDate,
         project_id: $("entryProject").value,
@@ -4219,7 +4194,7 @@ macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}
 
   async function renderReport(){
     try{
-      const user=isManager()?($("reportUser")?.value || me?.id):me?.id;
+      const user=isManager()?$("reportUser").value:me.id;
       lastReportRows=await selectEntries($("reportStart").value||firstDay(),$("reportEnd").value||lastDay(),user,$("reportProject").value);
       const reportHours=lastReportRows.reduce(
         (sum,row)=>sum+Number(row.hours||0),
@@ -4396,10 +4371,7 @@ macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}
   $("generatePeopleReportBtn").onclick=renderPeopleReport;
 
   $("exportReportBtn").onclick=()=>{
-    const lines=[["Data","Colaborador","Projeto","ÃƒÂrea","ReferÃƒÂªncia","Atividade","Disciplina","Macro Atividade","Horas","Observação","Status"],...lastReportRows.map(x=>[x.entry_date,profileName(x.user_id),projectName(x.project_id),areaName(x.area_code),entryReferenceName(x),activityName(x.activity_id),
-activityDiscipline(x.activity_id),
-activityMacro(x.activity_id),
-String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
+    const lines=[["Data","Colaborador","Projeto","Área","Referência","Atividade","Horas","Observação","Status"],...lastReportRows.map(x=>[x.entry_date,profileName(x.user_id),projectName(x.project_id),areaName(x.area_code),entryReferenceName(x),activityName(x.activity_id),String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     downloadCsv(`apontamentos_${today()}.csv`,lines);
   };
 
@@ -4853,9 +4825,9 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
 
   function parseSpreadsheetAreas(row){
     const combined=String(workbookValue(row,[
-      "ÃƒÆ’Ã‚Âreas aplicáveis (cÃƒÆ’Ã‚Â³digos)",
+      "Áreas aplicáveis (códigos)",
       "Areas aplicaveis codigos",
-      "ÃƒÆ’Ã‚Âreas aplicáveis",
+      "Áreas aplicáveis",
       "Areas",
       "Area"
     ])||"").trim();
@@ -4889,7 +4861,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
         const keys=[
           area.code,
           area.name,
-          `ÃƒÆ’Ã‚Ârea ${area.code}`,
+          `Área ${area.code}`,
           `Area ${area.code}`
         ];
 
@@ -4915,9 +4887,8 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
         "Código":normalizeActivityCode(activity.code),
         "Atividade":activity.name,
         "Disciplina":activity.discipline_name||"",
-        "Atividade Macro":activityMacro(activity),
         "Natureza":activity.nature||"",
-        "ÃƒÆ’Ã‚Âreas aplicáveis (cÃƒÆ’Ã‚Â³digos)":activityAreas(activity.id).join("; "),
+        "Áreas aplicáveis (códigos)":activityAreas(activity.id).join("; "),
         "Orientação de uso":activity.usage_description||"",
         "Observação":normalizeObservationRequirement(activity.observation_requirement),
         "Status":activity.active?"Ativa":"Inativa"
@@ -4943,9 +4914,8 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
         "Código",
         "Atividade",
         "Disciplina",
-        "Atividade Macro",
         "Natureza",
-        "ÃƒÆ’Ã‚Âreas aplicáveis (cÃƒÆ’Ã‚Â³digos)",
+        "Áreas aplicáveis (códigos)",
         "Orientação de uso",
         "Observação",
         "Status"
@@ -4957,24 +4927,22 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       {wch:16},
       {wch:48},
       {wch:28},
-      {wch:38},
       {wch:22},
       {wch:30},
       {wch:58},
       {wch:14},
       {wch:12}
     ];
-    activitySheet["!autofilter"]={ref:`A1:J${Math.max(rows.length+1,2)}`};
+    activitySheet["!autofilter"]={ref:`A1:I${Math.max(rows.length+1,2)}`};
 
     const instructionRows=[
-      ["IMPORTAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O DE ATIVIDADES — APONTA P3"],
+      ["IMPORTAÇÃO DE ATIVIDADES — APONTA P3"],
       [""],
       ["Regra","Orientação"],
       ["ID","Não altere o ID das atividades existentes. Para criar uma nova atividade, deixe o ID vazio."],
       ["Código","Use códigos sem o prefixo EM-. Exemplo: SST-020."],
       ["Atividade","Campo obrigatório e único."],
-      ["Atividade Macro","Preenchida automaticamente pelo sistema conforme a Disciplina. Não é necessário editar manualmente."],
-      ["ÃƒÆ’Ã‚Âreas aplicáveis (cÃƒÆ’Ã‚Â³digos)","Informe um ou mais cÃƒÆ’Ã‚Â³digos separados por ponto e vírgula. Exemplo: FAB; MES; MFI."],
+      ["Áreas aplicáveis (códigos)","Informe um ou mais códigos separados por ponto e vírgula. Exemplo: FAB; MES; MFI."],
       ["Observação","Use Opcional ou Obrigatória."],
       ["Status","Use Ativa ou Inativa."],
       ["Exclusão","Apagar uma linha do Excel não exclui a atividade do sistema. Use a seleção em massa no aplicativo."],
@@ -4984,7 +4952,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     instructionSheet["!cols"]=[{wch:32},{wch:100}];
 
     const areaRows=[
-      ["CÃƒÆ’Ã‚Â³digo","ÃƒÆ’Ã‚Ârea","Ativa"],
+      ["Código","Área","Ativa"],
       ...workAreas.map(area=>[area.code,area.name,area.active?"Sim":"Não"])
     ];
     const areaSheet=XLSX.utils.aoa_to_sheet(areaRows);
@@ -4993,7 +4961,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
 
     XLSX.utils.book_append_sheet(workbook,activitySheet,"Atividades");
     XLSX.utils.book_append_sheet(workbook,instructionSheet,"Instruções");
-    XLSX.utils.book_append_sheet(workbook,areaSheet,"ÃƒÆ’Ã‚Âreas");
+    XLSX.utils.book_append_sheet(workbook,areaSheet,"Áreas");
 
     XLSX.writeFile(workbook,`Lista_Atividades_Aponta_P3_${today()}.xlsx`);
     setActivityWorkbookStatus(`${rows.length} atividades exportadas para Excel.`);
@@ -5030,7 +4998,6 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       const code=normalizeActivityCode(workbookValue(row,["Código","Codigo","code"]));
       const name=String(workbookValue(row,["Atividade","Nome","activity","name"])||"").trim();
       const disciplineName=String(workbookValue(row,["Disciplina","discipline_name"])||"").trim();
-      const macroActivityName=String(workbookValue(row,["Atividade Macro","Macro Atividade","macro_atividade"])||"").trim();
       const nature=String(workbookValue(row,["Natureza","nature"])||"").trim();
       const usageDescription=String(workbookValue(row,[
         "Orientação de uso",
@@ -5087,7 +5054,6 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
         code:code||null,
         name,
         discipline_name:disciplineName,
-        macro_activity_name:macroActivityName,
         nature,
         usage_description:usageDescription,
         observation_requirement:observationRequirement,
@@ -5179,7 +5145,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     }
   }
 
-  /* APONTA P3 v2.19.11 — disciplina, natureza e sequÃƒÆ’Ã‚Âªncia de cÃƒÆ’Ã‚Â³digos */
+  /* APONTA P3 v2.19.11 — disciplina, natureza e sequência de códigos */
   const ACTIVITY_NATURE_DEFAULTS = [
     "Rotina / Demanda",
     "Planejada / Demanda",
@@ -5338,16 +5304,6 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     updateActivityCodeSequence("edit",false);
   }
 
-  function updateActivityMacroPreview(){
-    const field=$("activityMacroPreview");
-    if(!field)return;
-
-    const code=$("activityCode")?.value?.trim();
-    const existing=activities.find(a=>String(a.code)===String(code));
-
-    field.value=existing ? activityMacro(existing) : "";
-  }
-
   function activityCodeSequence(disciplineName){
     const discipline=String(disciplineName||"").trim();
     if(!discipline)return null;
@@ -5449,8 +5405,6 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
   $("activityCode")?.addEventListener("input",()=>{
     $("activityCode").dataset.sequenceSuggested="false";
   });
-  $("activityCode")?.addEventListener("input",updateActivityMacroPreview);
-  $("activityDiscipline")?.addEventListener("change",updateActivityMacroPreview);
 
   function populateActivityFilterOptions(){
     const areaSelect=$("activityFilterArea");
@@ -5547,7 +5501,6 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       <td>${esc(x.name)}</td>
       <td>${esc(activityAreas(x.id).map(areaName).join(", ")||"—")}</td>
       <td>${esc(x.discipline_name||"—")}</td>
-      <td>${esc(activityMacro(x.id)||"—")}</td>
       <td><span class="badge observation-${normalizeObservationRequirement(x.observation_requirement)==="Obrigatória"?"required":"optional"}">${esc(normalizeObservationRequirement(x.observation_requirement))}</span></td>
       <td><span class="badge">${x.active?"Ativa":"Inativa"}</span></td>
       <td><div class="table-actions">
@@ -5963,7 +5916,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       $("workAreaForm").reset();
       $("workAreaDetailType").value="none";
       $("workAreaOrder").value="10";
-      toast("ÃƒÆ’Ã‚Ârea adicionada.");
+      toast("Área adicionada.");
       await reloadCatalogs();
     }catch(error){
       handleError(
@@ -6007,7 +5960,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       showLoading(true);
       try{
         const area=workAreas.find(item=>item.code===toggleCode);
-        if(!area)throw new Error("ÃƒÆ’Ã‚Ârea nÃƒÆ’Ã‚Â£o encontrada.");
+        if(!area)throw new Error("Área não encontrada.");
 
         const {error}=await sb.rpc(
           "aponta_save_work_area_v2185",
@@ -6041,7 +5994,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
 
       if(!confirm(
         `Excluir a área ${area.code} — ${area.name}?\n\n`+
-        "ÃƒÆ’Ã‚Âreas usadas em atividades ou apontamentos nÃƒÆ’Ã‚Â£o poderÃƒÆ’Ã‚Â£o ser excluídas."
+        "Áreas usadas em atividades ou apontamentos não poderão ser excluídas."
       ))return;
 
       showLoading(true);
@@ -6052,12 +6005,12 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
         );
 
         if(error)throw error;
-        toast("ÃƒÆ’Ã‚Ârea excluída.");
+        toast("Área excluída.");
         await reloadCatalogs();
       }catch(error){
         handleError(
           error,
-          "ÃƒÆ’Ã‚Ârea com histÃƒÆ’Ã‚Â³rico ou vínculos deve ser inativada."
+          "Área com histórico ou vínculos deve ser inativada."
         );
       }finally{
         showLoading(false);
@@ -6096,7 +6049,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       if(error)throw error;
 
       $("editWorkAreaDialog").close();
-      toast("ÃƒÆ’Ã‚Ârea atualizada.");
+      toast("Área atualizada.");
       await reloadCatalogs();
     }catch(error){
       handleError(
@@ -7638,7 +7591,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       !analysis.enrichedFormatDetected
     ){
       warnings.push(
-        "Formato antigo detectado: sem colunas ÃƒÆ’Ã‚Ârea/ReferÃƒÆ’Ã‚Âªncia. Esses apontamentos continuam sendo tratados como Administrativo."
+        "Formato antigo detectado: sem colunas Área/Referência. Esses apontamentos continuam sendo tratados como Administrativo."
       );
     }
 
@@ -7722,15 +7675,15 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     $("importPreflightMode").textContent = modeText;
 
     const projectStateLabel = row => {
-      if (row.state === "new") return "NOVO — SERÃƒÆ’Ã‚Â CADASTRADO";
+      if (row.state === "new") return "NOVO — SERÁ CADASTRADO";
       if (row.state === "error") return "BLOQUEIA IMPORTAÇÃO";
       if (row.state === "warning") return "ATENÇÃO";
       return "EXISTENTE";
     };
 
     const activityStateLabel = row => {
-      if (row.state === "new") return "NOVA — SERÃƒÆ’Ã‚Â CADASTRADA";
-      if (row.state === "adjust") return "AJUSTAR ÃƒÆ’Ã‚ÂREA";
+      if (row.state === "new") return "NOVA — SERÁ CADASTRADA";
+      if (row.state === "adjust") return "AJUSTAR ÁREA";
       if (row.state === "error") return "BLOQUEIA IMPORTAÇÃO";
       if (row.state === "warning") return "ATENÇÃO";
       return "EXISTENTE";
@@ -7925,7 +7878,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     if(error?.code)parts.push(`Código: ${error.code}`);
     return {
       stage,
-      text:parts.filter(Boolean).join(" — ")||"Erro nÃƒÆ’Ã‚Â£o identificado."
+      text:parts.filter(Boolean).join(" — ")||"Erro não identificado."
     };
   }
 
@@ -8412,8 +8365,6 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
                 project.id,
               activity_id:
                 activity.id,
-macro_atividade_id:
-    activity.macro_atividade_id || null,
               ...resolution.payload,
               hours:
                 Math.round(
@@ -8617,7 +8568,7 @@ macro_atividade_id:
         <p><strong>Erro:</strong> ${esc(diagnosis.text)}</p>
         <p>Os registros concluídos antes dessa etapa podem ter sido gravados. Execute novamente após corrigir o erro; registros já existentes serão ignorados.</p>
       `;
-      toast(`Erro na importaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o — ${diagnosis.stage}`,true);
+      toast(`Erro na importação — ${diagnosis.stage}`,true);
     } finally {
       renderExcelPreflight();
     }
@@ -9059,7 +9010,7 @@ macro_atividade_id:
   }
 
 
-  // APONTA P3 v2.16.2 — transforma tabelas em cartÃƒÆ’Ã‚Âµes no celular
+  // APONTA P3 v2.16.2 — transforma tabelas em cartões no celular
   function applyResponsiveTableLabels(root=document){
     const tables=root.querySelectorAll?.(".page .table-wrap table")||[];
 
@@ -9124,7 +9075,7 @@ macro_atividade_id:
     });
   });
 
-  // APONTA P3 v2.17.1 — caixas de seleÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o pesquisáveis em Apontamentos
+  // APONTA P3 v2.17.1 — caixas de seleção pesquisáveis em Apontamentos
   const SEARCHABLE_ENTRY_SELECT_IDS = [
     "entryUser",
     "entryProject",
@@ -9451,7 +9402,7 @@ macro_atividade_id:
 
   boot();
 
-  // APONTA P3 v2.11.5 — convite de instalaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o no celular
+  // APONTA P3 v2.11.5 — convite de instalação no celular
   let deferredInstallPrompt = null;
 
   const isMobileDevice = () =>
@@ -9561,9 +9512,6 @@ macro_atividade_id:
     }, 350);
   });
 
-  window.APONTA_P3_VERSION = "2.19.25";
+  window.APONTA_P3_VERSION = "2.19.24";
 })();
-
-
-
 
