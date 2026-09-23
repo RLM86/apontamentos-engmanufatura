@@ -515,14 +515,14 @@ function activityMacro(activityOrId){
 
   if(!activity) return "";
 
-  const macroId = activity.macro_atividade_id;
-  if(macroId === null || macroId === undefined || macroId === "") return "";
+  const macroId = String(activity.macro_atividade_id ?? "").trim();
+  if(!macroId) return "";
 
   const macro = (macroActivities || []).find(
-    m => String(m.id) === String(macroId)
+    m => String(m.id).trim() === macroId
   );
 
-  return macro?.nome || "";
+  return macro?.nome || macro?.atividade_macro || "";
 }
     function areaName(code) {
     return workAreas.find(area => area.code === code)?.name || "—";
@@ -5450,6 +5450,8 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     $("activityCode").dataset.sequenceSuggested="false";
   });
   $("activityCode")?.addEventListener("input",updateActivityMacroPreview);
+    $("activityCode")?.addEventListener("blur",updateActivityMacroPreview);
+    $("editActivityCode")?.addEventListener("blur",updateActivityMacroPreview);
   $("activityDiscipline")?.addEventListener("change",updateActivityMacroPreview);
 
   function populateActivityFilterOptions(){
