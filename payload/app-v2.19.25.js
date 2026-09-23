@@ -516,8 +516,28 @@ function activityMacro(activityOrId){
 
   if(!activity) return "";
 
-  const macroId = activity.macro_atividade_id;
-  if(macroId === null || macroId === undefined || macroId === "") return "";
+  let macroId = activity.macro_atividade_id;
+
+  if(
+    macroId === null ||
+    macroId === undefined ||
+    macroId === ""
+  ){
+    const discipline = normalizeText(activity.discipline_name);
+
+    const map = (disciplinaMacroMap || []).find(item =>
+      normalizeText(
+        item.disciplina ||
+        item.discipline_name ||
+        item.disciplina_nome ||
+        item.nome ||
+        item.name ||
+        ""
+      ) === discipline
+    );
+
+    macroId = map?.macro_atividade_id;
+  }
 
   const macro = (macroActivities || []).find(
     m => String(m.id) === String(macroId)
