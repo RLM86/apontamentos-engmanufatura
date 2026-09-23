@@ -5530,6 +5530,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       <td>${esc(x.name)}</td>
       <td>${esc(activityAreas(x.id).map(areaName).join(", ")||"—")}</td>
       <td>${esc(x.discipline_name||"—")}</td>
+      <td>${esc(activityMacro(x.id)||"—")}</td>
       <td><span class="badge observation-${normalizeObservationRequirement(x.observation_requirement)==="Obrigatória"?"required":"optional"}">${esc(normalizeObservationRequirement(x.observation_requirement))}</span></td>
       <td><span class="badge">${x.active?"Ativa":"Inativa"}</span></td>
       <td><div class="table-actions">
