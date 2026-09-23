@@ -33,7 +33,8 @@
   let projects = [];
   let activities = [];
 let macroActivities = [];
-  let holidays = [];
+ let disciplinaMacroMap = [];
+ let holidays = [];
   let workAreas = [];
   let manufacturingSectors = [];
   let modules = [];
@@ -751,11 +752,12 @@ function activityMacro(activityOrId){
   }
 
   async function loadBaseData() {
-   const [p, pr, ac, mac, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim] = await Promise.all([
+  const [p, pr, ac, mac, dm, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim] = await Promise.all([
       sb.from("profiles").select("*").order("full_name"),
       loadAllProjects(),
       sb.from("activities").select("*").order("name"),
 sb.from("macro_atividades").select("*").order("ordem"),
+sb.from("disciplina_macro_map").select("*"),
       sb.from("holidays").select("*").order("holiday_date"),
       sb.from("work_areas").select("*").order("order_index"),
       sb.from("manufacturing_sectors").select("*").order("order_index"),
@@ -794,6 +796,7 @@ sb.from("macro_atividades").select("*").order("ordem"),
   macro_atividade_id: activity.macro_atividade_id
 }));
 macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}));
+disciplinaMacroMap = dm.data || [];
     holidays=ho.data||[];
     workAreas=wa.data||[]; manufacturingSectors=ms.data||[]; modules=mo.data||[];
     rooms=ro.data||[];
@@ -5350,15 +5353,32 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
 
 
   function updateActivityMacroPreviewByDiscipline(){
-    const field=$("activityMacroPreview");
-    if(!field)return;
 
-    const discipline=$("activityDiscipline")?.value?.trim();
+  const field = $("activityMacroPreview");
+  if(!field) return;
 
-    if(!discipline){
-      field.value="";
-      return;
-    }
+  const discipline = $("activityDiscipline")?.value?.trim();
+
+  if(!discipline){
+    field.value = "";
+    return;
+  }
+
+  const map = (disciplinaMacroMap || []).find(item =>
+    normalizeText(item.disciplina) === normalizeText(discipline)
+  );
+
+  if(!map){
+    field.value = "";
+    return;
+  }
+
+  const macro = (macroActivities || []).find(m =>
+    String(m.id) === String(map.macro_atividade_id)
+  );
+
+  field.value = macro?.nome || "";
+}
 
     const activity = activities.find(a =>
       normalizeText(a.discipline_name) === normalizeText(discipline)
