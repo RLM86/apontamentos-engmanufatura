@@ -1,4 +1,4 @@
-(() => {
+﻿(() => {
   "use strict";
 
   const cfg = window.APONTA_CONFIG || {};
@@ -33,7 +33,8 @@
   let projects = [];
   let activities = [];
 let macroActivities = [];
-  let holidays = [];
+ let disciplinaMacroMap = [];
+ let holidays = [];
   let workAreas = [];
   let manufacturingSectors = [];
   let modules = [];
@@ -751,32 +752,35 @@ function activityMacro(activityOrId){
   }
 
   async function loadBaseData() {
-   const [p, pr, ac, mac, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim] = await Promise.all([
-      sb.from("profiles").select("*").order("full_name"),
-      loadAllProjects(),
-      sb.from("activities").select("*").order("name"),
-sb.from("macro_atividades").select("*").order("ordem"),
-      sb.from("holidays").select("*").order("holiday_date"),
-      sb.from("work_areas").select("*").order("order_index"),
-      sb.from("manufacturing_sectors").select("*").order("order_index"),
-      sb.from("modules").select("*").order("order_index"),
-      sb.from("rooms").select("*").order("order_index"),
-      sb.from("panel_types").select("*").order("order_index"),
-      loadGroupedActivityAreaLinks(),
-      sb.from("project_modules").select("*").order("order_index"),
-      sb.from("project_rooms").select("*").order("order_index"),
-      sb.from("project_room_modules").select("*").order("order_index"),
-      sb.from("project_room_instances").select("*").order("order_index"),
-      sb.from("project_room_instance_modules").select("*").order("order_index")
-    ]);
-    for (const result of [p,pr,ac,ho]) if (result.error) throw result.error;
-    if(aal.error){
-      throw new Error(
-        "Não foi possível carregar todas as áreas vinculadas às atividades. " +
-        "Execute o SQL obrigatório da versão 2.18.3 no Supabase."
-      );
-    }
+  const [p, pr, ac, mac, dm, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim] = await Promise.all([
+  sb.from("profiles").select("*").order("full_name"),
+  loadAllProjects(),
+  sb.from("activities").select("*").order("name"),
+  sb.from("macro_atividades").select("*").order("ordem"),
+  sb.from("disciplina_macro_map").select("*"),
+  sb.from("holidays").select("*").order("holiday_date"),
+  sb.from("work_areas").select("*").order("order_index"),
+  sb.from("manufacturing_sectors").select("*").order("order_index"),
+  sb.from("modules").select("*").order("order_index"),
+  sb.from("rooms").select("*").order("order_index"),
+  sb.from("panel_types").select("*").order("order_index"),
+  loadGroupedActivityAreaLinks(),
+  sb.from("project_modules").select("*").order("order_index"),
+  sb.from("project_rooms").select("*").order("order_index"),
+  sb.from("project_room_modules").select("*").order("order_index"),
+  sb.from("project_room_instances").select("*").order("order_index"),
+  sb.from("project_room_instance_modules").select("*").order("order_index")
+]);
+    for (const result of [p,pr,ac,mac,dm,ho]) {
+  if (result.error) throw result.error;
+}
 
+if(aal.error){
+  throw new Error(
+    "Não foi possível carregar todas as áreas vinculadas às atividades. " +
+    "Execute o SQL obrigatório da versão 2.18.3 no Supabase."
+  );
+}
     for (const result of [wa,ms,mo,ro,pt,pm,pro,prm,pri,prim]) {
       if (result.error) {
         throw new Error(
@@ -794,6 +798,7 @@ sb.from("macro_atividades").select("*").order("ordem"),
   macro_atividade_id: activity.macro_atividade_id
 }));
 macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}));
+disciplinaMacroMap = dm.data || [];
     holidays=ho.data||[];
     workAreas=wa.data||[]; manufacturingSectors=ms.data||[]; modules=mo.data||[];
     rooms=ro.data||[];
@@ -5350,23 +5355,38 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
 
 
   function updateActivityMacroPreviewByDiscipline(){
+
     const field=$("activityMacroPreview");
     if(!field)return;
 
-    const discipline=$("activityDiscipline")?.value?.trim();
+    const discipline=String($("activityDiscipline")?.value||"").trim();
+
     if(!discipline){
       field.value="";
       return;
     }
 
-    const activity=activities.find(a=>
-      normalizeText(a.discipline_name)===normalizeText(discipline) &&
-      a.macro_atividade_id
+    const map=(disciplinaMacroMap||[]).find(item =>
+      normalizeText(
+        item.disciplina ||
+        item.discipline_name ||
+        item.nome ||
+        item.name ||
+        ""
+      ) === normalizeText(discipline)
     );
 
-    field.value=activity ? activityMacro(activity) : "";
-  }
+    if(!map){
+      field.value="";
+      return;
+    }
 
+    const macro=(macroActivities||[]).find(m =>
+      String(m.id)===String(map.macro_atividade_id)
+    );
+
+    field.value=macro?.nome || "";
+}
   function activityCodeSequence(disciplineName){
     const discipline=String(disciplineName||"").trim();
     if(!discipline)return null;
@@ -5459,6 +5479,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
 
   $("activityDiscipline")?.addEventListener("change",()=>{
     updateActivityCodeSequence("create",true);
+    updateActivityMacroPreviewByDiscipline();
   });
 
   $("editActivityDiscipline")?.addEventListener("change",()=>{
@@ -5469,8 +5490,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     $("activityCode").dataset.sequenceSuggested="false";
   });
   $("activityCode")?.addEventListener("input",updateActivityMacroPreview);
-  $("activityDiscipline")?.addEventListener("change",updateActivityMacroPreview);
-  $("activityDiscipline")?.addEventListener("change",updateActivityMacroPreviewByDiscipline);
+  $("activityCode")?.addEventListener("input",updateActivityMacroPreview);
 
   function populateActivityFilterOptions(){
     const areaSelect=$("activityFilterArea");
