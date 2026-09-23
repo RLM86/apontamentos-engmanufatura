@@ -819,7 +819,9 @@ if(aal.error){
 }));
 macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}));
 disciplinaMacroMap = dm.data || [];
-console.log("DISCIPLINA MAP:", disciplinaMacroMap);
+
+console.log("DISCIPLINA MAP CARREGADO:", disciplinaMacroMap);
+console.log("MACROS CARREGADAS:", macroActivities);
     holidays=ho.data||[];
     workAreas=wa.data||[]; manufacturingSectors=ms.data||[]; modules=mo.data||[];
     rooms=ro.data||[];
