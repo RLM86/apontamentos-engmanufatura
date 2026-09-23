@@ -753,27 +753,27 @@ function activityMacro(activityOrId){
 
   async function loadBaseData() {
   const [p, pr, ac, mac, dm, ho, wa, ms, mo, ro, pt, aal, pm, pro, prm, pri, prim] = await Promise.all([
-      sb.from("profiles").select("*").order("full_name"),
-      loadAllProjects(),
-      sb.from("activities").select("*").order("name"),
-sb.from("macro_atividades").select("*").order("ordem"),
-sb.from("disciplina_macro_map").select("*"),
-      sb.from("holidays").select("*").order("holiday_date"),
-      sb.from("work_areas").select("*").order("order_index"),
-      sb.from("manufacturing_sectors").select("*").order("order_index"),
-      sb.from("modules").select("*").order("order_index"),
-      sb.from("rooms").select("*").order("order_index"),
-      sb.from("panel_types").select("*").order("order_index"),
-      loadGroupedActivityAreaLinks(),
-      sb.from("project_modules").select("*").order("order_index"),
-      sb.from("project_rooms").select("*").order("order_index"),
-      sb.from("project_room_modules").select("*").order("order_index"),
-      sb.from("project_room_instances").select("*").order("order_index"),
-      sb.from("project_room_instance_modules").select("*").order("order_index")
-    ]);
-    for (const result of [p,pr,ac,ho]) if (result.error) throw result.error;
-    if(aal.error){
-      throw new Error(
+  sb.from("profiles").select("*").order("full_name"),
+  loadAllProjects(),
+  sb.from("activities").select("*").order("name"),
+  sb.from("macro_atividades").select("*").order("ordem"),
+  sb.from("disciplina_macro_map").select("*"),
+  sb.from("holidays").select("*").order("holiday_date"),
+  sb.from("work_areas").select("*").order("order_index"),
+  sb.from("manufacturing_sectors").select("*").order("order_index"),
+  sb.from("modules").select("*").order("order_index"),
+  sb.from("rooms").select("*").order("order_index"),
+  sb.from("panel_types").select("*").order("order_index"),
+  loadGroupedActivityAreaLinks(),
+  sb.from("project_modules").select("*").order("order_index"),
+  sb.from("project_rooms").select("*").order("order_index"),
+  sb.from("project_room_modules").select("*").order("order_index"),
+  sb.from("project_room_instances").select("*").order("order_index"),
+  sb.from("project_room_instance_modules").select("*").order("order_index")
+]);
+    for (const result of [p,pr,ac,mac,dm,ho]) {
+  if (result.error) throw result.error;
+}
         "Não foi possível carregar todas as áreas vinculadas às atividades. " +
         "Execute o SQL obrigatório da versão 2.18.3 no Supabase."
       );
@@ -5378,25 +5378,6 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
   );
 
   field.value = macro?.nome || "";
-}
-
-    const activity = activities.find(a =>
-      normalizeText(a.discipline_name) === normalizeText(discipline)
-      && a.macro_atividade_id !== null
-      && a.macro_atividade_id !== undefined
-      && a.macro_atividade_id !== ""
-    );
-
-    if(!activity){
-      field.value="";
-      return;
-    }
-
-    const macro = (macroActivities || []).find(m =>
-      String(m.id) === String(activity.macro_atividade_id)
-    );
-
-    field.value = macro?.nome || "";
 }
 
   function activityCodeSequence(disciplineName){
