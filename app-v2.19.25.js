@@ -5473,6 +5473,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
 
   $("activityDiscipline")?.addEventListener("change",()=>{
     updateActivityCodeSequence("create",true);
+    updateActivityMacroPreviewByDiscipline();
   });
 
   $("editActivityDiscipline")?.addEventListener("change",()=>{
@@ -5483,8 +5484,7 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     $("activityCode").dataset.sequenceSuggested="false";
   });
   $("activityCode")?.addEventListener("input",updateActivityMacroPreview);
-  $("activityDiscipline")?.addEventListener("change",updateActivityMacroPreview);
-  $("activityDiscipline")?.addEventListener("change",updateActivityMacroPreviewByDiscipline);
+  $("activityCode")?.addEventListener("input",updateActivityMacroPreview);
 
   function populateActivityFilterOptions(){
     const areaSelect=$("activityFilterArea");
