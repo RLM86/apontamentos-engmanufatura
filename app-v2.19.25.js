@@ -507,15 +507,17 @@ let macroActivities = [];
     return activities.find(a => a.id === id)?.discipline_name || "—";
   }
 function activityMacro(id){
-  if(!id || !Array.isArray(activities)) return "";
+  const activity = (activities || []).find(
+    a => String(a.id) === String(id)
+  );
 
-  const activity = activities.find(a => a && a.id === id);
+  if(!activity || activity.macro_atividade_id === null || activity.macro_atividade_id === undefined){
+    return "";
+  }
 
-  if(!activity || !activity.macro_atividade_id) return "";
-
- const macro = (macroActivities || []).find(
-  m => m && String(m.id) === String(activity.macro_atividade_id)
-);
+  const macro = (macroActivities || []).find(
+    m => Number(m.id) === Number(activity.macro_atividade_id)
+  );
 
   return macro?.nome || "";
 }
@@ -788,7 +790,7 @@ sb.from("macro_atividades").select("*").order("ordem"),
   observation_requirement:normalizeObservationRequirement(activity.observation_requirement),
   macro_atividade_id: activity.macro_atividade_id
 }));
-macroActivities = mac.data || [];
+macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}));
     holidays=ho.data||[];
     workAreas=wa.data||[]; manufacturingSectors=ms.data||[]; modules=mo.data||[];
     rooms=ro.data||[];
