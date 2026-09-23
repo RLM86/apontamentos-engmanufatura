@@ -5387,15 +5387,26 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       return;
     }
 
-    const map = (disciplinaMacroMap || []).find(item =>
-      normalizeText(
-        item.disciplina ||
-        item.discipline_name ||
-        item.nome ||
-        item.name ||
-        ""
-      ) === normalizeText(discipline)
-    );
+   const selectedName = normalizeText(
+  discipline.split("—").pop().trim()
+);
+
+const map = (disciplinaMacroMap || []).find(item => {
+
+  const mapName = normalizeText(
+    item.disciplina ||
+    item.discipline_name ||
+    item.nome ||
+    item.name ||
+    ""
+  );
+
+  return (
+    mapName === selectedName ||
+    selectedName.includes(mapName) ||
+    mapName.includes(selectedName)
+  );
+});
 
     const macroId = map?.macro_atividade_id;
 
