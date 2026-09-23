@@ -797,8 +797,18 @@ if(aal.error){
   observation_requirement:normalizeObservationRequirement(activity.observation_requirement),
   macro_atividade_id: activity.macro_atividade_id
 }));
-macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}));
+    macroActivities = (mac.data || []).map(macro => ({
+  ...macro,
+  id:Number(macro.id)
+}));
+
 disciplinaMacroMap = dm.data || [];
+
+console.log("MAC RETORNO:", mac);
+console.log("DM RETORNO:", dm);
+    
+//macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}));
+//disciplinaMacroMap = dm.data || [];
 
 console.log("DISCIPLINA MAP CARREGADO:", disciplinaMacroMap);
 console.log("MACROS CARREGADAS:", macroActivities);
