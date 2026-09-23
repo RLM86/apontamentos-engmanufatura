@@ -4214,7 +4214,7 @@ macroActivities = mac.data || [];
 
   async function renderReport(){
     try{
-      const user=isManager()?$("reportUser").value:me.id;
+      const user=isManager()?($("reportUser")?.value || me?.id):me?.id;
       lastReportRows=await selectEntries($("reportStart").value||firstDay(),$("reportEnd").value||lastDay(),user,$("reportProject").value);
       const reportHours=lastReportRows.reduce(
         (sum,row)=>sum+Number(row.hours||0),
