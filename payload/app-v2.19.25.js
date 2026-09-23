@@ -1361,6 +1361,7 @@ disciplinaMacroMap = dm.data || [];
     fillProjectStructureSelects();
     renderActivityAreaCheckboxes("activityAreasCheckboxes");
     refreshEntryFlow("entry");
+    updateActivityMacroPreviewByDiscipline();
   }
 
   function setInitialDates() {
@@ -5356,17 +5357,17 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
 
   function updateActivityMacroPreviewByDiscipline(){
 
-    const field=$("activityMacroPreview");
-    if(!field)return;
+    const field = $("activityMacroPreview");
+    if(!field) return;
 
-    const discipline=String($("activityDiscipline")?.value||"").trim();
+    const discipline = String($("activityDiscipline")?.value || "").trim();
 
     if(!discipline){
-      field.value="";
+      field.value = "";
       return;
     }
 
-    const map=(disciplinaMacroMap||[]).find(item =>
+    const map = (disciplinaMacroMap || []).find(item =>
       normalizeText(
         item.disciplina ||
         item.discipline_name ||
@@ -5376,17 +5377,15 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
       ) === normalizeText(discipline)
     );
 
-    if(!map){
-      field.value="";
-      return;
-    }
+    const macroId = map?.macro_atividade_id;
 
-    const macro=(macroActivities||[]).find(m =>
-      String(m.id)===String(map.macro_atividade_id)
+    const macro = (macroActivities || []).find(m =>
+      String(m.id) === String(macroId)
     );
 
-    field.value=macro?.nome || "";
-}
+    field.value = macro?.nome || "";
+  }
+
   function activityCodeSequence(disciplineName){
     const discipline=String(disciplineName||"").trim();
     if(!discipline)return null;
