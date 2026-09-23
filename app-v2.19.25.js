@@ -774,11 +774,13 @@ function activityMacro(activityOrId){
     for (const result of [p,pr,ac,mac,dm,ho]) {
   if (result.error) throw result.error;
 }
-        "Não foi possível carregar todas as áreas vinculadas às atividades. " +
-        "Execute o SQL obrigatório da versão 2.18.3 no Supabase."
-      );
-    }
 
+if(aal.error){
+  throw new Error(
+    "Não foi possível carregar todas as áreas vinculadas às atividades. " +
+    "Execute o SQL obrigatório da versão 2.18.3 no Supabase."
+  );
+}
     for (const result of [wa,ms,mo,ro,pt,pm,pro,prm,pri,prim]) {
       if (result.error) {
         throw new Error(
