@@ -5356,30 +5356,36 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
 
   function updateActivityMacroPreviewByDiscipline(){
 
-  const field = $("activityMacroPreview");
-  if(!field) return;
+    const field=$("activityMacroPreview");
+    if(!field)return;
 
-  const discipline = $("activityDiscipline")?.value?.trim();
+    const discipline=String($("activityDiscipline")?.value||"").trim();
 
-  if(!discipline){
-    field.value = "";
-    return;
-  }
+    if(!discipline){
+      field.value="";
+      return;
+    }
 
-  const map = (disciplinaMacroMap || []).find(item =>
-    normalizeText(item.disciplina) === normalizeText(discipline)
-  );
+    const map=(disciplinaMacroMap||[]).find(item =>
+      normalizeText(
+        item.disciplina ||
+        item.discipline_name ||
+        item.nome ||
+        item.name ||
+        ""
+      ) === normalizeText(discipline)
+    );
 
-  if(!map){
-    field.value = "";
-    return;
-  }
+    if(!map){
+      field.value="";
+      return;
+    }
 
-  const macro = (macroActivities || []).find(m =>
-    String(m.id) === String(map.macro_atividade_id)
-  );
+    const macro=(macroActivities||[]).find(m =>
+      String(m.id)===String(map.macro_atividade_id)
+    );
 
-  field.value = macro ? macro.nome : "";
+    field.value=macro?.nome || "";
 }
   function activityCodeSequence(disciplineName){
     const discipline=String(disciplineName||"").trim();
