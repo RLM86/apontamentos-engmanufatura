@@ -507,14 +507,17 @@ let macroActivities = [];
     return activities.find(a => a.id === id)?.discipline_name || "—";
   }
 function activityMacro(id){
-  const activity = activities.find(a => a.id === id);
+  if(!id || !Array.isArray(activities)) return "";
+
+  const activity = activities.find(a => a && a.id === id);
+
   if(!activity || !activity.macro_atividade_id) return "";
 
-  const macro = macroActivities.find(
-    m => m.id === activity.macro_atividade_id
+  const macro = (macroActivities || []).find(
+    m => m && m.id === activity.macro_atividade_id
   );
 
-  return macro ? macro.nome : "";
+  return macro?.nome || "";
 }
     function areaName(code) {
     return workAreas.find(area => area.code === code)?.name || "—";
