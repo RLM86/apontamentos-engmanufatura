@@ -5381,6 +5381,9 @@ String(x.hours).replace(".",","),x.details,statusLabel(x.status)])];
     if(!field) return;
 
     const discipline = String($("activityDiscipline")?.value || "").trim();
+console.log("DISCIPLINA SELECIONADA:", discipline);
+console.log("MAPA:", disciplinaMacroMap);
+console.log("MACROS:", macroActivities);
 
     if(!discipline){
       field.value = "";
