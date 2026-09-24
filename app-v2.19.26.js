@@ -786,14 +786,24 @@ function activityMacro(activityOrId){
       );
     }
 
-    for (const result of [wa,ms,mo,ro,pt,pm,pro,prm,pri,prim]) {
-      if (result.error) {
-        throw new Error(
-          "Estrutura Projeto > Sala > Módulo não instalada. " +
-          "Execute ATUALIZAR_BANCO_v2.16_SALAS_MULTIPLAS_PARTES_MODULO.sql no Supabase."
-        );
-      }
-    }
+   for (const result of [p,pr,ac,ho]) {
+  if (result.error) throw result.error;
+}
+
+for (const result of [mac, dm]) {
+  if (result.error) {
+    throw result.error;
+  }
+}
+
+for (const result of [wa,ms,mo,ro,pt,pm,pro,prm,pri,prim]) {
+  if (result.error) {
+    throw new Error(
+      "Estrutura Projeto > Sala > Módulo não instalada. " +
+      "Execute ATUALIZAR_BANCO_v2.16_SALAS_MULTIPLAS_PARTES_MODULO.sql no Supabase."
+    );
+  }
+}
     profiles=p.data||[];
     projects=pr.data||[];
     activities=(ac.data||[]).map(activity=>({
@@ -802,6 +812,8 @@ function activityMacro(activityOrId){
   observation_requirement:normalizeObservationRequirement(activity.observation_requirement),
   macro_atividade_id: activity.macro_atividade_id
 }));
+console.log("MAC RAW:", mac);
+console.log("DM RAW:", dm);
 macroActivities = (mac.data || []).map(macro => ({...macro, id:Number(macro.id)}));
     disciplinaMacroMap = dm.data || [];
     console.info("v2.19.26 - macros:", macroActivities.length, "mapa:", disciplinaMacroMap.length);
