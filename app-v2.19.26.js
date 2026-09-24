@@ -31,15 +31,7 @@ const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
     }
   }
 });
-  //const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
-   // auth: {
-      //detectSessionInUrl: true,
-      //persistSession: true,
-      //autoRefreshToken: true,
-      //flowType: "pkce"
-    }
-  });
-console.log("SUPABASE URL:", cfg.supabaseUrl);
+  console.log("SUPABASE URL:", cfg.supabaseUrl);
 console.log("SUPABASE KEY:", cfg.supabaseAnonKey?.substring(0,30));
   let session = null;
   let me = null;
