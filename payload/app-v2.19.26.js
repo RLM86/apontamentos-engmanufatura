@@ -24,11 +24,6 @@ const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
     persistSession: true,
     autoRefreshToken: true,
     flowType: "pkce"
-  },
-  global:{
-    headers:{
-      Authorization:"Bearer "+cfg.supabaseAnonKey
-    }
   }
 });
   console.log("SUPABASE URL:", cfg.supabaseUrl);
