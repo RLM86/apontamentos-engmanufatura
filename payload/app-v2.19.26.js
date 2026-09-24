@@ -756,8 +756,10 @@ function activityMacro(activityOrId){
       sb.from("profiles").select("*").order("full_name"),
       loadAllProjects(),
       sb.from("activities").select("*").order("name"),
-sb.from("macro_atividades").select("*").order("ordem"),
+      sb.from("macro_atividades").select("*"),
       sb.from("disciplina_macro_map").select("*"),
+      //sb.from("macro_atividades").select("*").order("ordem"),
+      //sb.from("disciplina_macro_map").select("*"),
       sb.from("holidays").select("*").order("holiday_date"),
       sb.from("work_areas").select("*").order("order_index"),
       sb.from("manufacturing_sectors").select("*").order("order_index"),
@@ -771,6 +773,8 @@ sb.from("macro_atividades").select("*").order("ordem"),
       sb.from("project_room_instances").select("*").order("order_index"),
       sb.from("project_room_instance_modules").select("*").order("order_index")
     ]);
+    console.log("MAC RETORNO:", mac);
+    console.log("DM RETORNO:", dm);
     for (const result of [p,pr,ac,ho]) if (result.error) throw result.error;
     if(aal.error){
       throw new Error(
