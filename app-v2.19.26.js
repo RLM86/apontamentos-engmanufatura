@@ -26,8 +26,10 @@ const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
     flowType: "pkce"
   }
 });
-  console.log("SUPABASE URL:", cfg.supabaseUrl);
+
+console.log("SUPABASE URL:", cfg.supabaseUrl);
 console.log("SUPABASE KEY:", cfg.supabaseAnonKey?.substring(0,30));
+
   let session = null;
   let me = null;
   let profiles = [];
