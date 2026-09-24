@@ -18,13 +18,25 @@
     setupScreen.hidden = false;
     return;
   }
-
-  const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
-    auth: {
-      detectSessionInUrl: true,
-      persistSession: true,
-      autoRefreshToken: true,
-      flowType: "pkce"
+const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+  auth: {
+    detectSessionInUrl: true,
+    persistSession: true,
+    autoRefreshToken: true,
+    flowType: "pkce"
+  },
+  global:{
+    headers:{
+      Authorization:"Bearer "+cfg.supabaseAnonKey
+    }
+  }
+});
+  //const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+   // auth: {
+      //detectSessionInUrl: true,
+      //persistSession: true,
+      //autoRefreshToken: true,
+      //flowType: "pkce"
     }
   });
 console.log("SUPABASE URL:", cfg.supabaseUrl);
