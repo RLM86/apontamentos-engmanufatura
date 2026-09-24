@@ -26,6 +26,7 @@ const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
     flowType: "pkce"
   }
 });
+window.TESTE_SB = sb;
 
 console.log("SUPABASE URL:", cfg.supabaseUrl);
 console.log("SUPABASE KEY:", cfg.supabaseAnonKey?.substring(0,30));
